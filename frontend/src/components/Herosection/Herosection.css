@@ -1,0 +1,8 @@
+* {
+  margin: 0;
+}
+.main {
+  width: 100vw;
+  height: 96px;
+  background-color: antiquewhite;
+}
