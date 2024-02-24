@@ -1,6 +1,6 @@
 import React from "react";
 import logo_dark from "../../assets/logo.svg";
-import Sign_image from "../../assets/signuppic.jpeg";
+import Sign_image from "../../assets/signuppic.jpg";
 import "./Signup.css";
 function Signup() {
   return (

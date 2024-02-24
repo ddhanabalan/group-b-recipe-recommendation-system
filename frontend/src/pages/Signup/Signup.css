@@ -44,34 +44,19 @@
 
 .form-input {
   width: 100%;
-  margin-bottom: 15px;
+
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
 }
-.form-input :focus {
-  width: 100%;
-  margin-bottom: 15px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-input[type="submit"]:focus {
-  background-color: yellow;
-  outline: none;
-}
+
 .form-button {
   width: 100%;
   display: flex;
   margin-top: 10px;
   border-radius: 5px;
 }
-.form-button :focus {
-  width: 100%;
-  display: flex;
-  margin-top: 10px;
-  border-radius: 5px;
-}
+
 .signup-button {
   width: 100%;
 
