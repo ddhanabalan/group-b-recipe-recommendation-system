@@ -1,0 +1,23 @@
+.item {
+  width: 350px;
+  border: 0.5px solid black;
+}
+/*.item p {
+  margin: 6px 0px;
+}
+.items-details {
+  display: flex;
+  gap: 20px;
+}
+.mins {
+  font-size: 18px;
+  font-weight: 600px;
+}
+.calories {
+  font-size: 18px;
+  font-weight: 600px;
+}*/
+.item:hover {
+  transform: scale(1.05);
+  transition: 0.6s;
+}
