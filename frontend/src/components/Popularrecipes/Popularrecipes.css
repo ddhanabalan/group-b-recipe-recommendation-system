@@ -1,3 +1,14 @@
-.main {
-  height: 40px;
+.popular {
+  height: 90vh;
+}
+.popular h1 {
+  color: black;
+  font-size: 36px;
+  font-family: serif;
+  padding-left: 70px;
+  padding-top: 40px;
+}
+.popularitem {
+  margin-top: 50px;
+  gap: 30px;
 }
