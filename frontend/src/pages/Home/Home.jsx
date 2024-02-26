@@ -1,7 +1,7 @@
 import React from "react";
 import Navbar from "../../components/Navbar/Navbar";
 import Herosection from "../../components/Herosection/Herosection";
-//import Popularrecipes from "../../components/Popularrecipes/Popularrecipes";
+import Popularrecipes from "../../components/Popularrecipes/Popularrecipes";
 //import Topcategories from "../../components/Topcategories/Topcategories";
 //import Newrecipes from "../../components/Newrecipes/Newrecipes";
 //import Whychooseus from "../../components/Whychooseus/Whychooseus";
@@ -13,8 +13,8 @@ function Home() {
     <div>
       <Navbar />
       <Herosection />
-      {/*<Popularrecipes />
-      <Topcategories />
+      <Popularrecipes />
+      {/*<Topcategories />
       <Newrecipes />
       <Whychooseus />
       <Joinnow />
