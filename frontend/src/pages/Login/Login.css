@@ -37,6 +37,7 @@
   color: #e49963;
   display: flex;
   align-items: center;
+  margin-left: 25px;
 }
 .login-header {
   font-size: 35px;
@@ -45,76 +46,53 @@
 
 .form-input {
   width: 100%;
-  margin-bottom: 15px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding-right: 0%;
-  .input[type="password"] {
-    margin-top: 5px;
-  }
-}
-.form-input:focus {
-  width: 100%;
-  margin-bottom: 15px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding-right: 0%;
-  .input[type="password"] {
-    margin-top: 5px;
-  }
-}
 
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding-right: 0%;
+}
+input[type="password"] {
+  margin-bottom: 5px;
+  margin-top: 5px;
+}
+input[type="text"] {
+  margin-bottom: 5px;
+  margin-top: 5px;
+}
 .form-options {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
+  justify-content: right;
+  margin-bottom: 5px;
 }
 
-.remember-me {
-  font-size: 12px;
-  color: black;
-  display: flex;
-  align-items: center;
-}
-.checkbox-button {
-  margin-right: 10px;
-}
 .forget-password {
   font-size: 12px;
   color: #e49963;
   text-decoration: none;
   transition: color 0.3s ease;
-  margin-bottom: 10px;
-  margin-top: 10px;
+  margin-bottom: 5px;
+  margin-top: 5px;
+  display: flex;
 }
 
 .forget-password:hover {
   color: #d26619;
 }
 
-.form-button {
-  width: 100%;
-  display: flex;
-  margin-top: 10px;
-  border-radius: 5px;
-  padding-right: 0;
-}
 .login-button {
   width: 100%;
-
   background-color: #e49963;
+  padding: 10px;
+  font-size: larger;
   color: #fff;
-  border: none;
-  cursor: pointer;
   text-align: center;
-  font-size: medium;
+  margin-left: 10px;
+  border: none;
 }
 
 .signup-link {
-  margin-top: 10px;
   font-size: 15px;
   color: #555;
 }

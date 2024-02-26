@@ -20,6 +20,7 @@ function Login() {
     e.preventDefault();
 
     setErrors(Validation(values));
+    return false;
   }
   return (
     <div className="login-container">
@@ -33,7 +34,14 @@ function Login() {
           <h2 className="login-header">Log in to your Account</h2>
         </div>
 
-        <form onSubmit={handleSubmit}>
+        <form
+          className="form-input"
+          onSubmit={handleSubmit}
+          style={{
+            width: "50%",
+            border: "none",
+          }}
+        >
           <input
             type="text"
             placeholder="Username"
@@ -57,16 +65,12 @@ function Login() {
             <p style={{ color: "red", fontSize: "13px" }}>{errors.password}</p>
           )}
           <div className="form-options">
-            <label className="remember-me">
-              <input type="checkbox" className="checkbox-button" /> Remember me
-            </label>
             <p className="forget-password">Forget Password ?</p>
           </div>
-          <div className="form-button">
-            <button type="submit" className="login-button">
-              Login
-            </button>
-          </div>
+
+          <button type="submit" className="login-button">
+            Login
+          </button>
         </form>
         <p className="signup-link">
           Don't have an account? <a href="/Signup">Create an account</a>
