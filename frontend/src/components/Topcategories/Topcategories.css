@@ -1,5 +1,35 @@
-.main {
-  height: 40px;
-  background-color: #ffdfc7;
+.top-categories-carousel {
+  height: 50vh;
+  background-color: #ffefe3;
   width: 100%;
+}
+.top-categories-carousel h1 {
+  color: black;
+  font-size: 36px;
+  font-family: serif;
+  display: flex;
+  justify-content: center;
+  font-weight: lighter;
+  padding-top: 30px;
+}
+.cat-slider {
+  margin-right: 100px;
+  margin-left: 100px;
+  margin-top: 50px;
+}
+.category-box {
+  border: 1.5px solid black;
+  border-radius: 8px;
+  padding: 10px;
+  width: 250px;
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.category-box p {
+  font-weight: bolder;
+}
+.slick-slide {
+  margin: 0 10px;
 }
