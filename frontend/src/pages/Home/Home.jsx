@@ -2,7 +2,7 @@ import React from "react";
 import Navbar from "../../components/Navbar/Navbar";
 import Herosection from "../../components/Herosection/Herosection";
 import Popularrecipes from "../../components/Popularrecipes/Popularrecipes";
-//import Topcategories from "../../components/Topcategories/Topcategories";
+import Topcategories from "../../components/Topcategories/Topcategories";
 //import Newrecipes from "../../components/Newrecipes/Newrecipes";
 //import Whychooseus from "../../components/Whychooseus/Whychooseus";
 //import Joinnow from "../../components/Joinnow/Joinnow";
@@ -14,8 +14,8 @@ function Home() {
       <Navbar />
       <Herosection />
       <Popularrecipes />
-      {/*<Topcategories />
-      <Newrecipes />
+      <Topcategories />
+      {/*<Newrecipes />
       <Whychooseus />
       <Joinnow />
       <Customersays />
