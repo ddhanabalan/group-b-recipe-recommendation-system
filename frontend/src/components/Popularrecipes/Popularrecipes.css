@@ -1,5 +1,6 @@
 .popular {
-  height: 90vh;
+  height: 80vh;
+  gap: 10px;
 }
 .popular h1 {
   color: black;
@@ -7,8 +8,17 @@
   font-family: serif;
   padding-left: 70px;
   padding-top: 40px;
+  padding-bottom: 30px;
 }
-.popularitem {
-  margin-top: 50px;
-  gap: 30px;
+
+.popular-slider {
+  margin-left: 70px;
+  margin-right: 70px;
+}
+.slick-slide {
+  margin: 0 50px;
+}
+.slick-prev::before,
+.slick-next::before {
+  color: black !important;
 }
