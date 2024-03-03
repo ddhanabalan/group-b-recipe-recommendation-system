@@ -1,5 +1,5 @@
 .top-categories-carousel {
-  height: 50vh;
+  height: 45vh;
   background-color: #ffefe3;
   width: 100%;
 }
@@ -27,8 +27,9 @@
   justify-content: center;
   align-items: center;
 }
+
 .category-box p {
-  font-weight: bolder;
+  font-weight: bold;
 }
 .slick-slide {
   margin: 0 10px;
