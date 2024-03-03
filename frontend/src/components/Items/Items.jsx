@@ -22,7 +22,7 @@ const Items = (props) => {
         </div>
       </div>
       <div className="item-rating">
-        <b>{props.ratings}</b> Rating
+        <b>{props.ratings} </b> Rating
       </div>
     </div>
   );
