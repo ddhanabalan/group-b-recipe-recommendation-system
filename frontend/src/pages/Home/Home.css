@@ -1,0 +1,80 @@
+/*hero section*/
+.hero {
+  height: 100vh;
+  width: 100%;
+  background-image: url(../../assets/hero.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.left-heading {
+  padding-left: 10%;
+  padding-top: 13%;
+  font-size: 33px;
+}
+.left-intro {
+  padding-left: 10%;
+  padding-right: 60%;
+  padding-top: 15px;
+}
+.btn {
+  padding-left: 10%;
+  padding-top: 15px;
+}
+.button {
+  width: 310px;
+  height: 50px;
+  letter-spacing: 1px;
+
+  color: white;
+  border: 100px;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 22px;
+  font-weight: 400;
+  border: 2px solid #e7823a;
+  background-color: #e49963;
+  margin-top: 0px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.btn a {
+  text-decoration: none;
+}
+
+.popularrecipe {
+  height: 80vh;
+  gap: 10px;
+}
+.popularrecipe h1 {
+  color: black;
+  font-size: 36px;
+  font-family: serif;
+  padding-left: 70px;
+  padding-top: 40px;
+  padding-bottom: 30px;
+}
+/*new recipe*/
+.newrecipe {
+  height: 80vh;
+  gap: 10px;
+}
+.newrecipe h1 {
+  color: black;
+  font-size: 36px;
+  font-weight: lighter;
+  font-family: serif;
+  padding-left: 70px;
+  padding-top: 40px;
+  padding-bottom: 30px;
+}
+
+.new-slider {
+  margin-left: 70px;
+  margin-right: 70px;
+}
+
+.rec.rec-arrow:disabled {
+  visibility: hidden;
+}
