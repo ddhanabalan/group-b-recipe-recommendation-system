@@ -1,5 +1,43 @@
-.main {
-  height: 30px;
+.footer {
+  height: 35vh;
   width: 100%;
-  background-color: black;
+  background-color: rgb(33, 32, 32);
+  color: white;
+}
+.footer-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 40px;
+  padding-bottom: 10px;
+}
+.footer-icons {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 30px;
+}
+.lang {
+  padding-left: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.lang button {
+  width: 150px;
+  height: 35px;
+  border-radius: 30px;
+  font-size: 22px;
+  font-weight: 200;
+  background: none;
+  color: white;
+  font-family: serif;
+  border: 0.2px solid white;
+}
+.footer-copyright {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 20px;
+  color: rgb(244, 240, 240);
+  font-weight: 200;
 }
