@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
+import Herosection from "../../components/Herosection/Herosection";
 import Topcategories from "../../components/Topcategories/Topcategories";
 import Footer from "../../components/Footer/Footer";
 import "../../pages/Home/Home.css";
@@ -85,20 +86,7 @@ function Home() {
   return (
     <div>
       <Navbar />
-      {/*Hero section*/}
-      <div className="hero">
-        <div className="left-heading">
-          <h1>Hello,</h1>
-          <h1>Are you Hungry?</h1>
-          <p>
-            Providing various easy-to-follow recipes from all over the
-            world.Learn how to make your cooking tastier and easier with us!
-          </p>
-          <Link to="/recipe">
-            <button active={true}>Explore All Recipes</button>
-          </Link>
-        </div>
-      </div>
+      <Herosection />
       {/*popular recipes section*/}
       <div className="popularrecipe">
         <h1>Popular Recipes</h1>
