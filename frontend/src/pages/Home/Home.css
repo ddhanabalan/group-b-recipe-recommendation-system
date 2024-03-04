@@ -16,40 +16,33 @@
   left: 0px;
   background-color: rgba(0, 0, 0, 0.1);
 }
-
 .left-heading {
-  padding-left: 10%;
-  padding-top: 13%;
-  font-size: 33px;
-}
-.left-intro {
-  padding-left: 10%;
-  padding-right: 60%;
-  padding-top: 15px;
-}
-.btn {
-  padding-left: 10%;
-  padding-top: 15px;
-}
-.button {
-  width: 310px;
-  height: 50px;
-  letter-spacing: 1px;
-  color: white;
-  border: 100px;
-  align-items: center;
-  justify-content: center;
   display: flex;
-  font-size: 22px;
-  font-weight: 400;
-  border: 2px solid #e7823a;
-  background-color: #e49963;
-  margin-top: 0px;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 250px;
+  padding-left: 130px;
 }
-
-.btn a {
-  text-decoration: none;
+.left-heading h1 {
+  font-size: 50px;
+  font-family: serif;
+}
+.left-heading p {
+  padding-top: 10px;
+  padding-right: 65%;
+  padding-bottom: 10px;
+}
+.left-heading button {
+  width: 250px;
+  height: 50px;
+  border: 2px solid #e06711;
+  background: #e19660;
+  color: white;
+  font-size: 20px;
+  font-weight: 400;
+  margin-top: 10px;
+  cursor: pointer;
 }
 /*popular recipe*/
 .popularrecipe {
