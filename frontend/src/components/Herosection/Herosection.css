@@ -1,0 +1,46 @@
+/*hero section*/
+.hero {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  background-image: url(../../assets/hero.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.left-heading {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 250px;
+  padding-left: 130px;
+}
+.left-heading h1 {
+  font-size: 50px;
+  font-family: serif;
+}
+.left-heading p {
+  padding-top: 10px;
+  padding-right: 65%;
+  padding-bottom: 10px;
+}
+.left-heading button {
+  width: 250px;
+  height: 50px;
+  border: 2px solid #e06711;
+  background: #e19660;
+  color: white;
+  font-size: 20px;
+  font-weight: 400;
+  margin-top: 10px;
+  cursor: pointer;
+}
