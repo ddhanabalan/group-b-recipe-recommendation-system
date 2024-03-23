@@ -1,12 +1,12 @@
 import React from "react";
-import Navbar from "../../components/Navbar/Navbar";
+import Navbar from "../../components/navbar/Navbar";
 import men1 from "../../assets/men1.jpg";
 import men2 from "../../assets/men2.jpg";
 import female1 from "../../assets/female1.jpg";
 import female2 from "../../assets/female2.jpg";
 import aboutpic from "../../assets/aboutpic.jpg";
-import "./About.css";
-import Footer from "../../components/Footer/Footer";
+import "../../styles/About.css";
+import Footer from "../../components/footer/Footer";
 function About() {
   return (
     <div>
@@ -20,11 +20,16 @@ function About() {
               <h2>WE ARE FLAVORFUSE</h2>
               <p>
                 Welcome to FlavorFuse, where culinary exploration meets
-                personalized perfection! Our recipe recommendation system is the
-                heart of our culinary hub, designed to elevate your cooking
-                experience to new heights.We believe in the joy of discovery,
-                and our recommendation system is the compass that guides you
-                through an ever-expanding universe of flavors.
+                personalized perfection!.
+                <br /> Our recipe recommendation system is the heart of our
+                culinary hub, designed to elevate your cooking experience to new
+                heights.We believe in the joy of discovery, and our
+                recommendation system is the compass that guides you through an
+                ever-expanding universe of flavors.
+                <br />
+                At FlavorFuse, we understand that each palate is unique, and our
+                algorithm considers your preferences, and culinary aspirations
+                to curate a tailored selection of recipes just for you.
               </p>
             </div>
             <div className="right">

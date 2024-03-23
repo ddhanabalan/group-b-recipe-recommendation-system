@@ -1,5 +1,5 @@
 import React from "react";
-import "../Navbar/Navbar.css";
+import "../../styles/Navbar.css";
 import logo_dark from "../../assets/logo.svg";
 import { Search } from "@mui/icons-material";
 

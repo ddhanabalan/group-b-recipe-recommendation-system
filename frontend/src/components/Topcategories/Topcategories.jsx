@@ -8,7 +8,7 @@ import { CiFries } from "react-icons/ci";
 import { PiBowlFood } from "react-icons/pi";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import "./Topcategories.css";
+import "../../styles/TopCategories.css";
 const TopRecipeCategoriesCarousel = () => {
   //dummy data
   const recipeCategoriesData = [

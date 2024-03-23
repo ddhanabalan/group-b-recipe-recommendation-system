@@ -44,17 +44,17 @@
   font-family: serif;
   display: flex;
   justify-content: flex-end;
-  padding-top: 120px;
+  padding-top: 130px;
   padding-bottom: 20px;
   font-size: 30px;
 }
 .left p {
+  font-family: serif;
   display: flex;
   justify-content: flex-start;
-  font-size: 15px;
+  font-size: 17px;
   padding-left: 220px;
   font-weight: 400;
-  letter-spacing: 1px;
 }
 .right img {
   height: 500px;
@@ -62,6 +62,8 @@
   object-fit: cover;
   padding: 20px;
   background-color: #ffffff;
+  border: 1px solid #bfbfbf;
+  box-shadow: 10px 10px 10px #aaaaaa;
 }
 
 .about-section2 h1 {
@@ -78,19 +80,24 @@
   align-items: center;
 }
 .person {
-  justify-content: space-between;
-
-  margin: 40px;
+  margin: 50px;
+  margin-top: 50px;
+  padding: 20px;
+  border: 1px solid #bfbfbf;
+  box-shadow: 5px 5px 5px #aaaaaa;
+  border-radius: 10px;
 }
 .person h2 {
   display: flex;
   justify-content: center;
-  font-size: 15px;
-  padding-top: 10px;
+  font-size: 18px;
+  padding-top: 20px;
+  font-weight: 400;
 }
 .person img {
   border-radius: 50%;
   object-fit: scale-down;
-  width: 200px;
-  height: 200px;
+  width: 150px;
+  height: 150px;
+  border: 1px solid #f0a871;
 }

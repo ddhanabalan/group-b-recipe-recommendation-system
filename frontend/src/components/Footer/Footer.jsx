@@ -1,5 +1,5 @@
 import React from "react";
-import "./Footer.css";
+import "../../styles/Footer.css";
 import logo_light from "../../assets/logo_light.svg";
 import { FaFacebook } from "react-icons/fa";
 import { AiFillTwitterCircle } from "react-icons/ai";
