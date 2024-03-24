@@ -84,6 +84,7 @@
 - **URL:** `/authentication/forgot-password/`
 - **Method:** POST
 - **Body:**
+  - `username`: string (required)
   - `email`: string (required)
 
 #### Response
@@ -101,7 +102,7 @@
   - **Content:** 
     ```json
     {
-        "error": "User with provided email does not exist"
+        "error": "User with provided username or email does not exist"
     }
     ```
 

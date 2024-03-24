@@ -47,11 +47,14 @@ class UserLogin(APIView):
 # ForgotPassword view for initiating the password reset process
 class ForgotPassword(APIView):
     def post(self, request):
+        username = request.data.get('username')
         email = request.data.get('email')
         try:
-            user = User.objects.get(email=email)
+            if User.objects.filter(email=email).exists() and User.objects.filter(username=username).exists():
+                user = User.objects.get(username=username)
+            #user = User.objects.get(email=email)
         except User.DoesNotExist:
-            return Response({"error": "User with provided email does not exist"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "User with provided username or email does not exist"}, status=status.HTTP_404_NOT_FOUND)
         
         uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
         token = custom_token_generator.make_token(user)

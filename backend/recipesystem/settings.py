@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -74,13 +77,20 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.office365.com'
+# EMAIL_PORT = 587  # For TLS encryption
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'flavorfusebot@hotmail.com'  # Your Outlook.com email address
+# EMAIL_HOST_PASSWORD = 'f123f456'  # Your Outlook.com app password
+# DEFAULT_FROM_EMAIL = 'flavorfusebot@hotmail.com'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.office365.com'
-EMAIL_PORT = 587  # For TLS encryption
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT'))  # Convert to integer
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'flavorfusebot@hotmail.com'  # Your Outlook.com email address
-EMAIL_HOST_PASSWORD = 'f123f456'  # Your Outlook.com app password
-DEFAULT_FROM_EMAIL = 'flavorfusebot@hotmail.com'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -121,11 +131,11 @@ WSGI_APPLICATION = 'recipesystem.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'recipesystem',
-        'USER': 'root',
-        'PASSWORD': '123456',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
     }
 }
 
