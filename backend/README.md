@@ -1,7 +1,5 @@
 # group-b-recipe-recommendation-system-backend
 
-Short description or introduction of your project goes here.
-
 ## Table of Contents
 
 - [API Endpoints](#api-endpoints)
