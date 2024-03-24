@@ -135,7 +135,5 @@
 
 ## Dependencies
 
-List all the external dependencies (libraries, frameworks) used in your project along with their versions.
-
 - Django
 - Django REST Framework
