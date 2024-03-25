@@ -1,7 +1,7 @@
 import React from "react";
 import Carousel, { consts } from "react-elastic-carousel";
-import Item from "../Items/Items";
-import "./Carouselcomponent.css";
+import Item from "../items/Items";
+import "../../styles/CarouselComponent.css";
 import { TfiArrowCircleLeft } from "react-icons/tfi";
 import { TfiArrowCircleRight } from "react-icons/tfi";
 function myArrow({ type, onClick, isEdge }) {
@@ -22,7 +22,7 @@ function myArrow({ type, onClick, isEdge }) {
     </button>
   );
 }
-const Carouselcomponent = ({ data }) => {
+const CarouselComponent = ({ data }) => {
   return (
     <Carousel
       itemsToShow={3}
@@ -44,4 +44,4 @@ const Carouselcomponent = ({ data }) => {
     </Carousel>
   );
 };
-export default Carouselcomponent;
+export default CarouselComponent;

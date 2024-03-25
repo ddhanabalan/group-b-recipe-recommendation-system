@@ -1,0 +1,34 @@
+.ratingContainer {
+  margin-right: 370px;
+
+  margin-left: 390px;
+  margin-top: 80px;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+.ratingContainer_review {
+  display: flex;
+  flex-direction: row;
+
+  padding-left: 20px;
+}
+.ratingContainer_review textarea {
+  width: 670px;
+  height: 100px;
+  margin-left: 10px;
+}
+.ratingContainer-bottom {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-left: 30px;
+  margin-right: 25px;
+  margin-top: 30px;
+}
+.ratingContainer-star {
+  font-size: 20px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+}

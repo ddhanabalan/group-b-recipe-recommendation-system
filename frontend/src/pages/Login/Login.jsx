@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import Validation from "./Validation";
 import logo_dark from "../../assets/logo.svg";
 import login_image from "../../assets/loginpic.jpeg";
-import "./Login.css";
+import "../../styles/Login.css";
+import Validation from "./validation";
 function Login() {
   const [values, setValues] = useState({
     name: "",
