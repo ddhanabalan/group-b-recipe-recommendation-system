@@ -1,8 +1,49 @@
-import React from "react";
+import React, { useState } from "react";
 import logo_dark from "../../assets/logo.svg";
 import Sign_image from "../../assets/signuppic.jpg";
 import "../../styles/Signup.css";
 function Signup() {
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log("Form Data:", formData);
+
+    try {
+      const response = await fetch("http://localhost:8000/signup/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Signup successful:", data);
+        // You can redirect the user or show a success message here
+      } else {
+        const errorData = await response.json();
+        console.error("Signup failed:", errorData);
+        // Display error message to the user
+      }
+    } catch (error) {
+      console.error("Error during signup:", error);
+      // Handle network or other errors
+    }
+  };
   return (
     <div className="sign-container">
       <div className="login-form-container">
@@ -13,23 +54,32 @@ function Signup() {
         </div>
         <h2 className="sign-header">Create Your Account</h2>
 
-        <form className="sign-form">
+        <form className="sign-form" onSubmit={handleSubmit}>
           <input
             type="text"
+            name="username"
             placeholder="Username"
             className="form-input"
             size={4}
+            value={formData.username}
+            onChange={handleInputChange}
           />
           <input
             type="email"
+            name="email"
             placeholder="Email"
             className="form-input"
             size={4}
+            value={formData.email}
+            onChange={handleInputChange}
           />
           <input
             type="password"
+            name="password"
             placeholder="Password"
             className="form-input"
+            value={formData.password}
+            onChange={handleInputChange}
           />
           <div className="form-button">
             <button type="submit" className="signup-button">
@@ -38,7 +88,7 @@ function Signup() {
           </div>
         </form>
         <p className="login-link">
-          Already have an account ? <a href="/Login">Login</a>
+          Already have an account ? <a href="/login">Login</a>
         </p>
       </div>
       <div className="image-container">
