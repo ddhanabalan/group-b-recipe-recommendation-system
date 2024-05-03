@@ -3,6 +3,8 @@ import logo_dark from "../../assets/logo.svg";
 import login_image from "../../assets/loginpic.jpg";
 import "../../styles/Login.css";
 import Validation from "./Validation";
+import axios from "axios"; // Import Axios
+
 function Login() {
   const [values, setValues] = useState({
     name: "",
@@ -16,12 +18,28 @@ function Login() {
       [e.target.name]: e.target.value,
     });
   }
-  function handleSubmit(e) {
+
+  async function handleSubmit(e) {
     e.preventDefault();
 
     setErrors(Validation(values));
-    return false;
+    if (Object.keys(errors).length === 0) {
+      try {
+        const response = await axios.post("http://localhost:8000/login/", {
+          username: values.name,
+          password: values.password,
+        });
+        // successful login
+        console.log(response.data);
+        window.location.href = "/home";
+      } catch (error) {
+        // Handle login error
+        console.error("Login error:", error);
+        setErrors({ invalidCredentials: "Invalid username or password" });
+      }
+    }
   }
+
   return (
     <div className="login-container">
       <div className="login-form-container">
@@ -64,8 +82,15 @@ function Login() {
                 {errors.password}
               </p>
             )}
+            {errors.invalidCredentials && (
+              <p style={{ color: "red", fontSize: "13px" }}>
+                {errors.invalidCredentials}
+              </p>
+            )}
             <div className="form-options">
-              <p className="forget-password">Forget Password ?</p>
+              <p className="forget-password">
+                <a href="/ForgotPassword">Forget Password ?</a>
+              </p>
             </div>
 
             <button type="submit" className="login-button">

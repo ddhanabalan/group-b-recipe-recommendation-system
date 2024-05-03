@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
@@ -9,8 +8,6 @@ import { IoMdArrowRoundBack } from "react-icons/io";
 
 const AddNewRecipe = () => {
   const handleGoBack = () => {
-    // Navigate back to the added recipe page
-    // You can replace the URL with the actual URL of your added recipe page
     window.location.href = "/user/addedrecipes";
   };
 

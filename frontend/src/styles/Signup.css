@@ -60,7 +60,6 @@
 
 .signup-button {
   width: 100%;
-
   background-color: #e49963;
   color: #fff;
   border: none;
@@ -97,4 +96,17 @@
   color: #fff;
   border: none;
   cursor: pointer;
+}
+
+.error-message {
+  color: red;
+  font-size: 11px;
+  margin-top: 5px;
+  background-color: rgb(243, 12, 12, 0.2);
+
+  width: 100%;
+  padding-right: 7.5px;
+  padding-left: 8px;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }

@@ -47,14 +47,14 @@
 }
 
 .form-input-name {
-  width: 300px;
+  width: 325px;
 
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
 }
 .form-input-password {
-  width: 300px;
+  width: 325px;
   margin-top: 10px;
   padding: 10px;
   border: 1px solid #ccc;
@@ -67,7 +67,7 @@
   margin-bottom: 5px;
 }
 
-.forget-password {
+.forget-password a {
   font-size: 13px;
   color: #e49963;
   text-decoration: none;
@@ -78,7 +78,7 @@
   display: flex;
 }
 
-.forget-password:hover {
+.forget-password a:hover {
   color: #d26619;
 }
 

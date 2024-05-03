@@ -1,13 +1,17 @@
 import React, { useState } from "react";
 import logo_dark from "../../assets/logo.svg";
 import Sign_image from "../../assets/signuppic.jpg";
+import Swal from "sweetalert2";
 import "../../styles/Signup.css";
+
 function Signup() {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
   });
+
+  const [passwordError, setPasswordError] = useState("");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -17,9 +21,21 @@ function Signup() {
     }));
   };
 
+  const validatePassword = (password) => {
+    const regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{6,}$/;
+    return regex.test(password);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Form Data:", formData);
+
+    if (!validatePassword(formData.password)) {
+      setPasswordError(
+        "Password must be at least 6 characters long, with at least one uppercase letter, one lowercase letter, one special character, and one digit."
+      );
+      return;
+    }
 
     try {
       const response = await fetch("http://localhost:8000/signup/", {
@@ -33,17 +49,23 @@ function Signup() {
       if (response.ok) {
         const data = await response.json();
         console.log("Signup successful:", data);
-        // You can redirect the user or show a success message here
+
+        window.location.href = "/login";
+
+        Swal.fire({
+          icon: "success",
+          title: "Registration Successful!",
+          text: "You can now login with your credentials.",
+        });
       } else {
         const errorData = await response.json();
         console.error("Signup failed:", errorData);
-        // Display error message to the user
       }
     } catch (error) {
       console.error("Error during signup:", error);
-      // Handle network or other errors
     }
   };
+
   return (
     <div className="sign-container">
       <div className="login-form-container">
@@ -81,6 +103,12 @@ function Signup() {
             value={formData.password}
             onChange={handleInputChange}
           />
+          {passwordError && (
+            <p className="error-message">
+              Password must be at least 6 characters long and contain <br />
+              digits, special characters, capital letters, and small letters.
+            </p>
+          )}
           <div className="form-button">
             <button type="submit" className="signup-button">
               SIGN UP
