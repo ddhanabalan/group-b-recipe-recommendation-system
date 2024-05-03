@@ -66,6 +66,15 @@ span {
   padding: 0 20px;
   border-radius: 20px;
 }
+.saved_recipe {
+  margin-right: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  background-color: #e6b490;
+  border: none;
+  padding: 0 20px;
+  border-radius: 20px;
+}
 .share {
   font-size: 16px;
   font-weight: 500;

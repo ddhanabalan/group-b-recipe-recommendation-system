@@ -1,6 +1,6 @@
 import React from "react";
 import Carousel, { consts } from "react-elastic-carousel";
-import Item from "../items/Items";
+import Item from "../Items/Items";
 import "../../styles/CarouselComponent.css";
 import { TfiArrowCircleLeft } from "react-icons/tfi";
 import { TfiArrowCircleRight } from "react-icons/tfi";

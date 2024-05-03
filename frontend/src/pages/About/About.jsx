@@ -1,12 +1,12 @@
 import React from "react";
-import Navbar from "../../components/navbar/Navbar";
+import Navbar from "../../components/Navbar/Navbar";
 import men1 from "../../assets/men1.jpg";
 import men2 from "../../assets/men2.jpg";
 import female1 from "../../assets/female1.jpg";
 import female2 from "../../assets/female2.jpg";
 import aboutpic from "../../assets/aboutpic.jpg";
 import "../../styles/About.css";
-import Footer from "../../components/footer/Footer";
+import Footer from "../../components/Footer/Footer";
 function About() {
   return (
     <div>

@@ -8,9 +8,18 @@ function Navbar() {
     <div className="navbar">
       <div className="left">
         <div className="search-bar-container">
-          <input type="text" placeholder="Search" className="search-bar" />
+          <input
+            type="text"
+            placeholder="Type to search"
+            className="search-bar"
+          />
           <Search
-            style={{ color: "gray", fontSize: 16, position: "absolute" }}
+            style={{
+              color: "gray",
+              fontSize: 16,
+              position: "absolute",
+              paddingLeft: 10,
+            }}
           />
         </div>
       </div>

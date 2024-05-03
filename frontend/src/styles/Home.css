@@ -42,7 +42,7 @@
 }
 .whychooseus h1 {
   font-weight: 300;
-  font-size: 36px;
+  font-size: 38px;
   font-family: serif;
   justify-content: center;
   display: flex;
@@ -51,7 +51,7 @@
 .features {
   display: flex;
   align-items: center;
-  margin-top: 40px;
+  margin-top: 20px;
   justify-content: center;
   padding-left: 90px;
 }
@@ -63,16 +63,16 @@
 }
 .features h2 {
   font-family: serif;
-  font-size: x-large;
+  font-size: 28px;
   padding-bottom: 10px;
 }
 .features p {
-  font-size: small;
+  font-size: medium;
 }
 /* joinnow section */
 .joinnow {
   height: 50vh;
-  width: 70%;
+  width: 75%;
   display: flex;
   margin: auto;
   margin-top: 60px;
@@ -86,19 +86,19 @@
   justify-content: center;
 }
 .joinnow-left h1 {
-  font-size: 36px;
+  font-size: 38px;
   font-weight: lighter;
   font-family: serif;
   padding-bottom: 10px;
 }
 .joinnow-left h3 {
   font-weight: 200;
-  font-size: 16px;
+  font-size: 18px;
   font-family: serif;
   padding-bottom: 15px;
 }
 .joinnow-left p {
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 300;
 }
 .joinnow-left button {

@@ -1,14 +1,14 @@
-import React, { Fragment } from "react";
-import { Link } from "react-router-dom";
+import React from "react";
 import AdminSideBar from "../../components/admin/AdminSideBar";
 import Navbar from "../../components/Navbar/Navbar";
-const Admin = () => {
+const UsersList = () => {
   return (
-    <Fragment>
+    <div>
       <Navbar />
       <AdminSideBar />
-    </Fragment>
+      <div className="userslist-content">users List</div>
+    </div>
   );
 };
 
-export default Admin;
+export default UsersList;

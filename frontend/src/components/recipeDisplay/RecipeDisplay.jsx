@@ -1,11 +1,21 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import "../../styles/RecipeDisplay.css";
+import { RecipeContext } from "../../context/recipeContext";
+import { Link } from "react-router-dom";
 
 const RecipeDisplay = (props) => {
   const { recipe } = props;
+  const { saveRecipe, isRecipeSaved } = useContext(RecipeContext);
+  console.log("isRecipesaved", isRecipeSaved);
+  const [isSaved, setIsSaved] = useState(isRecipeSaved(recipe.id));
   const ingredientList = recipe.ingredients.map((number) => {
     return <li style={{ paddingBottom: 5 }}>{number}</li>;
   });
+  const handleSaveRecipe = () => {
+    saveRecipe(recipe.id);
+    setIsSaved(true);
+  };
+
   return (
     <div className="recipedisplay">
       <div className="recipedisplay-left">
@@ -31,7 +41,20 @@ const RecipeDisplay = (props) => {
           <div className="ingredient-heading">
             <h2>Ingredients:</h2>
             <div className="ingredient-btns">
-              <button className="save_recipe">SAVE RECIPE</button>
+              {isSaved ? (
+                <button className="saved_recipe">
+                  <Link
+                    to={`/user/savedrecipes`}
+                    style={{ textDecoration: "none", color: "black" }}
+                  >
+                    SAVED
+                  </Link>
+                </button>
+              ) : (
+                <button onClick={handleSaveRecipe} className="save_recipe">
+                  SAVE RECIPE
+                </button>
+              )}
               <button className="share">SHARE</button>
             </div>
           </div>

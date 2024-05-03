@@ -2,13 +2,20 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 //importing pages
-import Home from "./pages/home/Home";
-import About from "./pages/about/About";
-import Login from "./pages/login/Login";
-import Signup from "./pages/signup/Signup";
-import Recipe from "./pages/recipe/Recipe";
+import Home from "./pages/Home/Home";
+import About from "./pages/About/About";
+import Login from "./pages/Login/Login";
+import Signup from "./pages/Signup/Signup";
+import Recipe from "./pages/Recipe/Recipe";
 import SingleRecipe from "./pages/SingleRecipe/SingleRecipe";
 import Admin from "./pages/admin/Admin";
+import UserSavedRecipes from "./pages/User/UserSavedRecipes";
+import UsersList from "./pages/admin/UsersList";
+import UserAddedRecipes from "./pages/User/UserAddedRecipes";
+import UserFeedback from "./pages/User/UserFeedback";
+import UserProfile from "./pages/User/UserProfile";
+import AddNewRecipe from "./pages/User/AddNewRecipe";
+import EditProfile from "./pages/User/EditProfile";
 function App() {
   return (
     <div>
@@ -22,6 +29,13 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/SingleRecipe/:RecipeId" element={<SingleRecipe />} />
           <Route path="/dashboard" element={<Admin />} />
+          <Route path="/admin/users" element={<UsersList />} />
+          <Route path="/user/savedrecipes" element={<UserSavedRecipes />} />
+          <Route path="/user/addedrecipes" element={<UserAddedRecipes />} />
+          <Route path="/user/feedbacks" element={<UserFeedback />} />
+          <Route path="/user/profile" element={<UserProfile />} />
+          <Route path="/addnewrecipe" element={<AddNewRecipe />} />
+          <Route path="/editprofile" element={<EditProfile />} />
         </Routes>
       </Router>
     </div>
