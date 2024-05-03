@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User
+from .models import User,Temp
 from django.contrib.auth.hashers import make_password
 
 class UserSerializer(serializers.ModelSerializer):
@@ -23,3 +23,7 @@ class PasswordResetSerializer(serializers.Serializer):
         if data.get('new_password') != data.get('confirm_password'):
             raise serializers.ValidationError("The passwords do not match.")
         return data
+class TempSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Temp
+        fields = ['userid','username', 'email', 'password']

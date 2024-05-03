@@ -64,7 +64,7 @@ SIMPLE_JWT = {
     'VERIFYING_KEY': None,
 
     'AUTH_HEADER_TYPES': ('Bearer',),
-    'USER_ID_FIELD': 'id',
+    'USER_ID_FIELD': 'userid',
     'USER_ID_CLAIM': 'user_id',
 
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
@@ -100,7 +100,7 @@ ROOT_URLCONF = 'recipesystem.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, '')],
+        'DIRS': [os.path.join(BASE_DIR, ''),os.path.join(BASE_DIR, '../frontend/public')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
