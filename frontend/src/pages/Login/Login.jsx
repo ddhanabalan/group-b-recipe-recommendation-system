@@ -3,7 +3,8 @@ import logo_dark from "../../assets/logo.svg";
 import login_image from "../../assets/loginpic.jpg";
 import "../../styles/Login.css";
 import Validation from "./Validation";
-import axios from "axios"; // Import Axios
+import axios from "axios";
+import { setAuthToken } from "../../utils/auth";
 
 function Login() {
   const [values, setValues] = useState({
@@ -12,14 +13,15 @@ function Login() {
   });
   const [errors, setErrors] = useState({});
 
-  function handleChange(e) {
+  const handleChange = (e) => {
+    // Define handleChange function
     setValues({
       ...values,
       [e.target.name]: e.target.value,
     });
-  }
+  };
 
-  async function handleSubmit(e) {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     setErrors(Validation(values));
@@ -29,16 +31,18 @@ function Login() {
           username: values.name,
           password: values.password,
         });
-        // successful login
-        console.log(response.data);
-        window.location.href = "/home";
+
+        const token = response.data.token;
+        setAuthToken(token); // Store the token
+
+        console.log("Login successful:", response.data);
+        window.location.href = "/home"; // Redirect after successful login
       } catch (error) {
-        // Handle login error
         console.error("Login error:", error);
         setErrors({ invalidCredentials: "Invalid username or password" });
       }
     }
-  }
+  };
 
   return (
     <div className="login-container">
