@@ -1,10 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import Navbar from "../../components/navbar/Navbar";
-import HeroSection from "../../components/heroSection/HeroSection";
-import CarouselComponent from "../../components/carouselComponent/CarouselComponent";
-import Footer from "../../components/footer/Footer";
-import TopCategories from "../../components/topCategories/TopCategories";
+import Navbar from "../../components/Navbar/Navbar";
+import HeroSection from "../../components/Herosection/Herosection";
+import CarouselComponent from "../../components/Carouselcomponent/Carouselcomponent";
+import Footer from "../../components/Footer/Footer";
+import TopCategories from "../../components/Topcategories/Topcategories";
 import FastfoodIcon from "@mui/icons-material/Fastfood";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import SupervisedUserCircleRoundedIcon from "@mui/icons-material/SupervisedUserCircleRounded";
@@ -229,7 +229,9 @@ function Home() {
         <div className="features">
           <div className="feature">
             <div className="icon">
-              <FastfoodIcon style={{ fontSize: 50, color: "#f0a068" }} />
+              <FastfoodIcon
+                style={{ paddingLeft: 5, fontSize: 50, color: "#f0a068" }}
+              />
             </div>
             <h2>1200+ Recipes</h2>
             <p>

@@ -4,7 +4,6 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px;
-
   color: #fff;
 }
 
@@ -15,7 +14,7 @@
 }
 .search-bar-container {
   position: relative;
-  padding: 8px;
+  padding: 5px;
   display: flex;
   border-radius: 20px;
   border: 0.5px solid black;
@@ -74,6 +73,7 @@ nav ul li a {
   text-decoration: none;
   color: black;
 }
+
 nav ul li:last-child a {
   border: 0.5px solid black;
   border-radius: 5px;
@@ -87,4 +87,10 @@ nav ul li:last-child a:hover {
 }
 .search-bar-container {
   position: relative;
+}
+nav ul li a:hover {
+  color: #e1792f;
+}
+nav ul li.selected a {
+  text-decoration: underline;
 }

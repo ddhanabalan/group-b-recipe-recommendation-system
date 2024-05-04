@@ -1,0 +1,128 @@
+.back-arrow {
+  cursor: pointer;
+  margin-left: 70px;
+  padding-top: 5px;
+  color: rgb(0, 0, 0);
+  font-size: 26px;
+}
+
+.back-arrow:hover {
+  text-decoration: underline;
+}
+
+.add-recipe-head {
+  display: flex;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.add-recipe-heading {
+  margin-left: 8%;
+  font-size: 25px;
+  padding-top: 5px;
+  font-weight: 500;
+}
+.add-recipe-btns {
+  margin-left: 60%;
+}
+.preview-btn {
+  background-color: #e49963;
+  font-size: 20px;
+  font-weight: 400;
+  width: 100px;
+  height: 40px;
+  border: none;
+  border-radius: 10px;
+  margin-right: 10px;
+}
+.edit-btn {
+  background-color: #e49963;
+  font-size: 20px;
+  font-weight: 400;
+  width: 100px;
+  height: 40px;
+  border: none;
+  border-radius: 10px;
+  margin-right: 10px;
+}
+.save-btn {
+  background-color: #e49963;
+  font-size: 20px;
+  font-weight: 400;
+  width: 100px;
+  height: 40px;
+  border: none;
+  border-radius: 10px;
+  margin-right: 10px;
+}
+.add-recipe-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
+.add-recipe-form-content {
+  border: 2px solid black;
+  width: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.form-group {
+  height: auto;
+  margin-bottom: 20px;
+  width: 600px;
+
+  margin-top: 20px;
+}
+#title {
+  margin-bottom: 20px;
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+#photo {
+  margin-bottom: 20px;
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+#hours {
+  margin-bottom: 20px;
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+#minutes {
+  margin-bottom: 20px;
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+#calorie {
+  margin-bottom: 20px;
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+.category-container {
+  margin-bottom: 20px;
+}
+.ingredient-container {
+  margin-bottom: 20px;
+}
+.image-container {
+  margin-bottom: 20px;
+}

@@ -1,4 +1,4 @@
-import React, { createContext } from "react";
+import React, { createContext, useEffect } from "react";
 import { useState } from "react";
 
 const all_recipe = [
@@ -332,9 +332,46 @@ const all_recipe = [
 const RecipeContext = createContext();
 
 const RecipeContextProvider = ({ children }) => {
-  const [value, setValue] = useState(all_recipe);
+  const [distinctCategories, setDistinctCategories] = useState([]);
+
+  useEffect(() => {
+    const categoriesSet = new Set();
+    all_recipe.forEach((recipe) => {
+      recipe.category.forEach((cat) => categoriesSet.add(cat));
+    });
+    const categoriesArray = Array.from(categoriesSet);
+    setDistinctCategories(categoriesArray);
+  }, []);
+
+  const [savedRecipes, setSavedRecipes] = useState([]);
+  const saveRecipe = (recipeId) => {
+    if (!savedRecipes.includes(recipeId)) {
+      setSavedRecipes([...savedRecipes, recipeId]);
+    }
+  };
+
+  // Function to remove a recipe from saved recipes
+  const unsaveRecipe = (recipeId) => {
+    setSavedRecipes(savedRecipes.filter((id) => id !== recipeId));
+  };
+
+  // Check if a recipe is saved
+  const isRecipeSaved = (recipeId) => {
+    return savedRecipes.includes(recipeId);
+  };
+
+  //const [value, setValue] = useState(all_recipe);
+
   return (
-    <RecipeContext.Provider value={{ value, setValue }}>
+    <RecipeContext.Provider
+      value={{
+        all_recipe,
+        distinctCategories,
+        saveRecipe,
+        unsaveRecipe,
+        isRecipeSaved,
+      }}
+    >
       {children}
     </RecipeContext.Provider>
   );

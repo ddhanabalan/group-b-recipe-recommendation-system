@@ -1,5 +1,5 @@
 import React from "react";
-import CarouselComponent from "../carouselComponent/CarouselComponent";
+import CarouselComponent from "../Carouselcomponent/Carouselcomponent";
 import "../../styles/RecommendedRecipes.css";
 //dummy data
 const recipeData = [

@@ -1,10 +1,9 @@
 import React from "react";
 import "../../styles/Items.css";
-import LensIcon from "@mui/icons-material/Lens";
+
 import StarRating from "../starRating/StarRating";
 import { Link } from "react-router-dom";
 const Items = (props) => {
-  console.log("props", props);
   return (
     <div className="item">
       <Link to={`/singlerecipe/${props.id}`}>
@@ -15,13 +14,7 @@ const Items = (props) => {
         <div className="mins">
           <b>{props.total_mins}</b> mins
         </div>
-        <t>
-          <LensIcon
-            style={{
-              fontSize: 5,
-            }}
-          />
-        </t>
+
         <div className="calories">
           <b>{props.calorie} </b> Calorie
         </div>
