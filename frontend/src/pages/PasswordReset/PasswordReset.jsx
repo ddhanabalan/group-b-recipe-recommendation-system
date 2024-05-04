@@ -26,7 +26,7 @@ const PasswordReset = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/update-password",
+        "http://localhost:8000/authentication/update-password",
         {
           new_password: newPassword,
         }
