@@ -27,7 +27,7 @@ function Login() {
     setErrors(Validation(values));
     if (Object.keys(errors).length === 0) {
       try {
-        const response = await axios.post("http://localhost:8000/login/", {
+        const response = await axios.post("127.0.0.1:8000/login/", {
           username: values.name,
           password: values.password,
         });
@@ -36,7 +36,13 @@ function Login() {
         setAuthToken(token); // Store the token
 
         console.log("Login successful:", response.data);
-        window.location.href = "/home"; // Redirect after successful login
+
+        // Redirect based on user role
+        if (response.data.role === "admin") {
+          window.location.href = "/dashboard";
+        } else {
+          window.location.href = "/home";
+        }
       } catch (error) {
         console.error("Login error:", error);
         setErrors({ invalidCredentials: "Invalid username or password" });
