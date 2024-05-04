@@ -17,7 +17,7 @@ function Home() {
 
   useEffect(() => {
     // Fetch popular recipes from the popular recipes API endpoint
-    fetch("127.0.0.1:8000/recipe/popularrecipes/")
+    fetch("http://127.0.0.1:8000/recipe/popularrecipes/")
       .then((response) => response.json())
       .then((data) => setPopularRecipes(data))
       .catch((error) =>
@@ -25,7 +25,7 @@ function Home() {
       );
 
     // Fetch new recipes from the new recipes API endpoint
-    fetch("127.0.0.1:8000/recipe/newrecipes/")
+    fetch("http://127.0.0.1:8000/recipe/newrecipes/")
       .then((response) => response.json())
       .then((data) => setNewRecipes(data))
       .catch((error) => console.error("Error fetching new recipes:", error));
