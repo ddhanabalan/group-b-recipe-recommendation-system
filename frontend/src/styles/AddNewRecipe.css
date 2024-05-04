@@ -16,7 +16,7 @@
   margin-bottom: 10px;
 }
 .add-recipe-heading {
-  margin-left: 8%;
+  margin-left: 3%;
   font-size: 25px;
   padding-top: 5px;
   font-weight: 500;
@@ -123,6 +123,33 @@
 .ingredient-container {
   margin-bottom: 20px;
 }
-.image-container {
+.image-portion {
   margin-bottom: 20px;
+}
+.nonveg-section {
+  margin-bottom: 10px;
+}
+#nonveg {
+  width: 20px;
+}
+#veg {
+  width: 20px;
+}
+.time-cooking {
+  margin-bottom: 10px;
+}
+.season-section {
+  margin-bottom: 10px;
+}
+#summer {
+  width: 20px;
+}
+#autumn {
+  width: 20px;
+}
+#winter {
+  width: 20px;
+}
+#spring {
+  width: 20px;
 }

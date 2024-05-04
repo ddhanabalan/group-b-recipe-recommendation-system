@@ -1,3 +1,4 @@
+// Import necessary dependencies
 import React, { useState } from "react";
 import Swal from "sweetalert2";
 import Navbar from "../../components/Navbar/Navbar";
@@ -5,12 +6,13 @@ import Footer from "../../components/Footer/Footer";
 import "../../styles/AddNewRecipe.css";
 import RecipeDisplay from "../../components/recipeDisplay/RecipeDisplay";
 import { IoMdArrowRoundBack } from "react-icons/io";
-
+import axios from "axios";
 const AddNewRecipe = () => {
   const handleGoBack = () => {
     window.location.href = "/user/addedrecipes";
   };
-
+  const token = localStorage.getItem("authToken");
+  // State variables
   const [formData, setFormData] = useState({
     title: "",
     imageurl: null,
@@ -18,29 +20,66 @@ const AddNewRecipe = () => {
     total_mins: 0,
     categories: [],
     calorie: "",
+    nonVeg: false, // Added non-veg/veg selection
+    timeOfDay: "", // Added time of cooking selection
+    seasons: [], // Added season selection
   });
   const [photoPreview, setPhotoPreview] = useState("");
   const [totalTime, setTotalTime] = useState(0);
   const [showPreview, setShowPreview] = useState(false);
 
+  // Handle form input changes
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-      total_mins:
-        name === "hours" || name === "minutes"
-          ? calculateTotalMins(prevData)
-          : prevData.total_mins,
-    }));
+    const { name, value, type, checked } = e.target;
+
+    if (type === "radio" && name === "nonVeg") {
+      // Set the value directly as "veg" or "nonveg"
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    } else if (type === "checkbox") {
+      // Handle checkbox inputs for arrays
+      const isChecked = checked;
+      const currentValue = formData[name];
+      let newValue;
+
+      if (isChecked) {
+        newValue = [...currentValue, value]; // Add the checked value to the array
+      } else {
+        newValue = currentValue.filter((item) => item !== value); // Remove the unchecked value from the array
+      }
+
+      // Update form data state for checkbox inputs
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: newValue,
+        total_mins:
+          name === "hours" || name === "minutes"
+            ? calculateTotalMins(prevData)
+            : prevData.total_mins,
+      }));
+    } else {
+      // For other input types, update form data state as usual
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+        total_mins:
+          name === "hours" || name === "minutes"
+            ? calculateTotalMins(prevData)
+            : prevData.total_mins,
+      }));
+    }
   };
 
+  // Calculate total minutes for cooking time
   const calculateTotalMins = (data) => {
     const hours = parseInt(data.hours) || 0;
     const minutes = parseInt(data.minutes) || 0;
     return hours * 60 + minutes;
   };
 
+  // Handle photo change
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
     setFormData((prevData) => ({
@@ -55,6 +94,7 @@ const AddNewRecipe = () => {
     reader.readAsDataURL(file);
   };
 
+  // Handle category change
   const handleCategoryChange = (e) => {
     const selectedCategories = Array.from(
       e.target.selectedOptions,
@@ -66,7 +106,8 @@ const AddNewRecipe = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  // Handle form submission
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const hours = parseInt(formData.hours) || 0;
     const minutes = parseInt(formData.minutes) || 0;
@@ -78,50 +119,59 @@ const AddNewRecipe = () => {
 
     delete formData.hours;
     delete formData.minutes;
+    console.log(formData);
+    try {
+      // Send the request with Axios
+      const response = await axios.post(
+        "http://your-api-endpoint.com/add-new-recipe",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+          },
+        }
+      );
 
-    // Show SweetAlert confirmation
-    Swal.fire({
-      title: "Are you sure you want to save this recipe?",
-      text: "Once saved, you cannot undo this action!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Save",
-      cancelButtonText: "Cancel",
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // Perform save action (you can replace this with your actual save logic)
-        console.log("Recipe saved:", formData);
+      console.log("Recipe saved:", response.data);
 
-        // Show success message
+      // Show success message
+      Swal.fire({
+        title: "Saved!",
+        text: "Your recipe has been saved.",
+        icon: "success",
+        confirmButtonText: "OK",
+        icon: null,
+      });
+      // Clear form fields for adding a new recipe
+      setFormData({
+        title: "",
+        imageurl: formData.imageurl, // Keep the image URL here
+        ingredients: [],
+        total_mins: 0,
+        categories: [],
+        calorie: "",
+      });
+      setPhotoPreview("");
+      setShowPreview(false);
+    } catch (error) {
+      console.error("Error saving recipe:", error);
 
-        Swal.fire({
-          title: "Saved!",
-          text: "Your recipe has been saved.",
-          icon: "success",
-          confirmButtonText: "OK",
-          icon: null, // Set the icon to null to make it none
-        });
-        // Clear form fields for adding a new recipe
-        setFormData({
-          title: "",
-          imageurl: formData.imageurl, // Keep the image URL here
-          ingredients: [],
-          total_mins: 0,
-          categories: [],
-          calorie: "",
-        });
-        setPhotoPreview("");
-        setShowPreview(false);
-      }
-    });
+      // Show error message
+      Swal.fire({
+        title: "Error!",
+        text: "Failed to save the recipe. Please try again later.",
+        icon: "error",
+        confirmButtonText: "OK",
+        icon: null,
+      });
+    }
   };
-
+  // Handle showing recipe preview
   const handleShowPreview = () => {
     setShowPreview(true);
   };
 
+  // Handle editing recipe
   const handleEdit = () => {
     setShowPreview(false);
   };
@@ -174,7 +224,97 @@ const AddNewRecipe = () => {
                     required
                   />
                 </div>
-                <div className="image-container">
+                {/* Non-Veg or Veg Selection */}
+                <div className="nonveg-section">
+                  <label>Non-Veg or Veg:</label>
+                  <label>
+                    <input
+                      type="radio"
+                      name="veg_nonveg"
+                      id="nonveg"
+                      value="nonveg"
+                      checked={formData.nonVeg}
+                      onChange={handleChange}
+                    />
+                    Non-Veg
+                  </label>
+                  <label>
+                    <input
+                      type="radio"
+                      name="veg_nonveg"
+                      id="veg"
+                      value="veg"
+                      checked={!formData.nonVeg}
+                      onChange={handleChange}
+                    />
+                    Veg
+                  </label>
+                </div>
+                {/* Time of Cooking Selection */}
+                <div className="time-cooking">
+                  <label htmlFor="timeOfDay">Time of Cooking:</label>
+                  <select
+                    id="timeOfDay"
+                    name="timeOfDay"
+                    value={formData.timeOfDay}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="">Select Time of Cooking</option>
+                    <option value="breakfast">Breakfast</option>
+                    <option value="lunch">Lunch</option>
+                    <option value="dinner">Dinner</option>
+                  </select>
+                </div>
+                {/* Season Selection */}
+                <div className="season-section">
+                  <label>Season:</label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      name="seasons"
+                      id="summer"
+                      value="summer"
+                      checked={formData.seasons.includes("summer")}
+                      onChange={handleChange}
+                    />
+                    Summer
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      name="seasons"
+                      id="winter"
+                      value="winter"
+                      checked={formData.seasons.includes("winter")}
+                      onChange={handleChange}
+                    />
+                    Winter
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      name="seasons"
+                      value="autumn"
+                      id="autumn"
+                      checked={formData.seasons.includes("autumn")}
+                      onChange={handleChange}
+                    />
+                    Autumn
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      name="seasons"
+                      value="spring"
+                      id="spring"
+                      checked={formData.seasons.includes("spring")}
+                      onChange={handleChange}
+                    />
+                    Spring
+                  </label>
+                </div>
+                <div className="image-portion">
                   <label htmlFor="imageurl">Upload Photo:</label>
                   <input
                     type="file"

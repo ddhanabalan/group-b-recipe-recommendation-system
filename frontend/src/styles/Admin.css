@@ -1,0 +1,36 @@
+.admin-cards {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+  margin-left: 30px;
+}
+
+.dashboard-area {
+  display: flex;
+  flex-direction: row;
+}
+.admin-card {
+  width: 150px;
+  padding: 20px;
+  border: 1px solid#e1792f;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  text-align: center;
+  margin: 10px;
+}
+
+.admin-card h3 {
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.admin-card p {
+  font-size: 16px;
+  color: #333;
+}
+.admin-card h3 {
+  font-size: 20px;
+  padding-top: 5px;
+  color: #333;
+}

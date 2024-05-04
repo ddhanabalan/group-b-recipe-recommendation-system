@@ -53,3 +53,32 @@
   margin-bottom: 10px;
   margin-top: 20px;
 }
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.pagination {
+  list-style: none;
+  display: flex;
+  gap: 10px;
+}
+
+.pagination li {
+  display: inline-block;
+}
+
+.pagination li button {
+  padding: 5px 10px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.pagination li button.active {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
