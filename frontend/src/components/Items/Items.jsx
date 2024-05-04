@@ -10,10 +10,10 @@ const Items = (props) => {
   return (
     <div className="item" onClick={handleClick}>
       <Link
-        to={`/singlerecipe/${props.id}`}
+        to={`/singlerecipe/${props.recipeid}`}
         style={{ textDecoration: "none", color: "black" }}
       >
-        <img src={props.imageurl} alt="recipe" className="img" />
+        <img src={props.img} alt="recipe" className="img" />
 
         <h3>{props.title}</h3>
         <div className="items-details">
@@ -21,12 +21,12 @@ const Items = (props) => {
             <b>{props.total_mins}</b> mins
           </div>
           <div className="calories" style={{ paddingTop: 3 }}>
-            <b>{props.calorie} </b> Calorie
+            <b>{props.calories} </b> Calorie
           </div>
         </div>
         <div className="item-rating">
-          <b style={{ paddingTop: 2.5, paddingRight: 5 }}>{props.ratings} </b>
-          <StarRating stars={props.ratings} />
+          <b style={{ paddingTop: 2.5, paddingRight: 5 }}>{props.rating} </b>
+          <StarRating stars={props.rating} />
         </div>
       </Link>
     </div>

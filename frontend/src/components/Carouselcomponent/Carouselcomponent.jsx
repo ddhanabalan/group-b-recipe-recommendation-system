@@ -33,12 +33,12 @@ const CarouselComponent = ({ data }) => {
       {data.map((item, i) => (
         <Item
           key={i}
-          id={item.id}
+          recipeid={item.recipeid}
           title={item.title}
-          imageurl={item.imageurl}
+          img={item.img}
           total_mins={item.total_mins}
-          calorie={item.calorie}
-          ratings={item.ratings}
+          calories={item.calories}
+          rating={item.rating}
         />
       ))}
     </Carousel>
