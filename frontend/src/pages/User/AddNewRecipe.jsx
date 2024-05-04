@@ -31,31 +31,45 @@ const AddNewRecipe = () => {
   // Handle form input changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    let newValue = value;
 
-    if (type === "radio") {
-      // For radio buttons, update the value directly
-      newValue = value === "true"; // Convert "true" to boolean true, "false" to boolean false
+    if (type === "radio" && name === "nonVeg") {
+      // Set the value directly as "veg" or "nonveg"
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
     } else if (type === "checkbox") {
       // Handle checkbox inputs for arrays
       const isChecked = checked;
       const currentValue = formData[name];
+      let newValue;
+
       if (isChecked) {
         newValue = [...currentValue, value]; // Add the checked value to the array
       } else {
         newValue = currentValue.filter((item) => item !== value); // Remove the unchecked value from the array
       }
-    }
 
-    // Update form data state
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: newValue,
-      total_mins:
-        name === "hours" || name === "minutes"
-          ? calculateTotalMins(prevData)
-          : prevData.total_mins,
-    }));
+      // Update form data state for checkbox inputs
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: newValue,
+        total_mins:
+          name === "hours" || name === "minutes"
+            ? calculateTotalMins(prevData)
+            : prevData.total_mins,
+      }));
+    } else {
+      // For other input types, update form data state as usual
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+        total_mins:
+          name === "hours" || name === "minutes"
+            ? calculateTotalMins(prevData)
+            : prevData.total_mins,
+      }));
+    }
   };
 
   // Calculate total minutes for cooking time
@@ -216,9 +230,9 @@ const AddNewRecipe = () => {
                   <label>
                     <input
                       type="radio"
-                      name="nonVeg"
+                      name="veg_nonveg"
                       id="nonveg"
-                      value="true"
+                      value="nonveg"
                       checked={formData.nonVeg}
                       onChange={handleChange}
                     />
@@ -227,9 +241,9 @@ const AddNewRecipe = () => {
                   <label>
                     <input
                       type="radio"
-                      name="nonVeg"
+                      name="veg_nonveg"
                       id="veg"
-                      value="false"
+                      value="veg"
                       checked={!formData.nonVeg}
                       onChange={handleChange}
                     />
