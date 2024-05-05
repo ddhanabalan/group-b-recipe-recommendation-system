@@ -7,7 +7,7 @@ import {
   isAuthenticated,
   getAuthToken,
   clearAuthToken,
-} from "../../utils/auth"; // Import isAuthenticated from auth.js
+} from "../../utils/auth";
 import { FaUser } from "react-icons/fa";
 
 function Navbar() {
