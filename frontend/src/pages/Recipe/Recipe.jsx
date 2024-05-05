@@ -13,6 +13,7 @@ const Recipe = () => {
 
   // Sort recipes based on sorting function
   const sortedRecipes = allRecipes.sort(sortFunction);
+  console.log("sortedrecipes:", sortedRecipes);
 
   return (
     <SortProvider>
