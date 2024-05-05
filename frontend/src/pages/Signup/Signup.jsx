@@ -55,12 +55,11 @@ function Signup() {
       );
 
       if (response.ok) {
-        const data = await response.json();
-        console.log("Signup successful:", data);
-        const email = data.email; // Extract email from response
-        console.log("Email from response:", email); // Log the email from the response
-        localStorage.setItem("signupEmail", email); // Store email in localStorage
-        history(`/otp/${email}`); // Redirect to OTP page with email parameter
+        console.log("Signup successful");
+        const email = formData.email;
+        console.log("email", email);
+        localStorage.setItem("signupEmail", email);
+        history(`/otp/${email}`);
       } else {
         const errorData = await response.json();
         console.error("Signup failed:", errorData);
