@@ -10,24 +10,19 @@ import { SortProvider, useSortContext } from "../../context/sortContext";
 const Recipe = () => {
   const { allRecipes } = useContext(RecipeContext);
   const { sortFunction } = useSortContext(); // sortFunction from SortContext
-  const [searchQuery, setSearchQuery] = useState(""); // State for search query
   const [currentPage, setCurrentPage] = useState(1);
   const recipesPerPage = 9;
 
-  // Apply search filter
-  const searchedRecipes = searchQuery
-    ? allRecipes.filter((recipe) =>
-        recipe.title.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : allRecipes;
-
   // Sort recipes based on sorting function
-  const sortedRecipes = searchedRecipes.sort(sortFunction);
+  const sortedRecipes = allRecipes.sort(sortFunction);
 
   // Pagination logic
   const indexOfLastRecipe = currentPage * recipesPerPage;
   const indexOfFirstRecipe = indexOfLastRecipe - recipesPerPage;
-  const currentRecipes = sortedRecipes.slice(indexOfFirstRecipe, indexOfLastRecipe);
+  const currentRecipes = sortedRecipes.slice(
+    indexOfFirstRecipe,
+    indexOfLastRecipe
+  );
 
   // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
@@ -37,9 +32,6 @@ const Recipe = () => {
       <div>
         <Navbar />
         <div className="recipecontainer">
-          <div className="recipe-filter">
-            {/* No FilterSection component since we're not filtering */}
-          </div>
           <div className="recipe-view--sort">
             <div className="main-recipe-section">
               <div>
@@ -67,9 +59,16 @@ const Recipe = () => {
                 </div>
                 {/* Pagination */}
                 <div className="pagination">
-                  {Array.from({ length: Math.ceil(sortedRecipes.length / recipesPerPage) }, (_, i) => (
-                    <button key={i} onClick={() => paginate(i + 1)}>{i + 1}</button>
-                  ))}
+                  {Array.from(
+                    {
+                      length: Math.ceil(sortedRecipes.length / recipesPerPage),
+                    },
+                    (_, i) => (
+                      <button key={i} onClick={() => paginate(i + 1)}>
+                        {i + 1}
+                      </button>
+                    )
+                  )}
                 </div>
               </div>
             </div>
