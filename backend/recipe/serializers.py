@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Recipe, Category, RecipeCategories, Favorite, Reviews
-from authentication.models import User
+#from authentication.models import User
+from datetime import date
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -18,7 +19,14 @@ class RecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = ['recipeid', 'userid', 'title', 'ingredients', 'img', 'calories', 'rating', 'total_reviews', 'season', 'daytimeofcooking', 'veg_nonveg', 'total_mins', 'created_at']#, 'categories']
-    
+
+class TitleSerializer(serializers.ModelSerializer):
+    # categories = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Recipe
+        fields = ['recipeid',  'title']
+
 class FavoriteSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -35,5 +43,18 @@ class ReviewsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reviews
         fields = ['id','recipeid','userid','username','review','review_date']
+    def create(self, validated_data):
+        # Automatically set the review_date to the current date
+        validated_data['review_date'] = date.today()
+        return super().create(validated_data)
 
+class RecipeWithCategoriesSerializer(serializers.ModelSerializer):
+    categories = serializers.ListField(child=serializers.CharField())
+
+
+    class Meta:
+        model = Recipe
+        fields = ['recipeid', 'title', 'userid', 'ingredients', 'img', 'calories', 'season', 'daytimeofcooking', 'veg_nonveg', 'total_mins', 'categories']
+
+    
         

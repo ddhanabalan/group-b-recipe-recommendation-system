@@ -123,6 +123,14 @@ class UserLogin(APIView):
         except User.DoesNotExist:
             return Response({"error": "Invalid username or password"}, status=status.HTTP_401_UNAUTHORIZED)
 
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        # Perform logout logic here, such as removing the authentication token
+        request.user.auth_token.delete()  # Assuming you're using TokenAuthentication
+        return Response({"message": "Successfully logged out."}, status=status.HTTP_200_OK)
+    
 # ForgotPassword view for initiating the password reset process
 class ForgotPassword(APIView):
     def post(self, request):
