@@ -204,7 +204,7 @@ function Navbar() {
                   className="user-heading"
                   onClick={() => (window.location.href = "/login")}
                 >
-                  User
+                  login
                 </span>
               </li>
             )}
