@@ -39,7 +39,7 @@ const Otp = () => {
         }
       );
 
-      if (response.status === 200) {
+      if (response.status === 201) {
         alert("Email verified successfully.");
         // Redirect to login page after successful email verification
         window.location.href = "/login";
