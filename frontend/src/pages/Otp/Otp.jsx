@@ -31,27 +31,40 @@ const Otp = () => {
   const handleOTPSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
+      console.log("Request body sent to server:", {
+        email: formData.email,
+        vericode: formData.otp,
+      }); // Log the request body sent to the server
+
+      const response = await fetch(
         "http://localhost:8000/authentication/verify-email/",
         {
-          email: formData.email,
-          vericode: formData.otp,
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            vericode: formData.otp,
+          }),
         }
       );
 
-      if (response.status === 201) {
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Response from server:", data); // Log the response content
         alert("Email verified successfully.");
         // Redirect to login page after successful email verification
         window.location.href = "/login";
       } else {
-        setVerificationError("Failed to verify email.");
+        const data = await response.json();
+        setVerificationError(data.message || "Failed to verify email.");
       }
     } catch (error) {
-      console.error("Error verifying email:", error);
+      console.error("Error verifying email:", error.message);
       setVerificationError("Failed to verify email.");
     }
   };
-
   return (
     <div className="forgotpassword">
       <div className="card" style={{ height: 270 }}>
