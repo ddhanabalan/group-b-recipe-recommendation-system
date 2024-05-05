@@ -10,7 +10,7 @@ import Reviews from "../../components/reviews/Reviews";
 import RatingAndReviewBox from "../../components/ratingAndReviewBox/RatingAndReviewBox";
 
 const SingleRecipe = () => {
-  const { all_recipe, loading, error } = useContext(RecipeContext);
+  const { allRecipes, loading, error } = useContext(RecipeContext);
   const { RecipeId } = useParams();
 
   if (loading) {
@@ -22,8 +22,8 @@ const SingleRecipe = () => {
   }
 
   const recipe =
-    all_recipe && all_recipe.length > 0
-      ? all_recipe.find((e) => e.id === Number(RecipeId))
+    allRecipes && allRecipes.length > 0
+      ? allRecipes.find((e) => e.id === Number(RecipeId))
       : [];
 
   if (!recipe) {

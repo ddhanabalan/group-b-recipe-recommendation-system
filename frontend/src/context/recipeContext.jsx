@@ -20,6 +20,7 @@ const RecipeContextProvider = ({ children }) => {
         setAllRecipes(data);
         setLoading(false);
         console.log("All Recipes:", data);
+        console.log("recipes= ", allRecipes);
       } catch (error) {
         setError(error);
         setLoading(false);

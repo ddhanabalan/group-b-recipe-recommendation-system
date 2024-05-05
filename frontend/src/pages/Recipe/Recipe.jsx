@@ -10,14 +10,14 @@ import { SortProvider, useSortContext } from "../../context/sortContext";
 import { FilterContext } from "../../context/filterContext";
 
 const Recipe = () => {
-  const { all_recipe } = useContext(RecipeContext);
+  const { allRecipes } = useContext(RecipeContext);
   const { sortFunction } = useSortContext(); //sortFunction from SortContext
   const { filter, setFilter } = useContext(FilterContext);
   console.log("Filter:", filter);
   const [searchQuery, setSearchQuery] = useState(""); // State for search query
   // Apply filters when filter is not empty, else show all recipes
-  const filteredRecipes = all_recipe
-    ? all_recipe.filter((recipe) => {
+  const filteredRecipes = allRecipes
+    ? allRecipes.filter((recipe) => {
         const categoryFilter =
           filter.category.length === 0 ||
           recipe.category.some((cat) => filter.category.includes(cat));

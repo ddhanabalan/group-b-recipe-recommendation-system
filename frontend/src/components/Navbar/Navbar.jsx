@@ -6,7 +6,7 @@ import { RecipeContext } from "../../context/recipeContext";
 import { isAuthenticated, getAuthToken } from "../../utils/auth"; // Import isAuthenticated from auth.js
 
 function Navbar() {
-  const { all_recipe } = useContext(RecipeContext);
+  const { allRecipes } = useContext(RecipeContext);
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredRecipes, setFilteredRecipes] = useState([]);
@@ -42,7 +42,7 @@ function Navbar() {
     setSearchTerm(term);
     if (term) {
       setShowDropdown(true);
-      const filteredRecipes = all_recipe.filter((recipe) =>
+      const filteredRecipes = allRecipes.filter((recipe) =>
         recipe.title.toLowerCase().includes(term.toLowerCase())
       );
       setFilteredRecipes(filteredRecipes);
