@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import logo_dark from "../../assets/logo.svg";
 import Sign_image from "../../assets/signuppic.jpg";
-import Swal from "sweetalert2";
 import "../../styles/Signup.css";
 import axios from "axios";
+import { useHistory } from "react-router-dom"; // Import useHistory for redirection
 
 function Signup() {
   const [formData, setFormData] = useState({
@@ -13,7 +13,7 @@ function Signup() {
   });
 
   const [passwordError, setPasswordError] = useState("");
-  const [emailResponse, setEmailResponse] = useState("");
+  const history = useHistory(); // Create history object for redirection
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -51,13 +51,9 @@ function Signup() {
       if (response.status === 200) {
         const data = await response.data;
         console.log("Signup successful:", data);
-        setEmailResponse(data.email); // Store the email response
-
-        Swal.fire({
-          icon: "success",
-          title: "Registration Successful!",
-          text: "An OTP has been sent to your email.",
-        });
+        const email = data.email; // Extract email from response
+        localStorage.setItem("signupEmail", email); // Store email in localStorage
+        history.push(`/otp?email=${encodeURIComponent(email)}`); // Redirect to OTP page with email parameter
       } else {
         const errorData = await response.data;
         console.error("Signup failed:", errorData);
@@ -66,6 +62,7 @@ function Signup() {
       console.error("Error during signup:", error);
     }
   };
+
   return (
     <div className="sign-container">
       <div className="login-form-container">
