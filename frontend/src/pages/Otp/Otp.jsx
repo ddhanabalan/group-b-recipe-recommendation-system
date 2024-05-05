@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useLocation, useParams } from "react-router-dom"; // Import useParams and useLocation
+import { useLocation } from "react-router-dom"; // Import useLocation hook
 import "../../styles/ForgotPassword.css";
 
 const Otp = () => {
   const location = useLocation();
-  const { email } = useParams();
-
   const [formData, setFormData] = useState({
-    email: email || "", // Initialize email from useParams or set to empty string
+    email: "",
     otp: "",
   });
 
   const [verificationError, setVerificationError] = useState("");
 
   useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const email = searchParams.get("email");
     if (email) {
       setFormData({ ...formData, email });
     }
-  }, [email]); // Update the formData when email changes
+  }, [location.search]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
