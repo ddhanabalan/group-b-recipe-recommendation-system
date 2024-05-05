@@ -48,7 +48,7 @@ function Signup() {
         }
       );
 
-      if (response.status === 200) {
+      if (response.status === 201) {
         const data = await response.data;
         console.log("Signup successful:", data);
         const email = data.email; // Extract email from response
