@@ -10,22 +10,9 @@ import { SortProvider, useSortContext } from "../../context/sortContext";
 const Recipe = () => {
   const { allRecipes } = useContext(RecipeContext);
   const { sortFunction } = useSortContext(); // sortFunction from SortContext
-  const [currentPage, setCurrentPage] = useState(1);
-  const recipesPerPage = 9;
 
   // Sort recipes based on sorting function
   const sortedRecipes = allRecipes.sort(sortFunction);
-
-  // Pagination logic
-  const indexOfLastRecipe = currentPage * recipesPerPage;
-  const indexOfFirstRecipe = indexOfLastRecipe - recipesPerPage;
-  const currentRecipes = sortedRecipes.slice(
-    indexOfFirstRecipe,
-    indexOfLastRecipe
-  );
-
-  // Change page
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <SortProvider>
@@ -41,8 +28,8 @@ const Recipe = () => {
                 </div>
                 <hr />
                 <div className="recipe-items">
-                  {currentRecipes.length > 0 ? (
-                    currentRecipes.map((item, i) => (
+                  {sortedRecipes.length > 0 ? (
+                    sortedRecipes.map((item, i) => (
                       <Items
                         key={i}
                         recipeid={item.recipeid}
@@ -58,18 +45,6 @@ const Recipe = () => {
                   )}
                 </div>
                 {/* Pagination */}
-                <div className="pagination">
-                  {Array.from(
-                    {
-                      length: Math.ceil(sortedRecipes.length / recipesPerPage),
-                    },
-                    (_, i) => (
-                      <button key={i} onClick={() => paginate(i + 1)}>
-                        {i + 1}
-                      </button>
-                    )
-                  )}
-                </div>
               </div>
             </div>
           </div>

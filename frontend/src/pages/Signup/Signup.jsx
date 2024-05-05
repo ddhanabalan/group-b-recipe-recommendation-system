@@ -53,7 +53,7 @@ function Signup() {
         console.log("Signup successful:", data);
         const email = data.email; // Extract email from response
         localStorage.setItem("signupEmail", email); // Store email in localStorage
-        history(`/otp?email=${encodeURIComponent(email)}`); // Redirect to OTP page with email parameter
+        history(`/otp/${email}`); // Redirect to OTP page with email parameter
       } else {
         const errorData = await response.data;
         console.error("Signup failed:", errorData);

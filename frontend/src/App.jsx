@@ -41,7 +41,7 @@ function App() {
           <Route path="/editprofile" element={<EditProfile />} />
           <Route path="/forgotpassword" element={<ForgotPassword />} />
           <Route path="/passwordreset" element={<PasswordReset />} />
-          <Route path="/otp?email=encodedEmail" element={<Otp />} />
+          <Route path="/otp/:email" element={<Otp />} />
         </Routes>
       </Router>
     </div>
