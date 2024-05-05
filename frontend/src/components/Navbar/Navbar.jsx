@@ -78,13 +78,23 @@ function Navbar() {
     );
   };
 
-  const handleLogout = () => {
-    // Handle logout logic here
-    setShowDropdown(false);
-    setSearchHistory([]); // Clear search history when logging out
-    sessionStorage.removeItem("searchHistory");
-
-    window.location.href = "/home";
+  const handleLogout = async () => {
+    try {
+      await fetch("http://localhost:8000/authentication/logout/", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+      setShowDropdown(false);
+      setSearchHistory([]); // Clear search history when logging out
+      sessionStorage.removeItem("searchHistory");
+      clearAuthToken(); // Clear the authentication token
+      window.location.href = "/home";
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
   };
 
   const toggleDropdown = () => {
@@ -182,14 +192,11 @@ function Navbar() {
                   onMouseEnter={() => setShowDropdown(true)}
                   onMouseLeave={() => setShowDropdown(false)}
                 >
-                  <FaUser className="user-icon-img" />
+                  <span className="user-heading">User</span>
                   {showDropdown && (
                     <ul className="dropdown">
                       <li>
                         <a href="/user/savedrecipes">Dashboard</a>
-                      </li>
-                      <li>
-                        <a href="/changepassword">Change Password</a>
                       </li>
                       <li>
                         <button onClick={handleLogout}>Logout</button>
@@ -200,7 +207,12 @@ function Navbar() {
               </li>
             ) : (
               <li>
-                <a href="/login">Login</a>
+                <span
+                  className="user-heading"
+                  onClick={() => (window.location.href = "/login")}
+                >
+                  User
+                </span>
               </li>
             )}
           </ul>
