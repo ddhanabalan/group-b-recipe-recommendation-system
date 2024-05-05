@@ -110,3 +110,40 @@
 .signup-link a:hover {
   color: #f79148;
 }
+.user-profile-container {
+  position: relative;
+}
+
+.profile-icon {
+  width: 40px;
+  height: 40px;
+  background-color: #ccc; /* Placeholder color */
+  border-radius: 50%;
+  /* Adjust positioning as needed */
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.dropdown-list {
+  position: absolute;
+  top: 60px; /* Adjust the top position based on your design */
+  right: 10px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  display: none; /* Hide the dropdown by default */
+}
+
+.dropdown-list li {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.dropdown-list li:hover {
+  background-color: #f0f0f0;
+}

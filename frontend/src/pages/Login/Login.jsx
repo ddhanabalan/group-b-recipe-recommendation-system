@@ -1,10 +1,11 @@
 import React, { useState } from "react";
+import axiosInstance from "../../utils/api";
 import logo_dark from "../../assets/logo.svg";
 import login_image from "../../assets/loginpic.jpg";
 import "../../styles/Login.css";
 import Validation from "./Validation";
-import axios from "axios";
 import { setAuthToken } from "../../utils/auth";
+import { Navigate, useNavigate } from "react-router-dom";
 
 function Login() {
   const [values, setValues] = useState({
@@ -12,61 +13,48 @@ function Login() {
     password: "",
   });
   const [errors, setErrors] = useState({});
+  const history = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // Remove leading spaces using trim()
-    const sanitizedValue = value.trim();
     setValues({
       ...values,
-      [name]: sanitizedValue,
+      [name]: value,
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    setErrors(Validation(values));
-    if (Object.keys(errors).length === 0) {
-      try {
-        const response = await axios.post(
-          "http://127.0.0.1:8000/authentication/login/",
-          {
-            username: values.name,
-            password: values.password,
-          }
-        );
-
-        const token = response.data.token;
-        setAuthToken(token); // Store the token
-
-        console.log("Login successful:", response.data);
-
-        // Log the user role to check if it's received correctly
-        console.log("User Role:", response.data.role);
-
-        // Redirect based on user role
-        if (response.data.role === "admin") {
-          window.location.href = "/dashboard";
-        } else {
-          window.location.href = "/home";
+    try {
+      const response = await axiosInstance.post(
+        "http://127.0.0.1:8000/authentication/login/",
+        {
+          username: values.name,
+          password: values.password,
         }
-      } catch (error) {
-        console.error("Login error:", error);
+      );
 
-        if (error.response) {
-          if (error.response.status === 401) {
-            setErrors({ invalidCredentials: "Invalid username or password" });
-          } else {
-            setErrors({
-              generalError: "An error occurred. Please try again later.",
-            });
-          }
-        } else {
-          setErrors({
-            generalError: "An error occurred. Please try again later.",
-          });
-        }
+      const token = response.data.token;
+      setAuthToken(token); // Store the token using sessionStorage
+
+      console.log("Login successful:", response.data);
+      console.log("token", token);
+      // Redirect based on user role
+      if (response.data.role === "admin") {
+        history("/dashboard");
+      } else {
+        history("/home");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+
+      if (error.response && error.response.status === 401) {
+        setErrors({ invalidCredentials: "Invalid username or password" });
+      } else {
+        setErrors({
+          generalError: "An error occurred. Please try again later.",
+        });
       }
     }
   };
