@@ -2,7 +2,8 @@ import React, { useContext, useState } from "react";
 import "../../styles/RecipeDisplay.css";
 import { RecipeContext } from "../../context/recipeContext";
 import { Link } from "react-router-dom";
-
+import axios from "axios";
+import { getAuthToken } from "../../utils/auth";
 const RecipeDisplay = (props) => {
   const { recipe } = props;
 
