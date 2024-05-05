@@ -45,6 +45,12 @@ INSTALLED_APPS = [
     'rest_framework',
     'authentication',
     'recipe',
+    'corsheaders',
+]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    # Add other origins if needed
 ]
 
 REST_FRAMEWORK = {
@@ -94,6 +100,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'recipesystem.urls'

@@ -8,9 +8,6 @@ class Category(models.Model):
     class Meta:
         db_table = 'category'
 
-    def __str__(self):
-        return self.name
-
 class Recipe(models.Model):
     recipeid = models.IntegerField(primary_key=True, unique=True)
     userid = models.ForeignKey(User, on_delete=models.CASCADE,db_column='userid') 
@@ -29,10 +26,6 @@ class Recipe(models.Model):
     class Meta:
         db_table = 'recipe'
 
-    def __str__(self):
-        return self.title
-
-
 class RecipeCategories(models.Model):
     recipeid = models.ForeignKey(Recipe, on_delete=models.CASCADE, db_column='recipeid')
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
@@ -40,5 +33,22 @@ class RecipeCategories(models.Model):
     class Meta:
         db_table = 'recipe_categories'
 
-    def __str__(self):
-        return f"{self.recipe.title} - {self.category.name}"
+class Favorite(models.Model):
+    userid = models.ForeignKey(User, on_delete=models.CASCADE, db_column='userid')
+    recipeid = models.ForeignKey(Recipe, on_delete=models.CASCADE, db_column='recipeid')
+
+    class Meta:
+        db_table = 'favourites'
+
+class Reviews(models.Model):
+    id = models.AutoField(primary_key=True)
+    recipeid = models.ForeignKey(Recipe, on_delete=models.CASCADE, db_column='recipeid')
+    userid = models.ForeignKey(User, on_delete=models.CASCADE, db_column='userid')
+    username = models.CharField(max_length=255)
+    review = models.TextField()
+    review_date = models.DateField()
+
+    class Meta:
+        db_table = 'reviews'
+        
+

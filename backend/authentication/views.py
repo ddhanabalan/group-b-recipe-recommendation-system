@@ -129,8 +129,8 @@ class ForgotPassword(APIView):
         username = request.data.get('username')
         email = request.data.get('email')
         try:
-            if User.objects.filter(email=email).exists() and User.objects.filter(username=username).exists():
-                user = User.objects.get(username=username)
+            if User.objects.filter(email=email,username=username).exists(): #and User.objects.filter(username=username).exists():
+                user = User.objects.get(email=email,username=username)
             #user = User.objects.get(email=email)
         except User.DoesNotExist:
             return Response({"error": "User with provided username or email does not exist"}, status=status.HTTP_404_NOT_FOUND)
