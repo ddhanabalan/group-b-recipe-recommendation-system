@@ -39,23 +39,30 @@ function Signup() {
     }
 
     try {
-      const response = await axios.post(
+      const response = await fetch(
         "http://localhost:8000/authentication/signup/",
         {
-          username: formData.username,
-          email: formData.email,
-          password: formData.password,
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: formData.username,
+            email: formData.email,
+            password: formData.password,
+          }),
         }
       );
 
-      if (response.status === 201) {
-        const data = await response.data;
+      if (response.ok) {
+        const data = await response.json();
         console.log("Signup successful:", data);
         const email = data.email; // Extract email from response
+        console.log("Email from response:", email); // Log the email from the response
         localStorage.setItem("signupEmail", email); // Store email in localStorage
         history(`/otp/${email}`); // Redirect to OTP page with email parameter
       } else {
-        const errorData = await response.data;
+        const errorData = await response.json();
         console.error("Signup failed:", errorData);
       }
     } catch (error) {
