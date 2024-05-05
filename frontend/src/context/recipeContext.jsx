@@ -16,15 +16,11 @@ const RecipeContextProvider = ({ children }) => {
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }
-        const allRecipes = await response.json();
-
+        const data = await response.json();
+        setAllRecipes(data);
         setLoading(false);
-<<<<<<< HEAD
-        console.log("All Recipes:", allRecipes);
-=======
+
         console.log("All Recipes:", data);
-    
->>>>>>> f7292195f5442366077da6f57c7c75eefc8cc8db
       } catch (error) {
         setError(error);
         setLoading(false);
@@ -48,7 +44,7 @@ const RecipeContextProvider = ({ children }) => {
       setDistinctCategories(categoriesArray);
     }
   }, [allRecipes, loading]);
-console.log("categoryset", categoriesSet);
+  console.log("categoryset", categoriesSet);
   const saveRecipe = (recipeId) => {
     if (!savedRecipes.includes(recipeId)) {
       setSavedRecipes([...savedRecipes, recipeId]);
