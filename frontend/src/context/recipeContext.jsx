@@ -32,13 +32,14 @@ const RecipeContextProvider = ({ children }) => {
   // Extract distinct categories from fetched recipes
   useEffect(() => {
     const categoriesSet = new Set();
-    allRecipes.forEach((recipe) => {
-      recipe.category.forEach((cat) => categoriesSet.add(cat));
-    });
-    const categoriesArray = Array.from(categoriesSet);
-    setDistinctCategories(categoriesArray);
+    if (allRecipes.length > 0) {
+      allRecipes.forEach((recipe) => {
+        recipe.category.forEach((cat) => categoriesSet.add(cat));
+      });
+      const categoriesArray = Array.from(categoriesSet);
+      setDistinctCategories(categoriesArray);
+    }
   }, [allRecipes]);
-
   // Save a recipe to savedRecipes state
   const saveRecipe = (recipeId) => {
     if (!savedRecipes.includes(recipeId)) {
