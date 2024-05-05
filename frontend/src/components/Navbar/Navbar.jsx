@@ -82,7 +82,9 @@ function Navbar() {
     // Handle logout logic here
     setShowDropdown(false);
     setSearchHistory([]); // Clear search history when logging out
-    sessionStorage.removeItem("searchHistory"); // Clear search history from sessionStorage
+    sessionStorage.removeItem("searchHistory");
+
+    window.location.href = "/home";
   };
 
   const toggleDropdown = () => {
