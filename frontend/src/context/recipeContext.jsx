@@ -19,8 +19,8 @@ const RecipeContextProvider = ({ children }) => {
         const data = await response.json();
         setAllRecipes(data);
         setLoading(false);
+
         console.log("All Recipes:", data);
-    
       } catch (error) {
         setError(error);
         setLoading(false);
@@ -44,7 +44,7 @@ const RecipeContextProvider = ({ children }) => {
       setDistinctCategories(categoriesArray);
     }
   }, [allRecipes, loading]);
-
+  console.log("categoryset", categoriesSet);
   const saveRecipe = (recipeId) => {
     if (!savedRecipes.includes(recipeId)) {
       setSavedRecipes([...savedRecipes, recipeId]);
