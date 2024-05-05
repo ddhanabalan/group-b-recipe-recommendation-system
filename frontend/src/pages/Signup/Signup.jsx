@@ -3,6 +3,7 @@ import logo_dark from "../../assets/logo.svg";
 import Sign_image from "../../assets/signuppic.jpg";
 import Swal from "sweetalert2";
 import "../../styles/Signup.css";
+import axios from "axios";
 
 function Signup() {
   const [formData, setFormData] = useState({
@@ -12,14 +13,13 @@ function Signup() {
   });
 
   const [passwordError, setPasswordError] = useState("");
+  const [emailResponse, setEmailResponse] = useState("");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    // Trim leading spaces from the input value
-    const trimmedValue = value.trim();
     setFormData((prevData) => ({
       ...prevData,
-      [name]: trimmedValue,
+      [name]: value.trim(),
     }));
   };
 
@@ -28,9 +28,8 @@ function Signup() {
     return regex.test(password);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
-    console.log("Form Data:", formData);
 
     if (!validatePassword(formData.password)) {
       setPasswordError(
@@ -40,37 +39,33 @@ function Signup() {
     }
 
     try {
-      const response = await fetch(
+      const response = await axios.post(
         "http://localhost:8000/authentication/signup/",
         {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
         }
       );
 
-      if (response.ok) {
-        const data = await response.json();
+      if (response.status === 200) {
+        const data = await response.data;
         console.log("Signup successful:", data);
-
-        window.location.href = "/login";
+        setEmailResponse(data.email); // Store the email response
 
         Swal.fire({
           icon: "success",
           title: "Registration Successful!",
-          text: "You can now login with your credentials.",
+          text: "An OTP has been sent to your email.",
         });
       } else {
-        const errorData = await response.json();
+        const errorData = await response.data;
         console.error("Signup failed:", errorData);
       }
     } catch (error) {
       console.error("Error during signup:", error);
     }
   };
-
   return (
     <div className="sign-container">
       <div className="login-form-container">
@@ -81,7 +76,7 @@ function Signup() {
         </div>
         <h2 className="sign-header">Create Your Account</h2>
 
-        <form className="sign-form" onSubmit={handleSubmit}>
+        <form className="sign-form" onSubmit={handleSignup}>
           <input
             type="text"
             name="username"

@@ -22,7 +22,7 @@ export const SortProvider = ({ children }) => {
       case "leasttime":
         return a.total_mins - b.total_mins;
       default:
-        return a.id - b.id;
+        return a.recipeid - b.recipeid;
     }
   };
 
