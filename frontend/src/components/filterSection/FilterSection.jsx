@@ -6,7 +6,7 @@ import "../../styles/FilterSection.css";
 
 const FilterSection = ({ setSearchQuery }) => {
   const { filter, dispatch } = useContext(FilterContext);
-  const { distinctCategories, all_recipe } = useContext(RecipeContext);
+  const { distinctCategories, allRecipes } = useContext(RecipeContext);
   const [showCategories, setShowCategories] = useState(false);
 
   const handleCategoryChange = (e) => {
@@ -49,8 +49,8 @@ const FilterSection = ({ setSearchQuery }) => {
     console.log(query);
   };
 
-  const filteredRecipes = all_recipe
-    ? all_recipe.filter((recipe) => {
+  const filteredRecipes = allRecipes
+    ? allRecipes.filter((recipe) => {
         const searchQueryLowerCase = filter.searchQuery
           ? filter.searchQuery.toLowerCase()
           : "";

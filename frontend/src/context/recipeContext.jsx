@@ -16,11 +16,10 @@ const RecipeContextProvider = ({ children }) => {
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }
-        const data = await response.json();
-        setAllRecipes(data);
+        const allRecipes = await response.json();
+
         setLoading(false);
-        console.log("All Recipes:", data);
-        console.log("recipes= ", allRecipes);
+        console.log("All Recipes:", allRecipes);
       } catch (error) {
         setError(error);
         setLoading(false);

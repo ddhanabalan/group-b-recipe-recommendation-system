@@ -16,31 +16,23 @@ const Recipe = () => {
   console.log("Filter:", filter);
   const [searchQuery, setSearchQuery] = useState(""); // State for search query
   // Apply filters when filter is not empty, else show all recipes
-  const filteredRecipes = allRecipes
-    ? allRecipes.filter((recipe) => {
-        const categoryFilter =
-          filter.category.length === 0 ||
-          recipe.category.some((cat) => filter.category.includes(cat));
-        const maxTimeFilter = recipe.total_mins <= filter.maxTime;
-        const maxCaloriesFilter = recipe.calorie <= filter.maxCalories;
-        return categoryFilter && maxTimeFilter && maxCaloriesFilter;
-      })
-    : null;
-
+  const filteredRecipes = allRecipes.filter((recipe) => {
+    const categoryFilter =
+      filter.category.length === 0 ||
+      recipe.category.some((cat) => filter.category.includes(cat));
+    const maxTimeFilter = recipe.total_mins <= filter.maxTime;
+    const maxCaloriesFilter = recipe.calorie <= filter.maxCalories;
+    return categoryFilter && maxTimeFilter && maxCaloriesFilter;
+  });
   // Apply search filter
   const searchedRecipes = searchQuery
-    ? filteredRecipes
-      ? filteredRecipes.filter((recipe) =>
-          recipe.title.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      : []
+    ? filteredRecipes.filter((recipe) =>
+        recipe.title.toLowerCase().includes(searchQuery.toLowerCase())
+      )
     : filteredRecipes;
 
   // Sort recipes based on sorting function
-  const sortedRecipes = searchedRecipes
-    ? searchedRecipes.sort(sortFunction)
-    : [];
-
+  const sortedRecipes = searchedRecipes.sort(sortFunction);
   return (
     <SortProvider>
       <div>
