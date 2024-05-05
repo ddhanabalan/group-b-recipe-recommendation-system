@@ -1,7 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
-import axios from "axios";
 
-// Define RecipeContext outside of the component
 const RecipeContext = createContext();
 
 const RecipeContextProvider = ({ children }) => {
@@ -10,14 +8,17 @@ const RecipeContextProvider = ({ children }) => {
   const [savedRecipes, setSavedRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  // Fetch recipe data from the API
+
+  // Fetch recipe data from the API using fetch
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
-        const response = await axios.get(
-          "http://127.0.0.1:8000/recipe/allrecipes"
-        );
-        setAllRecipes(response.data);
+        const response = await fetch("http://127.0.0.1:8000/recipe/allrecipes");
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
+        const data = await response.json();
+        setAllRecipes(data);
         setLoading(false);
       } catch (error) {
         setError(error);
@@ -70,4 +71,4 @@ const RecipeContextProvider = ({ children }) => {
   );
 };
 
-export { RecipeContext, RecipeContextProvider }; // Export RecipeContext and RecipeContextProvider
+export { RecipeContext, RecipeContextProvider };

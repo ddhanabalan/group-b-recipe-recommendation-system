@@ -1,5 +1,3 @@
-// auth.js
-
 export const setAuthToken = (token) => {
   sessionStorage.setItem("token", token);
 };
