@@ -35,7 +35,7 @@ const Otp = () => {
         "http://localhost:8000/authentication/verify-email/",
         {
           email: formData.email,
-          otp: formData.otp,
+          vericode: formData.otp,
         }
       );
 
