@@ -59,21 +59,23 @@ function Navbar() {
   };
 
   const handleRecipeClick = (recipeId, recipeTitle) => {
-    console.log("Redirecting to Recipe ID:", recipeId);
-    window.location.href = `/singlerecipe/${recipeId}`;
+  console.log("Redirecting to Recipe ID:", recipeId);
+  if (!isAuthenticated()) {
+    window.location.href = "/login"; // Redirect to the login page
+    return;
+  }
 
-    if (isAuthenticated()) {
-      setSearchHistory((prevHistory) => [
-        ...prevHistory,
-        { id: recipeId, title: recipeTitle },
-      ]);
-      sessionStorage.setItem(
-        "searchHistory",
-        JSON.stringify([...searchHistory, { id: recipeId, title: recipeTitle }])
-      );
-    }
-  };
+  window.location.href = `/singlerecipe/${recipeId}`;
 
+  setSearchHistory((prevHistory) => [
+    ...prevHistory,
+    { id: recipeId, title: recipeTitle },
+  ]);
+  sessionStorage.setItem(
+    "searchHistory",
+    JSON.stringify([...searchHistory, { id: recipeId, title: recipeTitle }])
+  );
+};
   const handleLogout = () => {
     // Handle logout logic here
     setShowDropdown(false);

@@ -4,22 +4,25 @@ import { RecipeContext } from "../../context/recipeContext";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { getAuthToken } from "../../utils/auth";
+
 const RecipeDisplay = (props) => {
   const { recipe } = props;
-
   const { saveRecipe, isRecipeSaved } = useContext(RecipeContext);
-  console.log("isRecipesaved", isRecipeSaved);
   const [isSaved, setIsSaved] = useState(isRecipeSaved(recipe.id));
+
   if (!recipe) {
     return <div>Loading...</div>;
   }
-  const ingredientList = recipe.ingredients
-    ? recipe.ingredients.map((ingredient, index) => (
-        <li key={index} style={{ paddingBottom: 5 }}>
-          {ingredient}
-        </li>
-      ))
-    : null;
+
+  // Parse ingredients text into an array
+  const ingredientsArray = recipe.ingredients.split("\n").filter((ingredient) => ingredient.trim() !== "");
+  
+  const ingredientList = ingredientsArray.map((ingredient, index) => (
+    <li key={index} style={{ paddingBottom: 5 }}>
+      {ingredient}
+    </li>
+  ));
+
   const handleSaveRecipe = async () => {
     try {
       // Assuming you have access to user ID and recipe ID
@@ -54,6 +57,7 @@ const RecipeDisplay = (props) => {
       // Handle any errors that occur during the save process
     }
   };
+
   return (
     <div className="recipedisplay">
       <div className="recipedisplay-left">
