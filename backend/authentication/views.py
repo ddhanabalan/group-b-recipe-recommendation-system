@@ -123,7 +123,7 @@ class UserLogin(APIView):
         except User.DoesNotExist:
             return Response({"error": "Invalid username or password"}, status=status.HTTP_401_UNAUTHORIZED)
 
-class LogoutView(APIView):
+class Logout(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
