@@ -20,7 +20,7 @@ const RecipeContextProvider = ({ children }) => {
         setAllRecipes(data);
         setLoading(false);
         console.log("All Recipes:", data);
-        console.log("recipes= ", allRecipes);
+    
       } catch (error) {
         setError(error);
         setLoading(false);
@@ -30,6 +30,7 @@ const RecipeContextProvider = ({ children }) => {
     fetchRecipes();
   }, []);
   useEffect(() => {
+    console.log("All Recipes:", allRecipes);
     if (!loading && allRecipes) {
       // Check if allRecipes is not undefined
       const categoriesSet = new Set();
