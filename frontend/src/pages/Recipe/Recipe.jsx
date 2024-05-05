@@ -13,6 +13,8 @@ const Recipe = () => {
   const { allRecipes } = useContext(RecipeContext);
   const { sortFunction } = useSortContext(); //sortFunction from SortContext
   const { filter, setFilter } = useContext(FilterContext);
+  console.log("allRecipes:", allRecipes);
+  console.log("sortFunction:", sortFunction);
   console.log("Filter:", filter);
   const [searchQuery, setSearchQuery] = useState(""); // State for search query
   // Apply filters when filter is not empty, else show all recipes
