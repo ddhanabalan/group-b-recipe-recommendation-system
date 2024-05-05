@@ -83,22 +83,11 @@ function Navbar() {
   };
 
   const handleLogout = async () => {
-    try {
-      await fetch("http://localhost:8000/authentication/logout/", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${storedToken}`,
-          "Content-Type": "application/json",
-        },
-      });
-      setShowDropdown(false);
-      setSearchHistory([]); // Clear search history when logging out
-      sessionStorage.removeItem("searchHistory");
-      clearAuthToken(); // Clear the authentication token
-      window.location.href = "/home";
-    } catch (error) {
-      console.error("Error logging out:", error);
-    }
+    setShowDropdown(false);
+    setSearchHistory([]); // Clear search history when logging out
+    sessionStorage.removeItem("searchHistory");
+    clearAuthToken(); // Clear the authentication token
+    window.location.href = "/home";
   };
 
   const toggleDropdown = () => {
