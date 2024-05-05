@@ -4,22 +4,18 @@ import { RecipeContext } from "../../context/recipeContext";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { getAuthToken } from "../../utils/auth";
+
 const RecipeDisplay = (props) => {
   const { recipe } = props;
 
   const { saveRecipe, isRecipeSaved } = useContext(RecipeContext);
   console.log("isRecipesaved", isRecipeSaved);
   const [isSaved, setIsSaved] = useState(isRecipeSaved(recipe.id));
+
   if (!recipe) {
     return <div>Loading...</div>;
   }
-  const ingredientList = recipe.ingredients
-    ? recipe.ingredients.map((ingredient, index) => (
-        <li key={index} style={{ paddingBottom: 5 }}>
-          {ingredient}
-        </li>
-      ))
-    : null;
+
   const handleSaveRecipe = async () => {
     try {
       // Assuming you have access to user ID and recipe ID
@@ -54,6 +50,7 @@ const RecipeDisplay = (props) => {
       // Handle any errors that occur during the save process
     }
   };
+
   return (
     <div className="recipedisplay">
       <div className="recipedisplay-left">
@@ -75,28 +72,22 @@ const RecipeDisplay = (props) => {
             <b>{recipe.total_reviews}</b> reviews
           </span>
         </div>
-        <div className="recipe-ingredients">
-          <div className="ingredient-heading">
-            <h2>Ingredients:</h2>
-            <div className="ingredient-btns">
-              {isSaved ? (
-                <button className="saved_recipe">
-                  <Link
-                    to={`/user/savedrecipes`}
-                    style={{ textDecoration: "none", color: "black" }}
-                  >
-                    SAVED
-                  </Link>
-                </button>
-              ) : (
-                <button onClick={handleSaveRecipe} className="save_recipe">
-                  SAVE RECIPE
-                </button>
-              )}
-              <button className="share">SHARE</button>
-            </div>
-          </div>
-          <ul>{ingredientList}</ul>
+        <div className="ingredient-btns">
+          {isSaved ? (
+            <button className="saved_recipe">
+              <Link
+                to={`/user/savedrecipes`}
+                style={{ textDecoration: "none", color: "black" }}
+              >
+                SAVED
+              </Link>
+            </button>
+          ) : (
+            <button onClick={handleSaveRecipe} className="save_recipe">
+              SAVE RECIPE
+            </button>
+          )}
+          <button className="share">SHARE</button>
         </div>
       </div>
     </div>
