@@ -3,7 +3,7 @@ import "../../styles/Navbar.css";
 import logo_dark from "../../assets/logo.svg";
 import { Search } from "@mui/icons-material";
 import { RecipeContext } from "../../context/recipeContext";
-import { isAuthenticated } from "../../utils/auth"; // Import isAuthenticated from auth.js
+import { isAuthenticated, getAuthToken } from "../../utils/auth"; // Import isAuthenticated from auth.js
 
 function Navbar() {
   const { all_recipe } = useContext(RecipeContext);
@@ -12,8 +12,10 @@ function Navbar() {
   const [filteredRecipes, setFilteredRecipes] = useState([]);
   const [searchHistory, setSearchHistory] = useState([]);
   const searchRef = useRef(null);
+  const storedToken = getAuthToken();
 
   useEffect(() => {
+    console.log("Stored Token:", storedToken);
     const storedSearchHistory = sessionStorage.getItem("searchHistory");
     if (storedSearchHistory) {
       setSearchHistory(JSON.parse(storedSearchHistory));

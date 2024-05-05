@@ -20,12 +20,12 @@ const SavedItems = () => {
             <div className="saved-recipe-card">
               <Items
                 key={i}
-                id={item.id}
+                id={item.recipeid}
                 title={item.title}
-                imageurl={item.imageurl}
+                imageurl={item.img}
                 total_mins={item.total_mins}
-                calorie={item.calorie}
-                ratings={item.ratings}
+                calorie={item.calories}
+                ratings={item.rating}
               />
               <button onClick={() => handleRemoveRecipe(item.id)}>
                 Remove

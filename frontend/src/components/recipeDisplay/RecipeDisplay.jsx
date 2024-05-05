@@ -26,19 +26,26 @@ const RecipeDisplay = (props) => {
       const userId = userId(); // Implement this function to get the user ID
       const recipeId = recipe.recipeid;
 
-      // Send a POST request to your API endpoint
-      const response = await axios.post(
-        "http://127.0.0.1:8000/recipe/saveRecipe",
-        { userId, recipeId },
-        {
-          headers: {
-            Authorization: `Bearer ${getAuthToken()}`,
-          },
-        }
-      );
+      // Prepare the request body
+      const requestBody = JSON.stringify({ userId, recipeId });
+
+      // Send a POST request using fetch
+      const response = await fetch("http://127.0.0.1:8000/recipe/saveRecipe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getAuthToken()}`,
+        },
+        body: requestBody,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save recipe");
+      }
 
       // Handle the response from the API as needed
-      console.log("Save Recipe Response:", response.data);
+      const responseData = await response.json();
+      console.log("Save Recipe Response:", responseData);
 
       // Update state to indicate that the recipe is saved
       setIsSaved(true);
@@ -47,7 +54,6 @@ const RecipeDisplay = (props) => {
       // Handle any errors that occur during the save process
     }
   };
-
   return (
     <div className="recipedisplay">
       <div className="recipedisplay-left">
