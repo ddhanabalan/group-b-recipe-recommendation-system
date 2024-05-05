@@ -27,14 +27,13 @@ const RecipeContextProvider = ({ children }) => {
 
     fetchRecipes();
   }, []);
+
   useEffect(() => {
     if (!loading && allRecipes) {
-      // Check if allRecipes is not undefined
       const categoriesSet = new Set();
       allRecipes.forEach((recipe) => {
-        if (recipe.category) {
-          // Check if recipe.category is not undefined
-          recipe.category.forEach((cat) => categoriesSet.add(cat));
+        if (recipe.categories) {
+          recipe.categories.forEach((cat) => categoriesSet.add(cat));
         }
       });
       const categoriesArray = Array.from(categoriesSet);
@@ -57,11 +56,11 @@ const RecipeContextProvider = ({ children }) => {
   };
 
   if (loading) {
-    return <div>Loading...</div>; // Show a loading indicator while fetching data
+    return <div>Loading...</div>;
   }
 
   if (error) {
-    return <div>Error: {error.message}</div>; // Show an error message if data fetching fails
+    return <div>Error: {error.message}</div>;
   }
 
   return (

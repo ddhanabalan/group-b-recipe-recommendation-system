@@ -12,9 +12,9 @@ export const SortProvider = ({ children }) => {
   const sortFunction = (a, b) => {
     switch (sortOption) {
       case "lowestCalorie":
-        return a.calorie - b.calorie;
+        return a.calories - b.calories;
       case "highestRating":
-        return b.ratings - a.ratings;
+        return b.rating - a.rating;
       case "alphabeticalAsc":
         return a.title.localeCompare(b.title);
       case "alphabeticalDesc":

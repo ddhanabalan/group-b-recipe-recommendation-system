@@ -14,12 +14,15 @@ const FilterSection = ({ setSearchQuery }) => {
     let updatedCategories;
 
     if (checked) {
-      updatedCategories = [...filter.category, name];
+      updatedCategories = [...filter.categories, name];
     } else {
-      updatedCategories = filter.category.filter((cat) => cat !== name);
+      updatedCategories = filter.categories.filter((cat) => cat !== name);
     }
 
-    dispatch({ type: "SET_FILTER", payload: { category: updatedCategories } });
+    dispatch({
+      type: "SET_FILTER",
+      payload: { categories: updatedCategories },
+    });
   };
 
   const handleTimeChange = (e) => {
@@ -56,12 +59,12 @@ const FilterSection = ({ setSearchQuery }) => {
           : "";
 
         const categoryFilter =
-          filter.category.length === 0 ||
-          recipe.category.some((cat) =>
+          filter.categories.length === 0 ||
+          recipe.categories.some((cat) =>
             cat.toLowerCase().includes(searchQueryLowerCase)
           );
         const maxTimeFilter = recipe.total_mins <= filter.maxTime;
-        const maxCaloriesFilter = recipe.calorie <= filter.maxCalories;
+        const maxCaloriesFilter = recipe.calories <= filter.maxCalories;
 
         let searchFilter = true; // Default to true
         if (searchQueryLowerCase) {
@@ -70,7 +73,7 @@ const FilterSection = ({ setSearchQuery }) => {
             recipe.ingredients.some((ingredient) =>
               ingredient.toLowerCase().includes(searchQueryLowerCase)
             ) ||
-            recipe.category.some((cat) =>
+            recipe.categories.some((cat) =>
               cat.toLowerCase().includes(searchQueryLowerCase)
             );
         }
@@ -116,7 +119,7 @@ const FilterSection = ({ setSearchQuery }) => {
                 type="checkbox"
                 name={category}
                 onChange={handleCategoryChange}
-                checked={filter.category.includes(category)}
+                checked={filter.categories.includes(category)}
               />
               {category}
             </label>
