@@ -4,6 +4,7 @@ import logo_dark from "../../assets/logo.svg";
 import { Search } from "@mui/icons-material";
 import { RecipeContext } from "../../context/recipeContext";
 import { isAuthenticated, getAuthToken } from "../../utils/auth"; // Import isAuthenticated from auth.js
+import { FaUser } from "react-icons/fa";
 
 function Navbar() {
   const { allRecipes } = useContext(RecipeContext);
@@ -59,23 +60,24 @@ function Navbar() {
   };
 
   const handleRecipeClick = (recipeId, recipeTitle) => {
-  console.log("Redirecting to Recipe ID:", recipeId);
-  if (!isAuthenticated()) {
-    window.location.href = "/login"; // Redirect to the login page
-    return;
-  }
+    console.log("Redirecting to Recipe ID:", recipeId);
+    if (!isAuthenticated()) {
+      window.location.href = "/login"; // Redirect to the login page
+      return;
+    }
 
-  window.location.href = `/singlerecipe/${recipeId}`;
+    window.location.href = `/singlerecipe/${recipeId}`;
 
-  setSearchHistory((prevHistory) => [
-    ...prevHistory,
-    { id: recipeId, title: recipeTitle },
-  ]);
-  sessionStorage.setItem(
-    "searchHistory",
-    JSON.stringify([...searchHistory, { id: recipeId, title: recipeTitle }])
-  );
-};
+    setSearchHistory((prevHistory) => [
+      ...prevHistory,
+      { id: recipeId, title: recipeTitle },
+    ]);
+    sessionStorage.setItem(
+      "searchHistory",
+      JSON.stringify([...searchHistory, { id: recipeId, title: recipeTitle }])
+    );
+  };
+
   const handleLogout = () => {
     // Handle logout logic here
     setShowDropdown(false);
@@ -110,49 +112,47 @@ function Navbar() {
               paddingLeft: 10,
             }}
           />
-          {showDropdown &&
-            authToken && ( // Display search history only if auth token is present
-              <div className="search-history">
-                <div>
-                  {searchHistory.map((item, index) => (
-                    <li
-                      key={index}
-                      className="search-item-history"
-                      onClick={() => setSearchTerm(item)}
-                    >
-                      {item.title}
-                    </li>
-                  ))}
-                </div>
-                <div>
-                  {filteredRecipes.map((recipe) => (
-                    <li
-                      key={recipe.id}
-                      className="search-item"
-                      onClick={() => handleRecipeClick(recipe.id, recipe.title)}
-                    >
-                      {recipe.title}
-                    </li>
-                  ))}
-                </div>
+          {showDropdown && authToken && (
+            <div className="search-history">
+              <div>
+                {searchHistory.map((item, index) => (
+                  <li
+                    key={index}
+                    className="search-item-history"
+                    onClick={() => setSearchTerm(item)}
+                  >
+                    {item.title}
+                  </li>
+                ))}
               </div>
-            )}
-          {showDropdown &&
-            !authToken && ( // Display filtered recipes for logged-out users
-              <div className="search-history">
-                <div>
-                  {filteredRecipes.map((recipe) => (
-                    <li
-                      key={recipe.id}
-                      className="search-item"
-                      onClick={() => handleRecipeClick(recipe.id, recipe.title)}
-                    >
-                      {recipe.title}
-                    </li>
-                  ))}
-                </div>
+              <div>
+                {filteredRecipes.map((recipe) => (
+                  <li
+                    key={recipe.id}
+                    className="search-item"
+                    onClick={() => handleRecipeClick(recipe.id, recipe.title)}
+                  >
+                    {recipe.title}
+                  </li>
+                ))}
               </div>
-            )}
+            </div>
+          )}
+          {showDropdown && !authToken && (
+            <div className="search-history">
+              <div>
+                {filteredRecipes.map((recipe) => (
+                  <li
+                    key={recipe.id}
+                    className="search-item"
+                    onClick={() => handleRecipeClick(recipe.id, recipe.title)}
+                  >
+                    {recipe.title}
+                  </li>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
       <div className="center">
@@ -180,11 +180,7 @@ function Navbar() {
                   onMouseEnter={() => setShowDropdown(true)}
                   onMouseLeave={() => setShowDropdown(false)}
                 >
-                  <img
-                    src="/path/to/user-icon.png" // Replace with actual user icon path
-                    alt="User Icon"
-                    className="user-icon-img"
-                  />
+                  <FaUser className="user-icon-img" />
                   {showDropdown && (
                     <ul className="dropdown">
                       <li>

@@ -3,7 +3,7 @@ import logo_dark from "../../assets/logo.svg";
 import Sign_image from "../../assets/signuppic.jpg";
 import "../../styles/Signup.css";
 import axios from "axios";
-import { useHistory } from "react-router-dom"; // Import useHistory for redirection
+import { useNavigate } from "react-router-dom"; // Import useHistory for redirection
 
 function Signup() {
   const [formData, setFormData] = useState({
@@ -13,7 +13,7 @@ function Signup() {
   });
 
   const [passwordError, setPasswordError] = useState("");
-  const history = useHistory(); // Create history object for redirection
+  const history = useNavigate(); // Create history object for redirection
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -53,7 +53,7 @@ function Signup() {
         console.log("Signup successful:", data);
         const email = data.email; // Extract email from response
         localStorage.setItem("signupEmail", email); // Store email in localStorage
-        history.push(`/otp?email=${encodeURIComponent(email)}`); // Redirect to OTP page with email parameter
+        history(`/otp?email=${encodeURIComponent(email)}`); // Redirect to OTP page with email parameter
       } else {
         const errorData = await response.data;
         console.error("Signup failed:", errorData);
