@@ -5,22 +5,53 @@ import { Link } from "react-router-dom";
 
 const RecipeDisplay = (props) => {
   const { recipe } = props;
+
   const { saveRecipe, isRecipeSaved } = useContext(RecipeContext);
   console.log("isRecipesaved", isRecipeSaved);
   const [isSaved, setIsSaved] = useState(isRecipeSaved(recipe.id));
-  const ingredientList = recipe.ingredients.map((number) => {
-    return <li style={{ paddingBottom: 5 }}>{number}</li>;
-  });
-  const handleSaveRecipe = () => {
-    saveRecipe(recipe.id);
-    setIsSaved(true);
+  if (!recipe) {
+    return <div>Loading...</div>;
+  }
+  const ingredientList = recipe.ingredients
+    ? recipe.ingredients.map((ingredient, index) => (
+        <li key={index} style={{ paddingBottom: 5 }}>
+          {ingredient}
+        </li>
+      ))
+    : null;
+  const handleSaveRecipe = async () => {
+    try {
+      // Assuming you have access to user ID and recipe ID
+      const userId = userId(); // Implement this function to get the user ID
+      const recipeId = recipe.recipeid;
+
+      // Send a POST request to your API endpoint
+      const response = await axios.post(
+        "http://127.0.0.1:8000/recipe/saveRecipe",
+        { userId, recipeId },
+        {
+          headers: {
+            Authorization: `Bearer ${getAuthToken()}`,
+          },
+        }
+      );
+
+      // Handle the response from the API as needed
+      console.log("Save Recipe Response:", response.data);
+
+      // Update state to indicate that the recipe is saved
+      setIsSaved(true);
+    } catch (error) {
+      console.error("Error saving recipe:", error);
+      // Handle any errors that occur during the save process
+    }
   };
 
   return (
     <div className="recipedisplay">
       <div className="recipedisplay-left">
         <div className="recipedisplay-img">
-          <img src={recipe.imageurl} alt="recipe-pic" />
+          <img src={recipe.img} alt="recipe-pic" />
         </div>
         <h1>{recipe.title}</h1>
         <div className="recipedisplay-details">
@@ -30,11 +61,11 @@ const RecipeDisplay = (props) => {
           </span>
           <span className="calorie">
             {" "}
-            <b>{recipe.calorie}</b> calorie
+            <b>{recipe.calories}</b> calorie
           </span>
           <span className="review">
             {" "}
-            <b>{recipe.reviews}</b> reviews
+            <b>{recipe.total_reviews}</b> reviews
           </span>
         </div>
         <div className="recipe-ingredients">

@@ -49,39 +49,37 @@ const FilterSection = ({ setSearchQuery }) => {
     console.log(query);
   };
 
-  const filteredRecipes = all_recipe.filter((recipe) => {
-    const searchQueryLowerCase = filter.searchQuery
-      ? filter.searchQuery.toLowerCase()
-      : "";
-    console.log("Search Query Lowercase:", searchQueryLowerCase);
+  const filteredRecipes = all_recipe
+    ? all_recipe.filter((recipe) => {
+        const searchQueryLowerCase = filter.searchQuery
+          ? filter.searchQuery.toLowerCase()
+          : "";
 
-    const categoryFilter =
-      filter.category.length === 0 ||
-      recipe.category.some((cat) =>
-        cat.toLowerCase().includes(searchQueryLowerCase)
-      );
-    const maxTimeFilter = recipe.total_mins <= filter.maxTime;
-    const maxCaloriesFilter = recipe.calorie <= filter.maxCalories;
+        const categoryFilter =
+          filter.category.length === 0 ||
+          recipe.category.some((cat) =>
+            cat.toLowerCase().includes(searchQueryLowerCase)
+          );
+        const maxTimeFilter = recipe.total_mins <= filter.maxTime;
+        const maxCaloriesFilter = recipe.calorie <= filter.maxCalories;
 
-    let searchFilter = true; // Default to true
-    if (searchQueryLowerCase) {
-      searchFilter =
-        recipe.title.toLowerCase().includes(searchQueryLowerCase) ||
-        recipe.ingredients.some((ingredient) =>
-          ingredient.toLowerCase().includes(searchQueryLowerCase)
-        ) ||
-        recipe.category.some((cat) =>
-          cat.toLowerCase().includes(searchQueryLowerCase)
+        let searchFilter = true; // Default to true
+        if (searchQueryLowerCase) {
+          searchFilter =
+            recipe.title.toLowerCase().includes(searchQueryLowerCase) ||
+            recipe.ingredients.some((ingredient) =>
+              ingredient.toLowerCase().includes(searchQueryLowerCase)
+            ) ||
+            recipe.category.some((cat) =>
+              cat.toLowerCase().includes(searchQueryLowerCase)
+            );
+        }
+
+        return (
+          categoryFilter && maxTimeFilter && maxCaloriesFilter && searchFilter
         );
-    }
-
-    console.log("Category Filter:", categoryFilter);
-    console.log("Max Time Filter:", maxTimeFilter);
-    console.log("Max Calories Filter:", maxCaloriesFilter);
-    console.log("Search Filter:", searchFilter);
-
-    return categoryFilter && maxTimeFilter && maxCaloriesFilter && searchFilter;
-  });
+      })
+    : null;
 
   return (
     <div className="filtersection">

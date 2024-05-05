@@ -1,0 +1,7 @@
+.dashboard-area {
+  display: flex;
+  flex-direction: row;
+}
+.userslist-content {
+  border: 2px solid black;
+}

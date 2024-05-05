@@ -1,18 +1,21 @@
+// filterContext.js
 import React, { createContext, useReducer } from "react";
 
 const initialState = {
-  category: [],
-  maxTime: Infinity,
-  maxCalories: Infinity,
+  filter: {
+    category: [],
+    maxTime: 0,
+    maxCalories: 0,
+    searchQuery: "",
+  },
 };
+
+const FilterContext = createContext(initialState);
 
 const filterReducer = (state, action) => {
   switch (action.type) {
     case "SET_FILTER":
-      return {
-        ...state,
-        ...action.payload,
-      };
+      return { ...state, filter: action.payload };
     case "RESET_FILTER":
       return initialState;
     default:
@@ -20,16 +23,13 @@ const filterReducer = (state, action) => {
   }
 };
 
-const FilterContext = createContext();
-
 const FilterContextProvider = ({ children }) => {
-  const [filter, dispatch] = useReducer(filterReducer, initialState);
-
+  const [state, dispatch] = useReducer(filterReducer, initialState);
   return (
-    <FilterContext.Provider value={{ filter, dispatch }}>
+    <FilterContext.Provider value={{ filter: state.filter, dispatch }}>
       {children}
     </FilterContext.Provider>
   );
 };
 
-export { FilterContext, FilterContextProvider, initialState };
+export { FilterContext, FilterContextProvider };
