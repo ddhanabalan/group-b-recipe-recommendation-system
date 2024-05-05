@@ -13,10 +13,9 @@ const Recipe = () => {
   const { allRecipes } = useContext(RecipeContext);
   const { sortFunction } = useSortContext(); //sortFunction from SortContext
   const { filter, setFilter } = useContext(FilterContext);
-  console.log("allRecipes:", allRecipes);
-  console.log("sortFunction:", sortFunction);
-  console.log("Filter:", filter);
   const [searchQuery, setSearchQuery] = useState(""); // State for search query
+  const [currentPage, setCurrentPage] = useState(1); // Current page of pagination
+  const recipesPerPage = 9; // Number of recipes per page
 
   // Apply filters when filter is not empty, else show all recipes
   const filteredRecipes = allRecipes.filter((recipe) => {
@@ -27,7 +26,6 @@ const Recipe = () => {
     const maxCaloriesFilter = recipe.calories <= filter.maxCalories;
     return categoryFilter && maxTimeFilter && maxCaloriesFilter;
   });
-  console.log("filteredRecipes:", filteredRecipes);
 
   // Apply search filter
   const searchedRecipes = searchQuery
@@ -38,7 +36,17 @@ const Recipe = () => {
 
   // Sort recipes based on sorting function
   const sortedRecipes = searchedRecipes.sort(sortFunction);
-  console.log("sortedRecipes", sortedRecipes);
+
+  // Calculate indexes for pagination
+  const indexOfLastRecipe = currentPage * recipesPerPage;
+  const indexOfFirstRecipe = indexOfLastRecipe - recipesPerPage;
+  const currentRecipes = sortedRecipes.slice(
+    indexOfFirstRecipe,
+    indexOfLastRecipe
+  );
+
+  // Change page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <SortProvider>
@@ -57,8 +65,8 @@ const Recipe = () => {
                 </div>
                 <hr />
                 <div className="recipe-items">
-                  {sortedRecipes.length > 0 ? (
-                    sortedRecipes.map((item, i) => (
+                  {currentRecipes.length > 0 ? (
+                    currentRecipes.map((item, i) => (
                       <Items
                         key={i}
                         recipeid={item.recipeid}
@@ -73,6 +81,22 @@ const Recipe = () => {
                     <p>No recipes found.</p>
                   )}
                 </div>
+                {/* Pagination */}
+                <ul className="pagination">
+                  {Array.from(
+                    {
+                      length: Math.ceil(sortedRecipes.length / recipesPerPage),
+                    },
+                    (_, i) => (
+                      <li
+                        key={i}
+                        className={currentPage === i + 1 ? "active" : ""}
+                      >
+                        <button onClick={() => paginate(i + 1)}>{i + 1}</button>
+                      </li>
+                    )
+                  )}
+                </ul>
               </div>
             </div>
           </div>
