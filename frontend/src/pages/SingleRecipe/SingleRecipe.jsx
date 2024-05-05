@@ -27,7 +27,7 @@ const SingleRecipe = () => {
 
   const recipe =
     allRecipes && allRecipes.length > 0
-      ? allRecipes.find((e) => e.id === Number(RecipeId))
+      ? allRecipes.find((e) => e.recipeid === Number(RecipeId))
       : [];
 
   if (!recipe) {
