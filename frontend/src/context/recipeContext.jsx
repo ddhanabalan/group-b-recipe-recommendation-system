@@ -29,10 +29,14 @@ const RecipeContextProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (!loading) {
+    if (!loading && allRecipes) {
+      // Check if allRecipes is not undefined
       const categoriesSet = new Set();
       allRecipes.forEach((recipe) => {
-        recipe.category.forEach((cat) => categoriesSet.add(cat));
+        if (recipe.category) {
+          // Check if recipe.category is not undefined
+          recipe.category.forEach((cat) => categoriesSet.add(cat));
+        }
       });
       const categoriesArray = Array.from(categoriesSet);
       setDistinctCategories(categoriesArray);
