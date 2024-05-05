@@ -41,6 +41,20 @@ const RecipeContextProvider = ({ children }) => {
     }
   }, [allRecipes, loading]);
 
+  const saveRecipe = (recipeId) => {
+    if (!savedRecipes.includes(recipeId)) {
+      setSavedRecipes([...savedRecipes, recipeId]);
+    }
+  };
+
+  const unsaveRecipe = (recipeId) => {
+    setSavedRecipes(savedRecipes.filter((id) => id !== recipeId));
+  };
+
+  const isRecipeSaved = (recipeId) => {
+    return savedRecipes.includes(recipeId);
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -54,6 +68,9 @@ const RecipeContextProvider = ({ children }) => {
       value={{
         allRecipes,
         distinctCategories,
+        saveRecipe,
+        unsaveRecipe,
+        isRecipeSaved,
       }}
     >
       {children}
