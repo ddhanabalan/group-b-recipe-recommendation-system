@@ -3,7 +3,11 @@ import "../../styles/Navbar.css";
 import logo_dark from "../../assets/logo.svg";
 import { Search } from "@mui/icons-material";
 import { RecipeContext } from "../../context/recipeContext";
-import { isAuthenticated, getAuthToken } from "../../utils/auth"; // Import isAuthenticated from auth.js
+import {
+  isAuthenticated,
+  getAuthToken,
+  clearAuthToken,
+} from "../../utils/auth"; // Import isAuthenticated from auth.js
 import { FaUser } from "react-icons/fa";
 
 function Navbar() {
