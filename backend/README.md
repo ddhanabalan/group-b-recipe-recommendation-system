@@ -220,81 +220,104 @@ This is the backend component of the Group B Recipe Recommendation System, provi
 
 ## All Recipes
 
-**URL:** `/allrecipes/`  
+**URL:** `/recipe/allrecipes/`  
 **Method:** `GET`  
 **Description:** Retrieves all recipes.  
 
 ## Popular Recipes
 
-**URL:** `/popularrecipes/`  
+**URL:** `/recipe/popularrecipes/`  
 **Method:** `GET`  
 **Description:** Retrieves popular recipes.  
 
 ## New Recipes
 
-**URL:** `/newrecipes/`  
+**URL:** `/recipe/newrecipes/`  
 **Method:** `GET`  
 **Description:** Retrieves new recipes.  
 
 ## Add Favorite
 
-**URL:** `/saverecipe/`  
+**URL:** `/recipe/saverecipe/`  
 **Method:** `POST`  
 **Description:** Adds a recipe to favorites.  
+**Parameters:**
+- `userid`: string (required)
+- `recipeid`: string (required)
 
 ## All Favorites
 
-**URL:** `/saved/`  
+**URL:** `/recipe/saved/`  
 **Method:** `POST`  
 **Description:** Retrieves all favorite recipes for a user.  
+**Parameters:**
+- `userid`: string (required)
 
 ## Recipe Reviews
 
-**URL:** `/recipereview/`  
+**URL:** `/recipe/recipereview/`  
 **Method:** `POST`  
 **Description:** Retrieves reviews for a recipe.  
+**Parameters:**
+- `recipeid`: string (required)
 
 ## All Reviews
 
-**URL:** `/allreviews/`  
+**URL:** `/recipe/allreviews/`  
 **Method:** `GET`  
 **Description:** Retrieves all reviews.  
 
 ## All Titles
 
-**URL:** `/alltitles/`  
+**URL:** `/recipe/alltitles/`  
 **Method:** `GET`  
 **Description:** Retrieves titles of all recipes.  
 
 ## Add Review
 
-**URL:** `/addreview/`  
+**URL:** `/recipe/addreview/`  
 **Method:** `POST`  
 **Description:** Adds a review for a recipe.  
+**Parameters:**
+- `userid`: string (required)
+- `recipeid`: string (required)
+- `rating`: integer (required)
+- `review_text`: string (optional)
 
 ## Delete Review
 
-**URL:** `/deletereview/`  
+**URL:** `/recipe/deletereview/`  
 **Method:** `DELETE`  
 **Description:** Deletes a review.  
+**Parameters:**
+- `review_id`: integer (required)
 
 ## Add Recipe
 
-**URL:** `/addrecipe/`  
+**URL:** `/recipe/addrecipe/`  
 **Method:** `POST`  
 **Description:** Adds a new recipe.  
+**Parameters:**
+- `userid`: string (required)
+- `title`: string (required)
+- `description`: string (optional)
+- `ingredients`: array of strings (required)
+- `directions`: array of strings (required)
+- `categories`: array of strings (required)
 
 ## All Categories
 
-**URL:** `/allcategories/`  
+**URL:** `/recipe/allcategories/`  
 **Method:** `GET`  
 **Description:** Retrieves all recipe categories.  
 
 ## User Recipes
 
-**URL:** `/userrecipes/`  
+**URL:** `/recipe/userrecipes/`  
 **Method:** `POST`  
 **Description:** Retrieves recipes for a user.  
+**Parameters:**
+- `userid`: string (required)
 
 ## Dependencies
 
