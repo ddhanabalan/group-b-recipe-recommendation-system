@@ -14,10 +14,8 @@ const RecipeDisplay = ({ recipe }) => {
   }
 
   // Parse ingredients text into an array
-  const ingredientsArray = recipe.ingredients
-    .split("\n")
-    .filter((ingredient) => ingredient.trim() !== "");
-
+  const ingredientsArray = recipe.ingredients.split("\n").filter((ingredient) => ingredient.trim() !== "");
+  
   const ingredientList = ingredientsArray.map((ingredient, index) => (
     <li key={index} style={{ paddingBottom: 5 }}>
       {ingredient}
