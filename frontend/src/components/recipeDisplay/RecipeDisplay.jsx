@@ -1,16 +1,64 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import "../../styles/RecipeDisplay.css";
-
+import { RecipeContext } from "../../context/recipeContext";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import { getAuthToken } from "../../utils/auth";
 const RecipeDisplay = (props) => {
   const { recipe } = props;
-  const ingredientList = recipe.ingredients.map((number) => {
-    return <li style={{ paddingBottom: 5 }}>{number}</li>;
-  });
+
+  const { saveRecipe, isRecipeSaved } = useContext(RecipeContext);
+  console.log("isRecipesaved", isRecipeSaved);
+  const [isSaved, setIsSaved] = useState(isRecipeSaved(recipe.id));
+  if (!recipe) {
+    return <div>Loading...</div>;
+  }
+  const ingredientList = recipe.ingredients
+    ? recipe.ingredients.map((ingredient, index) => (
+        <li key={index} style={{ paddingBottom: 5 }}>
+          {ingredient}
+        </li>
+      ))
+    : null;
+  const handleSaveRecipe = async () => {
+    try {
+      // Assuming you have access to user ID and recipe ID
+      const userId = userId(); // Implement this function to get the user ID
+      const recipeId = recipe.recipeid;
+
+      // Prepare the request body
+      const requestBody = JSON.stringify({ userId, recipeId });
+
+      // Send a POST request using fetch
+      const response = await fetch("http://127.0.0.1:8000/recipe/saveRecipe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getAuthToken()}`,
+        },
+        body: requestBody,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save recipe");
+      }
+
+      // Handle the response from the API as needed
+      const responseData = await response.json();
+      console.log("Save Recipe Response:", responseData);
+
+      // Update state to indicate that the recipe is saved
+      setIsSaved(true);
+    } catch (error) {
+      console.error("Error saving recipe:", error);
+      // Handle any errors that occur during the save process
+    }
+  };
   return (
     <div className="recipedisplay">
       <div className="recipedisplay-left">
         <div className="recipedisplay-img">
-          <img src={recipe.imageurl} alt="recipe-pic" />
+          <img src={recipe.img} alt="recipe-pic" />
         </div>
         <h1>{recipe.title}</h1>
         <div className="recipedisplay-details">
@@ -20,18 +68,31 @@ const RecipeDisplay = (props) => {
           </span>
           <span className="calorie">
             {" "}
-            <b>{recipe.calorie}</b> calorie
+            <b>{recipe.calories}</b> calorie
           </span>
           <span className="review">
             {" "}
-            <b>{recipe.reviews}</b> reviews
+            <b>{recipe.total_reviews}</b> reviews
           </span>
         </div>
         <div className="recipe-ingredients">
           <div className="ingredient-heading">
             <h2>Ingredients:</h2>
             <div className="ingredient-btns">
-              <button className="save_recipe">SAVE RECIPE</button>
+              {isSaved ? (
+                <button className="saved_recipe">
+                  <Link
+                    to={`/user/savedrecipes`}
+                    style={{ textDecoration: "none", color: "black" }}
+                  >
+                    SAVED
+                  </Link>
+                </button>
+              ) : (
+                <button onClick={handleSaveRecipe} className="save_recipe">
+                  SAVE RECIPE
+                </button>
+              )}
               <button className="share">SHARE</button>
             </div>
           </div>

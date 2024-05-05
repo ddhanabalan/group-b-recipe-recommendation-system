@@ -1,0 +1,62 @@
+.user-profile-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.usercontainer {
+  display: flex;
+  flex: 1;
+}
+.user-profile-heading {
+  display: flex;
+}
+.profile-icon {
+  margin-right: 30px;
+}
+.head {
+  padding-top: 15px;
+}
+.user-content-section {
+  flex: 1;
+  padding: 20px;
+}
+.user-content-section h2 {
+  font-size: 35px;
+
+  margin-bottom: 20px;
+}
+.user-details {
+  margin-bottom: 20px;
+}
+
+.detail-item {
+  margin-bottom: 10px;
+}
+
+.detail-item label {
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.button-group button {
+  margin-right: 10px;
+}
+
+.edit-button {
+  background-color: #e16d19;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.password-button {
+  background-color: #e16d19;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+}

@@ -1,6 +1,6 @@
 import React from "react";
 import Carousel, { consts } from "react-elastic-carousel";
-import Item from "../items/Items";
+import Item from "../Items/Items";
 import "../../styles/CarouselComponent.css";
 import { TfiArrowCircleLeft } from "react-icons/tfi";
 import { TfiArrowCircleRight } from "react-icons/tfi";
@@ -33,12 +33,12 @@ const CarouselComponent = ({ data }) => {
       {data.map((item, i) => (
         <Item
           key={i}
-          id={item.id}
+          recipeid={item.recipeid}
           title={item.title}
-          imageurl={item.imageurl}
+          img={item.img}
           total_mins={item.total_mins}
-          calorie={item.calorie}
-          ratings={item.ratings}
+          calories={item.calories}
+          rating={item.rating}
         />
       ))}
     </Carousel>

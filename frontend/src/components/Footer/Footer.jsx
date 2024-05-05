@@ -21,9 +21,6 @@ function Footer() {
           <FaInstagram style={{ fontSize: 40, padding: 6 }} />
           <MdAlternateEmail style={{ fontSize: 40, padding: 6 }} />
           <FaYoutube style={{ fontSize: 40, padding: 6 }} />
-          <div className="lang">
-            <button>English</button>
-          </div>
         </div>
         <hr />
         <div className="footer-copyright">

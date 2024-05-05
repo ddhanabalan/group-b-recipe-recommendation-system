@@ -1,10 +1,9 @@
 .navbar {
   display: flex;
-  height: 70px;
+  height: 60px;
   justify-content: space-between;
   align-items: center;
   padding: 10px;
-
   color: #fff;
 }
 
@@ -15,7 +14,7 @@
 }
 .search-bar-container {
   position: relative;
-  padding: 8px;
+  padding: 2px;
   display: flex;
   border-radius: 20px;
   border: 0.5px solid black;
@@ -74,6 +73,7 @@ nav ul li a {
   text-decoration: none;
   color: black;
 }
+
 nav ul li:last-child a {
   border: 0.5px solid black;
   border-radius: 5px;
@@ -87,4 +87,45 @@ nav ul li:last-child a:hover {
 }
 .search-bar-container {
   position: relative;
+}
+nav ul li a:hover {
+  color: #e1792f;
+}
+nav ul li.selected a {
+  text-decoration: underline;
+}
+.search-bar-container {
+  position: relative;
+  z-index: 1000; /* Ensure the search bar is above other elements */
+}
+
+.search-history {
+  list-style-type: none;
+  position: absolute;
+  top: calc(100% + 4px); /* Adjust this value as needed */
+  left: 0;
+  background-color: #ffffff; /* Grey background color */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  z-index: 1001; /* Ensure the dropdown is above the search bar */
+
+  overflow-y: auto; /* Enable vertical scrolling if needed */
+  color: black;
+  width: 250px;
+  font-size: 12px;
+}
+.search-item-history {
+  background-color: rgb(205, 205, 205);
+  list-style-type: none;
+}
+.search-history li {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.search-history li:hover {
+  background-color: #f0f0f0;
+}
+.search-item {
+  list-style-type: none;
 }

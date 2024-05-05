@@ -1,6 +1,89 @@
-import React from "react";
+import React, { useContext, useState } from "react";
+import { FilterContext } from "../../context/filterContext";
+import { RecipeContext } from "../../context/recipeContext";
+import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
+import "../../styles/FilterSection.css";
 
-const FilterSection = () => {
+const FilterSection = ({ setSearchQuery }) => {
+  const { filter, dispatch } = useContext(FilterContext);
+  const { distinctCategories, allRecipes } = useContext(RecipeContext);
+  const [showCategories, setShowCategories] = useState(false);
+
+  const handleCategoryChange = (e) => {
+    const { name, checked } = e.target;
+    let updatedCategories;
+
+    if (checked) {
+      updatedCategories = [...filter.category, name];
+    } else {
+      updatedCategories = filter.category.filter((cat) => cat !== name);
+    }
+
+    dispatch({
+      type: "SET_FILTER",
+      payload: { categories: updatedCategories },
+    });
+  };
+
+  const handleTimeChange = (e) => {
+    const { value } = e.target;
+    dispatch({ type: "SET_FILTER", payload: { maxTime: parseInt(value, 10) } });
+  };
+
+  const handleCaloriesChange = (e) => {
+    const { value } = e.target;
+    dispatch({
+      type: "SET_FILTER",
+      payload: { maxCalories: parseInt(value, 10) },
+    });
+  };
+
+  const handleApplyFilter = () => {
+    // Apply filter logic as needed
+  };
+
+  const handleResetFilter = () => {
+    dispatch({ type: "RESET_FILTER" });
+  };
+
+  const handleSearch = (e) => {
+    const query = e.target.value.toLowerCase();
+    setSearchQuery(query);
+    console.log(query);
+  };
+
+  const filteredRecipes = allRecipes
+    ? allRecipes.filter((recipe) => {
+        const searchQueryLowerCase = filter.searchQuery
+          ? filter.searchQuery.toLowerCase()
+          : "";
+
+        const categoryFilter =
+          filter.category.length === 0 ||
+          recipe.categories.some((cat) =>
+            cat.toLowerCase().includes(searchQueryLowerCase)
+          );
+        const maxTimeFilter = recipe.total_mins <= filter.maxTime;
+        const maxCaloriesFilter = recipe.calories <= filter.maxCalories;
+
+        let searchFilter = true; // Default to true
+        if (searchQueryLowerCase) {
+          searchFilter =
+            recipe.title.toLowerCase().includes(searchQueryLowerCase) ||
+            recipe.ingredients.some((ingredient) =>
+              ingredient.toLowerCase().includes(searchQueryLowerCase)
+            ) ||
+            recipe.categories.some((cat) =>
+              cat.toLowerCase().includes(searchQueryLowerCase)
+            );
+        }
+
+        return (
+          categoryFilter && maxTimeFilter && maxCaloriesFilter && searchFilter
+        );
+      })
+    : null;
+
   return (
     <div className="filtersection">
       <h1
@@ -13,16 +96,66 @@ const FilterSection = () => {
       >
         Filter Recipes:
       </h1>
-      <div
-        className="filtersection-box"
-        style={{ gap: 10, padding: 10, backgroundColor: "#f7e1d1" }}
-      >
-        categories
-        <br />
-        total time
-        <br />
-        calories
+      <div className="search-container">
+        <input
+          type="text"
+          placeholder="Search recipes by name"
+          onChange={handleSearch}
+          className="search-input"
+        />
       </div>
+      <div
+        className="category-header"
+        onClick={() => setShowCategories(!showCategories)}
+      >
+        Categories{" "}
+        {showCategories ? <IoMdArrowDropup /> : <IoMdArrowDropdown />}
+      </div>
+      {showCategories && (
+        <div className="category-container">
+          {distinctCategories.map((category) => (
+            <label key={category} className="category-label">
+              <input
+                type="checkbox"
+                name={category}
+                onChange={handleCategoryChange}
+                checked={filter.category.includes(category)}
+              />
+              {category}
+            </label>
+          ))}
+        </div>
+      )}
+      <br />
+      <label className="total-mins">
+        Total Time (mins):
+        <input
+          type="range"
+          min="0"
+          max="120"
+          step="5"
+          value={filter.maxTime}
+          onChange={handleTimeChange}
+        />
+        {filter.maxTime} mins
+      </label>
+      <br />
+      <label className="max-calorie">
+        Max Calories:
+        <input
+          type="range"
+          min="0"
+          max="1000"
+          step="50"
+          value={filter.maxCalories}
+          onChange={handleCaloriesChange}
+        />
+        {filter.maxCalories} calories
+      </label>
+      <br />
+      <button className="reset-filter" onClick={handleResetFilter}>
+        Reset Filter
+      </button>
     </div>
   );
 };
