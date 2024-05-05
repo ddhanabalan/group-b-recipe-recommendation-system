@@ -8,7 +8,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import AdminSideBar from "../../components/admin/AdminSideBar";
 import Navbar from "../../components/Navbar/Navbar";
-import Chart from "chart.js/auto"; // Import Chart.js library
+
 import "../../styles/Admin.css";
 
 const Admin = () => {
@@ -43,48 +43,10 @@ const Admin = () => {
 
       const feedbackCountData = await fetchFeedbackCount();
       setFeedbackCount(feedbackCountData);
-
-      // Update chart data after fetching counts
-      updateChart(recipeCountData, userCountData, feedbackCountData);
     };
 
     fetchCounts();
   }, []); // Empty dependency array to fetch counts on initial render
-
-  // Function to update the chart with new data
-  const updateChart = (recipes, users, feedbacks) => {
-    const ctx = document.getElementById("adminChart").getContext("2d");
-    new Chart(ctx, {
-      type: "bar",
-      data: {
-        labels: ["Recipes", "Users", "Feedbacks"],
-        datasets: [
-          {
-            label: "Usage",
-            data: [recipes, users, feedbacks],
-            backgroundColor: [
-              "rgba(255, 99, 132, 0.5)", // Red with opacity
-              "rgba(54, 162, 235, 0.5)", // Blue with opacity
-              "rgba(255, 206, 86, 0.5)", // Yellow with opacity
-            ],
-            borderColor: [
-              "rgba(255, 99, 132, 1)", // Red
-              "rgba(54, 162, 235, 1)", // Blue
-              "rgba(255, 206, 86, 1)", // Yellow
-            ],
-            borderWidth: 1,
-          },
-        ],
-      },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true,
-          },
-        },
-      },
-    });
-  };
 
   return (
     <Fragment>
@@ -126,9 +88,6 @@ const Admin = () => {
                 <p>{feedbackCount}</p>
               </Link>
             </div>
-          </div>
-          <div className="chart-container">
-            <canvas id="adminChart"></canvas>
           </div>
         </div>
       </div>

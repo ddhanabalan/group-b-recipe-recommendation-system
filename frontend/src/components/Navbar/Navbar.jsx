@@ -3,10 +3,10 @@ import "../../styles/Navbar.css";
 import logo_dark from "../../assets/logo.svg";
 import { Search } from "@mui/icons-material";
 import { RecipeContext } from "../../context/recipeContext";
+import { isAuthenticated } from "../../utils/auth"; // Import isAuthenticated from auth.js
 
 function Navbar() {
   const { all_recipe } = useContext(RecipeContext);
-  const [authToken, setAuthToken] = useState(""); // Example of authentication token state
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredRecipes, setFilteredRecipes] = useState([]);
@@ -60,7 +60,7 @@ function Navbar() {
     console.log("Redirecting to Recipe ID:", recipeId);
     window.location.href = `/singlerecipe/${recipeId}`;
 
-    if (authToken) {
+    if (isAuthenticated()) {
       setSearchHistory((prevHistory) => [
         ...prevHistory,
         { id: recipeId, title: recipeTitle },
@@ -73,7 +73,7 @@ function Navbar() {
   };
 
   const handleLogout = () => {
-    setAuthToken(""); // Clear authentication token
+    // Handle logout logic here
     setShowDropdown(false);
     setSearchHistory([]); // Clear search history when logging out
     sessionStorage.removeItem("searchHistory"); // Clear search history from sessionStorage
@@ -82,6 +82,8 @@ function Navbar() {
   const toggleDropdown = () => {
     setShowDropdown(!showDropdown);
   };
+
+  const authToken = isAuthenticated(); // Determine if the user is authenticated
 
   return (
     <div className="navbar">

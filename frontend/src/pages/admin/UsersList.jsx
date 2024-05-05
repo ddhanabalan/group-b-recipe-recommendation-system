@@ -5,8 +5,10 @@ const UsersList = () => {
   return (
     <div>
       <Navbar />
-      <AdminSideBar />
-      <div className="userslist-content">users List</div>
+      <div className="dashboard-area">
+        <AdminSideBar />
+        <div className="userslist-content">hello</div>
+      </div>
     </div>
   );
 };

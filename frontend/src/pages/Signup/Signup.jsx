@@ -15,9 +15,11 @@ function Signup() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    // Trim leading spaces from the input value
+    const trimmedValue = value.trim();
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value,
+      [name]: trimmedValue,
     }));
   };
 

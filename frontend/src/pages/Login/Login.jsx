@@ -14,10 +14,12 @@ function Login() {
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
-    // Define handleChange function
+    const { name, value } = e.target;
+    // Remove leading spaces using trim()
+    const sanitizedValue = value.trim();
     setValues({
       ...values,
-      [e.target.name]: e.target.value,
+      [name]: sanitizedValue,
     });
   };
 
@@ -40,6 +42,9 @@ function Login() {
 
         console.log("Login successful:", response.data);
 
+        // Log the user role to check if it's received correctly
+        console.log("User Role:", response.data.role);
+
         // Redirect based on user role
         if (response.data.role === "admin") {
           window.location.href = "/dashboard";
@@ -48,7 +53,20 @@ function Login() {
         }
       } catch (error) {
         console.error("Login error:", error);
-        setErrors({ invalidCredentials: "Invalid username or password" });
+
+        if (error.response) {
+          if (error.response.status === 401) {
+            setErrors({ invalidCredentials: "Invalid username or password" });
+          } else {
+            setErrors({
+              generalError: "An error occurred. Please try again later.",
+            });
+          }
+        } else {
+          setErrors({
+            generalError: "An error occurred. Please try again later.",
+          });
+        }
       }
     }
   };
