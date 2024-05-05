@@ -15,7 +15,7 @@ const RecipeContextProvider = ({ children }) => {
     const fetchRecipes = async () => {
       try {
         const response = await axios.get(
-          "http://127.0.0.1:8000/recipe/recipes"
+          "http://127.0.0.1:8000/recipe/allrecipes"
         );
         setAllRecipes(response.data);
         setLoading(false);
