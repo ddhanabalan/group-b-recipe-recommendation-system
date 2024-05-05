@@ -61,12 +61,12 @@ const Recipe = () => {
                     sortedRecipes.map((item, i) => (
                       <Items
                         key={i}
-                        id={item.recipeid}
+                        recipeid={item.recipeid}
                         title={item.title}
-                        imageurl={item.img}
+                        img={item.img}
                         total_mins={item.total_mins}
-                        calorie={item.calories}
-                        ratings={item.rating}
+                        calories={item.calories}
+                        rating={item.rating}
                       />
                     ))
                   ) : (
