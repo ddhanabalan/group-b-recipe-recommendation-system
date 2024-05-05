@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { useLocation } from "react-router-dom"; // Import useLocation hook
+import { useLocation } from "react-router-dom";
 import "../../styles/ForgotPassword.css";
 
 const Otp = () => {
@@ -13,12 +12,13 @@ const Otp = () => {
   const [verificationError, setVerificationError] = useState("");
 
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const email = searchParams.get("email");
-    if (email) {
-      setFormData({ ...formData, email });
+    const pathnameSegments = location.pathname.split("/"); // Split URL path into segments
+    const emailSegmentIndex = pathnameSegments.indexOf("otp") + 1; // Get index of email segment
+    if (emailSegmentIndex > 0 && emailSegmentIndex < pathnameSegments.length) {
+      const email = pathnameSegments[emailSegmentIndex]; // Extract email from URL path
+      setFormData((prevData) => ({ ...prevData, email })); // Update form data state with email
     }
-  }, [location.search]);
+  }, [location.pathname]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -34,7 +34,7 @@ const Otp = () => {
       console.log("Request body sent to server:", {
         email: formData.email,
         vericode: formData.otp,
-      }); // Log the request body sent to the server
+      });
 
       const response = await fetch(
         "http://localhost:8000/authentication/verify-email/",
@@ -65,6 +65,7 @@ const Otp = () => {
       setVerificationError("Failed to verify email.");
     }
   };
+
   return (
     <div className="forgotpassword">
       <div className="card" style={{ height: 270 }}>
