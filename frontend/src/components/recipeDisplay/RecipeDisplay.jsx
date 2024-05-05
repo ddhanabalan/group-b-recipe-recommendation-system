@@ -7,14 +7,21 @@ import { getAuthToken } from "../../utils/auth";
 
 const RecipeDisplay = (props) => {
   const { recipe } = props;
-
   const { saveRecipe, isRecipeSaved } = useContext(RecipeContext);
-  console.log("isRecipesaved", isRecipeSaved);
   const [isSaved, setIsSaved] = useState(isRecipeSaved(recipe.id));
 
   if (!recipe) {
     return <div>Loading...</div>;
   }
+
+  // Parse ingredients text into an array
+  const ingredientsArray = recipe.ingredients.split("\n").filter((ingredient) => ingredient.trim() !== "");
+  
+  const ingredientList = ingredientsArray.map((ingredient, index) => (
+    <li key={index} style={{ paddingBottom: 5 }}>
+      {ingredient}
+    </li>
+  ));
 
   const handleSaveRecipe = async () => {
     try {
@@ -72,22 +79,28 @@ const RecipeDisplay = (props) => {
             <b>{recipe.total_reviews}</b> reviews
           </span>
         </div>
-        <div className="ingredient-btns">
-          {isSaved ? (
-            <button className="saved_recipe">
-              <Link
-                to={`/user/savedrecipes`}
-                style={{ textDecoration: "none", color: "black" }}
-              >
-                SAVED
-              </Link>
-            </button>
-          ) : (
-            <button onClick={handleSaveRecipe} className="save_recipe">
-              SAVE RECIPE
-            </button>
-          )}
-          <button className="share">SHARE</button>
+        <div className="recipe-ingredients">
+          <div className="ingredient-heading">
+            <h2>Ingredients:</h2>
+            <div className="ingredient-btns">
+              {isSaved ? (
+                <button className="saved_recipe">
+                  <Link
+                    to={`/user/savedrecipes`}
+                    style={{ textDecoration: "none", color: "black" }}
+                  >
+                    SAVED
+                  </Link>
+                </button>
+              ) : (
+                <button onClick={handleSaveRecipe} className="save_recipe">
+                  SAVE RECIPE
+                </button>
+              )}
+              <button className="share">SHARE</button>
+            </div>
+          </div>
+          <ul>{ingredientList}</ul>
         </div>
       </div>
     </div>
