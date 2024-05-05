@@ -14,9 +14,9 @@ const FilterSection = ({ setSearchQuery }) => {
     let updatedCategories;
 
     if (checked) {
-      updatedCategories = [...filter.categories, name];
+      updatedCategories = [...filter.category, name];
     } else {
-      updatedCategories = filter.categories.filter((cat) => cat !== name);
+      updatedCategories = filter.category.filter((cat) => cat !== name);
     }
 
     dispatch({
@@ -59,7 +59,7 @@ const FilterSection = ({ setSearchQuery }) => {
           : "";
 
         const categoryFilter =
-          filter.categories.length === 0 ||
+          filter.category.length === 0 ||
           recipe.categories.some((cat) =>
             cat.toLowerCase().includes(searchQueryLowerCase)
           );
@@ -119,7 +119,7 @@ const FilterSection = ({ setSearchQuery }) => {
                 type="checkbox"
                 name={category}
                 onChange={handleCategoryChange}
-                checked={filter.categories.includes(category)}
+                checked={filter.category.includes(category)}
               />
               {category}
             </label>
