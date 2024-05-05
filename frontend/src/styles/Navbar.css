@@ -150,3 +150,6 @@ nav ul li.selected a {
 .dropdown li:hover {
   background-color: #f0f0f0;
 }
+.user-heading {
+  color: black;
+}
