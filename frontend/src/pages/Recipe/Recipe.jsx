@@ -21,8 +21,8 @@ const Recipe = () => {
   // Apply filters when filter is not empty, else show all recipes
   const filteredRecipes = allRecipes.filter((recipe) => {
     const categoryFilter =
-      filter.categories.length === 0 ||
-      recipe.categories.some((cat) => filter.categories.includes(cat));
+      filter.category.length === 0 ||
+      recipe.categories.some((cat) => filter.category.includes(cat));
     const maxTimeFilter = recipe.total_mins <= filter.maxTime;
     const maxCaloriesFilter = recipe.calories <= filter.maxCalories;
     return categoryFilter && maxTimeFilter && maxCaloriesFilter;
