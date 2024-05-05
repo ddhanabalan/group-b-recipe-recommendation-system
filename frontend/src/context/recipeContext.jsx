@@ -9,7 +9,6 @@ const RecipeContextProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch recipe data from the API using fetch
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
@@ -29,33 +28,38 @@ const RecipeContextProvider = ({ children }) => {
     fetchRecipes();
   }, []);
 
-  // Extract distinct categories from fetched recipes
   useEffect(() => {
-    const categoriesSet = new Set();
-    if (allRecipes.length > 0) {
+    if (!loading) {
+      const categoriesSet = new Set();
       allRecipes.forEach((recipe) => {
         recipe.category.forEach((cat) => categoriesSet.add(cat));
       });
       const categoriesArray = Array.from(categoriesSet);
       setDistinctCategories(categoriesArray);
     }
-  }, [allRecipes]);
-  // Save a recipe to savedRecipes state
+  }, [allRecipes, loading]);
+
   const saveRecipe = (recipeId) => {
     if (!savedRecipes.includes(recipeId)) {
       setSavedRecipes([...savedRecipes, recipeId]);
     }
   };
 
-  // Remove a recipe from savedRecipes state
   const unsaveRecipe = (recipeId) => {
     setSavedRecipes(savedRecipes.filter((id) => id !== recipeId));
   };
 
-  // Check if a recipe is saved
   const isRecipeSaved = (recipeId) => {
     return savedRecipes.includes(recipeId);
   };
+
+  if (loading) {
+    return <div>Loading...</div>; // Show a loading indicator while fetching data
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>; // Show an error message if data fetching fails
+  }
 
   return (
     <RecipeContext.Provider
