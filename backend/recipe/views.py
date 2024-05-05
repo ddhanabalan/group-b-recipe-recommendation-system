@@ -28,7 +28,8 @@ class AllRecipes(generics.ListAPIView):
         return Response(data)
 
 class PopularRecipes(generics.ListAPIView):
-    # permission_classes = [IsAuthenticated]
+    # authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     queryset = Recipe.objects.order_by("-total_reviews")[:10]
     serializer_class = RecipeSerializer
 

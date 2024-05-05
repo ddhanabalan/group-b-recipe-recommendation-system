@@ -27,7 +27,10 @@ const Recipe = () => {
   // Pagination logic
   const indexOfLastRecipe = currentPage * recipesPerPage;
   const indexOfFirstRecipe = indexOfLastRecipe - recipesPerPage;
-  const currentRecipes = sortedRecipes.slice(indexOfFirstRecipe, indexOfLastRecipe);
+  const currentRecipes = sortedRecipes.slice(
+    indexOfFirstRecipe,
+    indexOfLastRecipe
+  );
 
   // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
@@ -67,9 +70,16 @@ const Recipe = () => {
                 </div>
                 {/* Pagination */}
                 <div className="pagination">
-                  {Array.from({ length: Math.ceil(sortedRecipes.length / recipesPerPage) }, (_, i) => (
-                    <button key={i} onClick={() => paginate(i + 1)}>{i + 1}</button>
-                  ))}
+                  {Array.from(
+                    {
+                      length: Math.ceil(sortedRecipes.length / recipesPerPage),
+                    },
+                    (_, i) => (
+                      <button key={i} onClick={() => paginate(i + 1)}>
+                        {i + 1}
+                      </button>
+                    )
+                  )}
                 </div>
               </div>
             </div>

@@ -145,8 +145,9 @@ class ForgotPassword(APIView):
         
         uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
         token = custom_token_generator.make_token(user)
-        reset_link = f"{request.scheme}://{request.get_host()}/authentication/reset/{uidb64}/{token}/"
-        print(f"reset link = {reset_link}\nuidb64 = {uidb64}\ntoken = {token}\nuser = {user}")
+        # reset_link = f"{request.scheme}://{request.get_host()}/authentication/reset/{uidb64}/{token}/"
+        reset_link = f"http://localhost:3000/passwordreset/{uidb64}/{token}/"
+        # print(f"reset link = {reset_link}\nuidb64 = {uidb64}\ntoken = {token}\nuser = {user}")
         email_subject = 'Password Reset'
         email_body = render_to_string('./authentication/password_reset_email.html', {
             'user': user,
