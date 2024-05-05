@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import Footer from "../../components/Footer/Footer";
 import Navbar from "../../components/Navbar/Navbar";
 import RecipeDisplay from "../../components/recipeDisplay/RecipeDisplay";
-import Breadcrumbs from "../../components/breadcrumbs/Breadcrumbs";
+import Breadcrums from "../../components/breadcrums/Breadcrums";
 import RecommendedRecipes from "../../components/recommendedRecipes/RecommendedRecipes";
 import Reviews from "../../components/reviews/Reviews";
 import RatingAndReviewBox from "../../components/ratingAndReviewBox/RatingAndReviewBox";
@@ -38,7 +38,7 @@ const SingleRecipe = () => {
   return (
     <div>
       <Navbar />
-      <Breadcrumbs recipe={recipe} />
+      <Breadcrums recipe={recipe} />
       <RecipeDisplay recipe={recipe} />
       <RatingAndReviewBox />
       <Reviews />
