@@ -44,7 +44,7 @@ const RecipeContextProvider = ({ children }) => {
       setDistinctCategories(categoriesArray);
     }
   }, [allRecipes, loading]);
-  console.log("categoryset", categoriesSet);
+
   const saveRecipe = (recipeId) => {
     if (!savedRecipes.includes(recipeId)) {
       setSavedRecipes([...savedRecipes, recipeId]);
