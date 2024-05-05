@@ -26,6 +26,7 @@ const Recipe = () => {
     const maxCaloriesFilter = recipe.calorie <= filter.maxCalories;
     return categoryFilter && maxTimeFilter && maxCaloriesFilter;
   });
+  console.log("filteredRecipes:", filteredRecipes);
   // Apply search filter
   const searchedRecipes = searchQuery
     ? filteredRecipes.filter((recipe) =>
@@ -35,6 +36,7 @@ const Recipe = () => {
 
   // Sort recipes based on sorting function
   const sortedRecipes = searchedRecipes.sort(sortFunction);
+  console.log("sortedRecipes", sortedRecipes);
   return (
     <SortProvider>
       <div>
@@ -57,12 +59,12 @@ const Recipe = () => {
                     sortedRecipes.map((item, i) => (
                       <Items
                         key={i}
-                        id={item.id}
+                        id={item.recipeid}
                         title={item.title}
-                        imageurl={item.imageurl}
+                        imageurl={item.img}
                         total_mins={item.total_mins}
-                        calorie={item.calorie}
-                        ratings={item.ratings}
+                        calorie={item.calories}
+                        ratings={item.rating}
                       />
                     ))
                   ) : (
