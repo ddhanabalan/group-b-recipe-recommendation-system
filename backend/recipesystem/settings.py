@@ -44,6 +44,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'authentication',
+    'recipe',
+    'corsheaders',
+]
+
+CORS_ALLOWED_ORIGINS = [
+    ("http://localhost:3000"),
+    # Add other origins if needed
 ]
 
 REST_FRAMEWORK = {
@@ -64,7 +71,7 @@ SIMPLE_JWT = {
     'VERIFYING_KEY': None,
 
     'AUTH_HEADER_TYPES': ('Bearer',),
-    'USER_ID_FIELD': 'id',
+    'USER_ID_FIELD': 'userid',
     'USER_ID_CLAIM': 'user_id',
 
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
@@ -86,6 +93,7 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -93,6 +101,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'recipesystem.urls'
@@ -100,7 +109,7 @@ ROOT_URLCONF = 'recipesystem.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, '')],
+        'DIRS': [os.path.join(BASE_DIR, ''),os.path.join(BASE_DIR, '../frontend/public')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

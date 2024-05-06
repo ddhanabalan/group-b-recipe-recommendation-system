@@ -1,5 +1,6 @@
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.crypto import constant_time_compare
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 
 class CustomTokenGenerator(PasswordResetTokenGenerator):
     def _make_hash_value(self, user, timestamp):
@@ -7,7 +8,7 @@ class CustomTokenGenerator(PasswordResetTokenGenerator):
         Generate a hash value that is used as the token.
         """
         return (
-            str(user.pk) + "-" + str(timestamp) +"-"+
+            str(urlsafe_base64_encode(str(user.pk).encode('utf-32'))) + "-" + str(timestamp) +"-"+
             str(user.is_active)
         )
 
@@ -28,7 +29,7 @@ class CustomTokenGenerator(PasswordResetTokenGenerator):
             user_pk, timestamp, is_active = token.split("-")
             
             # Convert the user_pk to an integer
-            user_pk = int(user_pk)
+            user_pk = int(urlsafe_base64_decode(user_pk).decode('utf-32'))
             
             # Check if the user_pk matches the user's primary key
             if user_pk != user.pk:
