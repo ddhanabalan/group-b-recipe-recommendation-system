@@ -2,18 +2,62 @@ import React, { useContext, useState } from "react";
 import "../../styles/RecipeDisplay.css";
 import { RecipeContext } from "../../context/recipeContext";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import { getAuthToken } from "../../utils/auth";
 
 const RecipeDisplay = (props) => {
   const { recipe } = props;
   const { saveRecipe, isRecipeSaved } = useContext(RecipeContext);
-  console.log("isRecipesaved", isRecipeSaved);
   const [isSaved, setIsSaved] = useState(isRecipeSaved(recipe.id));
-  const ingredientList = recipe.ingredients.map((number) => {
-    return <li style={{ paddingBottom: 5 }}>{number}</li>;
-  });
-  const handleSaveRecipe = () => {
-    saveRecipe(recipe.id);
-    setIsSaved(true);
+
+  if (!recipe) {
+    return <div>Loading...</div>;
+  }
+
+  // Parse ingredients text into an array
+  const ingredientsArray = recipe.ingredients
+    .split("\n")
+    .filter((ingredient) => ingredient.trim() !== "");
+
+  const ingredientList = ingredientsArray.map((ingredient, index) => (
+    <li key={index} style={{ paddingBottom: 5 }}>
+      {ingredient}
+    </li>
+  ));
+
+  const handleSaveRecipe = async () => {
+    try {
+      // Assuming you have access to user ID and recipe ID
+      const userId = userId(); // Implement this function to get the user ID
+      const recipeId = recipe.recipeid;
+
+      // Prepare the request body
+      const requestBody = JSON.stringify({ userId, recipeId });
+
+      // Send a POST request using fetch
+      const response = await fetch("http://127.0.0.1:8000/recipe/saveRecipe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getAuthToken()}`,
+        },
+        body: requestBody,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save recipe");
+      }
+
+      // Handle the response from the API as needed
+      const responseData = await response.json();
+      console.log("Save Recipe Response:", responseData);
+
+      // Update state to indicate that the recipe is saved
+      setIsSaved(true);
+    } catch (error) {
+      console.error("Error saving recipe:", error);
+      // Handle any errors that occur during the save process
+    }
   };
 
   return (
