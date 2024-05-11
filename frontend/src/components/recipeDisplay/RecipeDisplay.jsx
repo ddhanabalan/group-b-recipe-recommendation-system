@@ -8,58 +8,33 @@ import { getAuthToken } from "../../utils/auth";
 const RecipeDisplay = (props) => {
   const { recipe } = props;
   const { saveRecipe, isRecipeSaved } = useContext(RecipeContext);
-  const [isSaved, setIsSaved] = useState(isRecipeSaved(recipe.id));
 
+  const [isSaved, setIsSaved] = useState(isRecipeSaved(recipe.id));
   if (!recipe) {
     return <div>Loading...</div>;
   }
-
-  // Parse ingredients text into an array
-  const ingredientsArray = recipe.ingredients
-    .split("\n")
-    .filter((ingredient) => ingredient.trim() !== "");
+  let ingredientsArray = [];
+  if (typeof recipe.ingredients === "string") {
+    ingredientsArray = recipe.ingredients
+      .replace(/"/g, "")
+      .replace(/\['/g, "")
+      .replace(/'\]/g, "")
+      .replace(/'/g, "")
+      .split(", ");
+  } else if (Array.isArray(recipe.ingredients)) {
+    // Assuming recipe.ingredients is already an array
+    ingredientsArray = recipe.ingredients;
+  }
 
   const ingredientList = ingredientsArray.map((ingredient, index) => (
     <li key={index} style={{ paddingBottom: 5 }}>
       {ingredient}
     </li>
   ));
-
-  const handleSaveRecipe = async () => {
-    try {
-      // Assuming you have access to user ID and recipe ID
-      const userId = userId(); // Implement this function to get the user ID
-      const recipeId = recipe.recipeid;
-
-      // Prepare the request body
-      const requestBody = JSON.stringify({ userId, recipeId });
-
-      // Send a POST request using fetch
-      const response = await fetch("http://127.0.0.1:8000/recipe/saveRecipe", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${getAuthToken()}`,
-        },
-        body: requestBody,
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to save recipe");
-      }
-
-      // Handle the response from the API as needed
-      const responseData = await response.json();
-      console.log("Save Recipe Response:", responseData);
-
-      // Update state to indicate that the recipe is saved
-      setIsSaved(true);
-    } catch (error) {
-      console.error("Error saving recipe:", error);
-      // Handle any errors that occur during the save process
-    }
+  const handleSaveRecipe = () => {
+    saveRecipe(recipe.id);
+    setIsSaved(true);
   };
-
   return (
     <div className="recipedisplay">
       <div className="recipedisplay-left">

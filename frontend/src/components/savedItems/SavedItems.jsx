@@ -3,8 +3,8 @@ import Items from "../Items/Items";
 import { RecipeContext } from "../../context/recipeContext";
 import "../../styles/SavedItems.css";
 const SavedItems = () => {
-  const { all_recipe, unsaveRecipe, isRecipeSaved } = useContext(RecipeContext);
-  console.log("isRecipesaved", isRecipeSaved);
+  {
+    /*const { all_recipe, unsaveRecipe, isRecipeSaved } = useContext(RecipeContext);
 
   const savedRecipes = all_recipe
     ? all_recipe.filter((recipe) => isRecipeSaved(recipe.id))
@@ -12,13 +12,14 @@ const SavedItems = () => {
   console.log("savedRecipes", savedRecipes);
   const handleRemoveRecipe = (recipeId) => {
     unsaveRecipe(recipeId);
-  };
+  };*/
+  }
   return (
     <div className="saveditems">
       <hr />
       <div>
         <div className="saveditems-format">
-          {savedRecipes.map((item, i) => (
+          {/*{savedRecipes.map((item, i) => (
             <div className="saved-recipe-card">
               <Items
                 key={i}
@@ -33,7 +34,7 @@ const SavedItems = () => {
                 Remove
               </button>
             </div>
-          ))}
+          ))}*/}
         </div>
       </div>
     </div>

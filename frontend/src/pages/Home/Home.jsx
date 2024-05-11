@@ -9,12 +9,13 @@ import FastfoodIcon from "@mui/icons-material/Fastfood";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import SupervisedUserCircleRoundedIcon from "@mui/icons-material/SupervisedUserCircleRounded";
 import joinpic from "../../assets/joinnowpic.jpg";
+import { isAuthenticated } from "../../utils/auth";
 import "../../styles/Home.css";
 
 function Home() {
   const [popularRecipes, setPopularRecipes] = useState([]);
   const [newRecipes, setNewRecipes] = useState([]);
-
+  const authToken = isAuthenticated();
   useEffect(() => {
     // Fetch popular recipes from the popular recipes API endpoint
     fetch("http://127.0.0.1:8000/recipe/popularrecipes/")
@@ -109,23 +110,30 @@ function Home() {
         </div>
       </div>
       {/*Join now section */}
-      <div className="joinnow">
-        <div className="joinnow-left">
-          <h1>DON'T MISS A THING</h1>
-          <h3>EXPLORE MORE RECIPES AND MAKE YOUR LIFE EASIER.</h3>
-          <p>
-            Unlock a world of culinary delights by creating an account with us
-            today – your gateway to personalized recipe collections, exclusive
-            content, and a community of fellow food enthusiasts.
-          </p>
-          <Link to="/Signup">
-            <button>Join Now</button>
-          </Link>
-        </div>
-        <div className="joinnow-right">
-          <img src={joinpic} alt="join with us" />
-        </div>
-      </div>
+      {authToken ? (
+        <></>
+      ) : (
+        <>
+          <div className="joinnow">
+            <div className="joinnow-left">
+              <h1>DON'T MISS A THING</h1>
+              <h3>EXPLORE MORE RECIPES AND MAKE YOUR LIFE EASIER.</h3>
+              <p>
+                Unlock a world of culinary delights by creating an account with
+                us today – your gateway to personalized recipe collections,
+                exclusive content, and a community of fellow food enthusiasts.
+              </p>
+              <Link to="/Signup">
+                <button>Join Now</button>
+              </Link>
+            </div>
+            <div className="joinnow-right">
+              <img src={joinpic} alt="join with us" />
+            </div>
+          </div>
+        </>
+      )}
+      {/*Footer section */}
       <Footer />
     </div>
   );

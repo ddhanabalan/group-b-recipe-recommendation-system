@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { FilterContext } from "../../context/filterContext";
 import { RecipeContext } from "../../context/recipeContext";
 import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
@@ -6,8 +6,44 @@ import "../../styles/FilterSection.css";
 
 const FilterSection = ({ setSearchQuery }) => {
   const { filter, dispatch } = useContext(FilterContext);
-  const { distinctCategories, allRecipes } = useContext(RecipeContext);
+  const { allRecipes, distinctCategories } = useContext(RecipeContext);
   const [showCategories, setShowCategories] = useState(false);
+  const [filteredRecipes, setFilteredRecipes] = useState(allRecipes);
+
+  useEffect(() => {
+    // Apply existing filters when filter context or search query changes
+    const updatedFilteredRecipes = allRecipes.filter((recipe) => {
+      const searchQueryLowerCase = filter.searchQuery
+        ? filter.searchQuery.toLowerCase()
+        : "";
+
+      const categoryFilter =
+        filter.category.length === 0 ||
+        recipe.categories.some((cat) =>
+          cat.toLowerCase().includes(searchQueryLowerCase)
+        );
+      const maxTimeFilter = recipe.total_mins <= filter.maxTime;
+      const maxCaloriesFilter = recipe.calories <= filter.maxCalories;
+
+      let searchFilter = true; // Default to true
+      if (searchQueryLowerCase) {
+        searchFilter =
+          recipe.title.toLowerCase().includes(searchQueryLowerCase) ||
+          recipe.ingredients.some((ingredient) =>
+            ingredient.toLowerCase().includes(searchQueryLowerCase)
+          ) ||
+          recipe.categories.some((cat) =>
+            cat.toLowerCase().includes(searchQueryLowerCase)
+          );
+      }
+
+      return (
+        categoryFilter && maxTimeFilter && maxCaloriesFilter && searchFilter
+      );
+    });
+
+    setFilteredRecipes(updatedFilteredRecipes);
+  }, [allRecipes, filter, filter.searchQuery]);
 
   const handleCategoryChange = (e) => {
     const { name, checked } = e.target;
@@ -21,7 +57,7 @@ const FilterSection = ({ setSearchQuery }) => {
 
     dispatch({
       type: "SET_FILTER",
-      payload: { categories: updatedCategories },
+      payload: { category: updatedCategories }, // Use 'category' instead of 'categories'
     });
   };
 
@@ -38,10 +74,6 @@ const FilterSection = ({ setSearchQuery }) => {
     });
   };
 
-  const handleApplyFilter = () => {
-    // Apply filter logic as needed
-  };
-
   const handleResetFilter = () => {
     dispatch({ type: "RESET_FILTER" });
   };
@@ -49,40 +81,7 @@ const FilterSection = ({ setSearchQuery }) => {
   const handleSearch = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
-    console.log(query);
   };
-
-  const filteredRecipes = allRecipes
-    ? allRecipes.filter((recipe) => {
-        const searchQueryLowerCase = filter.searchQuery
-          ? filter.searchQuery.toLowerCase()
-          : "";
-
-        const categoryFilter =
-          filter.category.length === 0 ||
-          recipe.categories.some((cat) =>
-            cat.toLowerCase().includes(searchQueryLowerCase)
-          );
-        const maxTimeFilter = recipe.total_mins <= filter.maxTime;
-        const maxCaloriesFilter = recipe.calories <= filter.maxCalories;
-
-        let searchFilter = true; // Default to true
-        if (searchQueryLowerCase) {
-          searchFilter =
-            recipe.title.toLowerCase().includes(searchQueryLowerCase) ||
-            recipe.ingredients.some((ingredient) =>
-              ingredient.toLowerCase().includes(searchQueryLowerCase)
-            ) ||
-            recipe.categories.some((cat) =>
-              cat.toLowerCase().includes(searchQueryLowerCase)
-            );
-        }
-
-        return (
-          categoryFilter && maxTimeFilter && maxCaloriesFilter && searchFilter
-        );
-      })
-    : null;
 
   return (
     <div className="filtersection">

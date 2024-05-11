@@ -7,6 +7,9 @@ const Items = (props) => {
   const handleClick = () => {
     window.scrollTo({ top: 0, behavior: "auto" });
   };
+  const formatDecimal = (number) => {
+    return Number(number).toFixed(1);
+  };
   return (
     <div className="item" onClick={handleClick}>
       <Link
@@ -21,11 +24,13 @@ const Items = (props) => {
             <b>{props.total_mins}</b> mins
           </div>
           <div className="calories" style={{ paddingTop: 3 }}>
-            <b>{props.calories} </b> Calorie
+            <b>{props.calories}</b> Calorie
           </div>
         </div>
         <div className="item-rating">
-          <b style={{ paddingTop: 2.5, paddingRight: 5 }}>{props.rating} </b>
+          <b style={{ paddingTop: 2.5, paddingRight: 5 }}>
+            {formatDecimal(props.rating)}
+          </b>
           <StarRating stars={props.rating} />
         </div>
       </Link>

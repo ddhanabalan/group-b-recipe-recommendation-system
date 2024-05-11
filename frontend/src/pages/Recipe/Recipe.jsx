@@ -1,58 +1,82 @@
 import React, { useContext, useState } from "react";
+import FilterSection from "../../components/filterSection/FilterSection";
 import Navbar from "../../components/Navbar/Navbar";
-import Sort from "../../components/sort/Sort"; // Import the Sort component
+import Sort from "../../components/sort/Sort";
 import "../../styles/Recipe.css";
 import Items from "../../components/Items/Items";
 import Footer from "../../components/Footer/Footer";
 import { RecipeContext } from "../../context/recipeContext";
-import { SortProvider, useSortContext } from "../../context/sortContext";
+import { useSortContext } from "../../context/sortContext";
+import { FilterContext } from "../../context/filterContext";
 
 const Recipe = () => {
   const { allRecipes } = useContext(RecipeContext);
-  const { sortFunction } = useSortContext(); // sortFunction from SortContext
+  const { sortFunction } = useSortContext();
+  const { filter } = useContext(FilterContext);
+  const [searchQuery, setSearchQuery] = useState("");
+  console.log("allrecipes :", allRecipes);
+  const filteredRecipes = allRecipes.filter((recipe) => {
+    const searchQueryLowerCase = searchQuery.toLowerCase();
+    const categoryFilter =
+      filter.category.length === 0 ||
+      recipe.categories.some((cat) => filter.category.includes(cat));
+    const maxTimeFilter = recipe.total_mins <= filter.maxTime;
+    const maxCaloriesFilter = recipe.calories <= filter.maxCalories;
 
-  // Sort recipes based on sorting function
-  const sortedRecipes = allRecipes.sort(sortFunction);
-  console.log("sortedrecipes:", sortedRecipes);
+    return (
+      (recipe.title.toLowerCase().includes(searchQueryLowerCase) ||
+        searchQueryLowerCase === "") &&
+      categoryFilter &&
+      maxTimeFilter &&
+      maxCaloriesFilter
+    );
+  });
+
+  const sortedRecipes = filteredRecipes.sort(sortFunction);
+
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
+  };
 
   return (
-    <SortProvider>
-      <div>
-        <Navbar />
-        <div className="recipecontainer">
-          <div className="recipe-view--sort">
-            <div className="main-recipe-section">
-              <div>
-                <div className="main-recipe-section-header">
-                  <h1>Recipes</h1>
-                  <Sort /> {/* Use the Sort component here */}
-                </div>
-                <hr />
-                <div className="recipe-items">
-                  {sortedRecipes.length > 0 ? (
-                    sortedRecipes.map((item, i) => (
-                      <Items
-                        key={i}
-                        recipeid={item.recipeid}
-                        title={item.title}
-                        img={item.img}
-                        total_mins={item.total_mins}
-                        calories={item.calories}
-                        rating={item.rating}
-                      />
-                    ))
-                  ) : (
-                    <p>No recipes found.</p>
-                  )}
-                </div>
-                {/* Pagination */}
+    <div>
+      <Navbar />
+      <div className="recipecontainer">
+        <div className="recipe-filter">
+          <FilterSection setSearchQuery={setSearchQuery} />
+        </div>
+
+        <div className="recipe-view--sort">
+          <div className="main-recipe-section">
+            <div>
+              <div className="main-recipe-section-header">
+                <h1>Recipes</h1>
+                <Sort />
+              </div>
+              <hr />
+              <div className="recipe-items">
+                {sortedRecipes.length > 0 ? (
+                  sortedRecipes.map((item, i) => (
+                    <Items
+                      key={i}
+                      recipeid={item.recipeid}
+                      title={item.title}
+                      img={item.img}
+                      total_mins={item.total_mins}
+                      calories={item.calories}
+                      rating={item.rating}
+                    />
+                  ))
+                ) : (
+                  <p>No recipes found.</p>
+                )}
               </div>
             </div>
           </div>
         </div>
-        <Footer />
       </div>
-    </SortProvider>
+      <Footer />
+    </div>
   );
 };
 

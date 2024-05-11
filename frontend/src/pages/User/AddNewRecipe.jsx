@@ -1,5 +1,5 @@
 // Import necessary dependencies
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import Swal from "sweetalert2";
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
@@ -7,76 +7,71 @@ import "../../styles/AddNewRecipe.css";
 import RecipeDisplay from "../../components/recipeDisplay/RecipeDisplay";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import axios from "axios";
+import { RecipeContext } from "../../context/recipeContext";
 const AddNewRecipe = () => {
+  const { distinctCategories } = useContext(RecipeContext);
   const handleGoBack = () => {
     window.location.href = "/user/addedrecipes";
   };
   const token = localStorage.getItem("authToken");
   // State variables
+
   const [formData, setFormData] = useState({
     title: "",
-    imageurl: null,
+    img: null,
     ingredients: [],
     total_mins: 0,
     categories: [],
-    calorie: "",
-    nonVeg: false, // Added non-veg/veg selection
-    timeOfDay: "", // Added time of cooking selection
-    seasons: [], // Added season selection
+    calories: 0,
+    veg_nonveg: "",
+    daytimeofcooking: "",
+    season: "",
   });
   const [photoPreview, setPhotoPreview] = useState("");
   const [totalTime, setTotalTime] = useState(0);
   const [showPreview, setShowPreview] = useState(false);
-
-  // Handle form input changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
-    if (type === "radio" && name === "nonVeg") {
-      // Set the value directly as "veg" or "nonveg"
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: value,
-      }));
-    } else if (type === "checkbox") {
-      // Handle checkbox inputs for arrays
+    if (type === "checkbox") {
       const isChecked = checked;
       const currentValue = formData[name];
       let newValue;
 
       if (isChecked) {
-        newValue = [...currentValue, value]; // Add the checked value to the array
+        newValue = [...currentValue, value];
       } else {
-        newValue = currentValue.filter((item) => item !== value); // Remove the unchecked value from the array
+        newValue = currentValue.filter((item) => item !== value);
       }
 
       // Update form data state for checkbox inputs
       setFormData((prevData) => ({
         ...prevData,
         [name]: newValue,
-        total_mins:
-          name === "hours" || name === "minutes"
-            ? calculateTotalMins(prevData)
-            : prevData.total_mins,
       }));
     } else {
-      // For other input types, update form data state as usual
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: value,
-        total_mins:
-          name === "hours" || name === "minutes"
-            ? calculateTotalMins(prevData)
-            : prevData.total_mins,
-      }));
+      setFormData((prevData) => {
+        const newData = {
+          ...prevData,
+          [name]: value,
+        };
+
+        // Calculate total_mins based on hours and minutes if either of them changes
+        if (name === "hours" || name === "minutes") {
+          const hours = name === "hours" ? value : newData.hours;
+          const minutes = name === "minutes" ? value : newData.minutes;
+          newData.total_mins = calculateTotalMins(hours, minutes);
+        }
+
+        return newData;
+      });
     }
   };
 
-  // Calculate total minutes for cooking time
-  const calculateTotalMins = (data) => {
-    const hours = parseInt(data.hours) || 0;
-    const minutes = parseInt(data.minutes) || 0;
-    return hours * 60 + minutes;
+  const calculateTotalMins = (hours, minutes) => {
+    const parsedHours = parseInt(hours) || 0;
+    const parsedMinutes = parseInt(minutes) || 0;
+    return parsedHours * 60 + parsedMinutes;
   };
 
   // Handle photo change
@@ -84,7 +79,7 @@ const AddNewRecipe = () => {
     const file = e.target.files[0];
     setFormData((prevData) => ({
       ...prevData,
-      imageurl: URL.createObjectURL(file),
+      img: URL.createObjectURL(file),
     }));
 
     const reader = new FileReader();
@@ -93,17 +88,20 @@ const AddNewRecipe = () => {
     };
     reader.readAsDataURL(file);
   };
-
-  // Handle category change
   const handleCategoryChange = (e) => {
-    const selectedCategories = Array.from(
-      e.target.selectedOptions,
-      (option) => option.value
-    );
-    setFormData((prevData) => ({
-      ...prevData,
-      categories: selectedCategories,
-    }));
+    const { name, value, checked } = e.target;
+
+    if (checked) {
+      setFormData((prevData) => ({
+        ...prevData,
+        categories: [...prevData.categories, value],
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        categories: prevData.categories.filter((cat) => cat !== value),
+      }));
+    }
   };
 
   // Handle form submission
@@ -145,11 +143,14 @@ const AddNewRecipe = () => {
       // Clear form fields for adding a new recipe
       setFormData({
         title: "",
-        imageurl: formData.imageurl, // Keep the image URL here
+        img: formData.img, // Keep the image URL here
         ingredients: [],
         total_mins: 0,
         categories: [],
-        calorie: "",
+        calories: 0,
+        veg_nonveg: "",
+        daytimeofcooking: "",
+        season: "",
       });
       setPhotoPreview("");
       setShowPreview(false);
@@ -226,37 +227,27 @@ const AddNewRecipe = () => {
                 </div>
                 {/* Non-Veg or Veg Selection */}
                 <div className="nonveg-section">
-                  <label>Non-Veg or Veg:</label>
-                  <label>
-                    <input
-                      type="radio"
-                      name="veg_nonveg"
-                      id="nonveg"
-                      value="nonveg"
-                      checked={formData.nonVeg}
-                      onChange={handleChange}
-                    />
-                    Non-Veg
-                  </label>
-                  <label>
-                    <input
-                      type="radio"
-                      name="veg_nonveg"
-                      id="veg"
-                      value="veg"
-                      checked={!formData.nonVeg}
-                      onChange={handleChange}
-                    />
-                    Veg
-                  </label>
+                  <label htmlFor="veg_nonveg">Nonveg or Veg :</label>
+                  <select
+                    id="veg_nonveg"
+                    name="veg_nonveg"
+                    value={formData.veg_nonveg}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="">Select nonveg or veg</option>
+                    <option value="nonveg(turkey)">nonveg(turkey)</option>
+                    <option value="veg(egg)">veg(egg)</option>
+                    <option value="veg">veg</option>
+                  </select>
                 </div>
                 {/* Time of Cooking Selection */}
                 <div className="time-cooking">
-                  <label htmlFor="timeOfDay">Time of Cooking:</label>
+                  <label htmlFor="daytimeofcooking">Time of Cooking:</label>
                   <select
-                    id="timeOfDay"
-                    name="timeOfDay"
-                    value={formData.timeOfDay}
+                    id="daytimeofcooking"
+                    name="daytimeofcooking"
+                    value={formData.daytimeofcooking}
                     onChange={handleChange}
                     required
                   >
@@ -268,58 +259,27 @@ const AddNewRecipe = () => {
                 </div>
                 {/* Season Selection */}
                 <div className="season-section">
-                  <label>Season:</label>
-                  <label>
-                    <input
-                      type="checkbox"
-                      name="seasons"
-                      id="summer"
-                      value="summer"
-                      checked={formData.seasons.includes("summer")}
-                      onChange={handleChange}
-                    />
-                    Summer
-                  </label>
-                  <label>
-                    <input
-                      type="checkbox"
-                      name="seasons"
-                      id="winter"
-                      value="winter"
-                      checked={formData.seasons.includes("winter")}
-                      onChange={handleChange}
-                    />
-                    Winter
-                  </label>
-                  <label>
-                    <input
-                      type="checkbox"
-                      name="seasons"
-                      value="autumn"
-                      id="autumn"
-                      checked={formData.seasons.includes("autumn")}
-                      onChange={handleChange}
-                    />
-                    Autumn
-                  </label>
-                  <label>
-                    <input
-                      type="checkbox"
-                      name="seasons"
-                      value="spring"
-                      id="spring"
-                      checked={formData.seasons.includes("spring")}
-                      onChange={handleChange}
-                    />
-                    Spring
-                  </label>
+                  <label htmlFor="season">Season:</label>
+                  <select
+                    id="season"
+                    name="season"
+                    value={formData.season}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="">Select Season</option>
+                    <option value="summer">summer</option>
+                    <option value="winter">winter</option>
+                    <option value="fall">fall</option>
+                  </select>
                 </div>
+
                 <div className="image-portion">
-                  <label htmlFor="imageurl">Upload Photo:</label>
+                  <label htmlFor="img">Upload Photo:</label>
                   <input
                     type="file"
-                    id="imageurl"
-                    name="imageurl"
+                    id="img"
+                    name="img"
                     accept="image/*"
                     onChange={handlePhotoChange}
                     required
@@ -341,9 +301,7 @@ const AddNewRecipe = () => {
                     onChange={(e) =>
                       setFormData((prevData) => ({
                         ...prevData,
-                        ingredients: e.target.value
-                          .split(/\s*,\s*/)
-                          .filter((ingredient) => ingredient.trim() !== ""), // Split and filter out empty strings
+                        ingredients: e.target.value.split(/,\s*/),
                       }))
                     }
                     required
@@ -358,6 +316,19 @@ const AddNewRecipe = () => {
                     name="hours"
                     value={formData.hours}
                     onChange={handleChange}
+                    min="0"
+                    step="1"
+                    onKeyDown={(e) => {
+                      if (
+                        e.code === "Minus" ||
+                        e.key === "-" ||
+                        e.key === "." ||
+                        e.key === "0"
+                      ) {
+                        e.preventDefault();
+                      }
+                    }}
+                    placeholder="Enter whole integers (e.g., 1, 2, 3), excluding zero"
                     required
                   />
                 </div>
@@ -370,34 +341,57 @@ const AddNewRecipe = () => {
                     name="minutes"
                     value={formData.minutes}
                     onChange={handleChange}
+                    min="0"
+                    step="1"
+                    onKeyDown={(e) => {
+                      if (
+                        e.code === "Minus" ||
+                        e.key === "-" ||
+                        e.key === "."
+                      ) {
+                        e.preventDefault();
+                      }
+                    }}
                     required
                   />
                 </div>
 
                 <div></div>
-                <div className="category-container">
+                <div className="category-section">
                   <label htmlFor="categories">Category:</label>
-                  <select
-                    id="categories"
-                    name="categories"
-                    multiple
-                    onChange={handleCategoryChange}
-                    required
-                  >
-                    <option value="breakfast">Breakfast</option>
-                    <option value="lunch">Lunch</option>
-                    <option value="dinner">Dinner</option>
-                    <option value="snack">Snack</option>
-                  </select>
+                  <div className="category-part">
+                    {distinctCategories.map((category) => (
+                      <label key={category} className="category-label">
+                        <input
+                          type="checkbox"
+                          name="categories"
+                          value={category}
+                          onChange={handleCategoryChange}
+                          checked={formData.categories.includes(category)}
+                        />
+                        {category}
+                      </label>
+                    ))}
+                  </div>
                 </div>
                 <div>
-                  <label htmlFor="calorie">Calories:</label>
+                  <label htmlFor="calories">Calories:</label>
                   <input
                     type="number"
-                    id="calorie"
-                    name="calorie"
+                    id="calories"
+                    name="calories"
                     value={formData.calorie}
                     onChange={handleChange}
+                    min="0"
+                    onKeyDown={(e) => {
+                      if (
+                        e.code === "Minus" ||
+                        e.key === "-" ||
+                        e.key === "."
+                      ) {
+                        e.preventDefault();
+                      }
+                    }}
                     required
                   />
                 </div>

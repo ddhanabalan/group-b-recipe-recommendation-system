@@ -18,6 +18,7 @@ function Navbar() {
   const [searchHistory, setSearchHistory] = useState([]);
   const searchRef = useRef(null);
   const storedToken = getAuthToken();
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     console.log("Stored Token:", storedToken);
@@ -82,16 +83,8 @@ function Navbar() {
     );
   };
 
-  const handleLogout = async () => {
-    setShowDropdown(false);
-    setSearchHistory([]); // Clear search history when logging out
-    sessionStorage.removeItem("searchHistory");
-    clearAuthToken(); // Clear the authentication token
-    window.location.href = "/home";
-  };
-
   const toggleDropdown = () => {
-    setShowDropdown(!showDropdown);
+    setOpen(!open);
   };
 
   const authToken = isAuthenticated(); // Determine if the user is authenticated
@@ -178,6 +171,41 @@ function Navbar() {
               <a href="/about">About Us</a>
             </li>
             {authToken ? (
+              <li>
+                <span className="user-heading" onClick={toggleDropdown}>
+                  User
+                </span>
+                {open && (
+                  <ul className="dropdown-menu">
+                    <li>
+                      <a href="/user/savedrecipes">Dashboard</a>
+                    </li>
+                    <li>Change Password</li>
+                    <li>
+                      <button style={{ border: "none", background: "none" }}>
+                        Logout
+                      </button>
+                    </li>
+                  </ul>
+                )}
+              </li>
+            ) : (
+              <li>
+                <span
+                  className="user-heading"
+                  style={{
+                    border: "2px dashed #e49963",
+                    padding: " 8px 30px",
+                    color: "black",
+                  }}
+                  onClick={() => (window.location.href = "/login")}
+                >
+                  Login
+                </span>
+              </li>
+            )}
+
+            {/*{authToken ? (
               <li className="dropdown-container">
                 <div
                   className="user-icon"
@@ -207,7 +235,7 @@ function Navbar() {
                   login
                 </span>
               </li>
-            )}
+            )}*/}
           </ul>
         </nav>
       </div>

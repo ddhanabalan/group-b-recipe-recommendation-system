@@ -62,7 +62,7 @@
 }
 .add-recipe-form-content {
   border: 2px solid black;
-  width: 50%;
+  width: 60%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -152,4 +152,10 @@
 }
 #spring {
   width: 20px;
+}
+.category-part {
+  overflow-y: auto;
+  height: 350px;
+  margin-top: 10px;
+  margin-bottom: 20px;
 }
