@@ -64,25 +64,28 @@ function Navbar() {
     }
   };
 
-  const handleRecipeClick = (recipeId, recipeTitle) => {
-    console.log("Redirecting to Recipe ID:", recipeId);
+  const handleRecipeClick = (recipeid, recipeTitle) => {
     if (!isAuthenticated()) {
-      window.location.href = "/login"; // Redirect to the login page
+      window.location.href = "/login";
       return;
     }
 
-    window.location.href = `/singlerecipe/${recipeId}`;
+    // Redirect to the single recipe page
+    window.location.href = `/singlerecipe/${recipeid}`;
 
-    setSearchHistory((prevHistory) => [
-      ...prevHistory,
-      { id: recipeId, title: recipeTitle },
-    ]);
-    sessionStorage.setItem(
-      "searchHistory",
-      JSON.stringify([...searchHistory, { id: recipeId, title: recipeTitle }])
-    );
+    // Update search history in sessionStorage
+    const updatedHistory = [
+      ...searchHistory,
+      { id: recipeid, title: recipeTitle },
+    ];
+    setSearchHistory(updatedHistory);
+    sessionStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
   };
-
+  const handleLogout = () => {
+    // Perform logout actions
+    clearAuthToken(); // Clear the authentication token
+    window.location.href = "/login"; // Redirect to the login page
+  };
   const toggleDropdown = () => {
     setOpen(!open);
   };
@@ -117,7 +120,7 @@ function Navbar() {
                   <li
                     key={index}
                     className="search-item-history"
-                    onClick={() => setSearchTerm(item)}
+                    onClick={() => handleRecipeClick(item.id, item.title)}
                   >
                     {item.title}
                   </li>
@@ -126,9 +129,11 @@ function Navbar() {
               <div>
                 {filteredRecipes.map((recipe) => (
                   <li
-                    key={recipe.id}
+                    key={recipe.recipeid}
                     className="search-item"
-                    onClick={() => handleRecipeClick(recipe.id, recipe.title)}
+                    onClick={() =>
+                      handleRecipeClick(recipe.recipeid, recipe.title)
+                    }
                   >
                     {recipe.title}
                   </li>
@@ -141,9 +146,11 @@ function Navbar() {
               <div>
                 {filteredRecipes.map((recipe) => (
                   <li
-                    key={recipe.id}
+                    key={recipe.reciepid}
                     className="search-item"
-                    onClick={() => handleRecipeClick(recipe.id, recipe.title)}
+                    onClick={() =>
+                      handleRecipeClick(recipe.recipeid, recipe.title)
+                    }
                   >
                     {recipe.title}
                   </li>
@@ -182,7 +189,10 @@ function Navbar() {
                     </li>
                     <li>Change Password</li>
                     <li>
-                      <button style={{ border: "none", background: "none" }}>
+                      <button
+                        style={{ border: "none", background: "none" }}
+                        onClick={handleLogout}
+                      >
                         Logout
                       </button>
                     </li>

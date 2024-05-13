@@ -4,7 +4,7 @@ import logo_dark from "../../assets/logo.svg";
 import login_image from "../../assets/loginpic.jpg";
 import "../../styles/Login.css";
 import Validation from "./Validation";
-import { setAuthToken } from "../../utils/auth";
+import { setAuthToken, setUserId } from "../../utils/auth";
 import { Navigate, useNavigate } from "react-router-dom";
 
 function Login() {
@@ -28,20 +28,21 @@ function Login() {
 
     try {
       const response = await axiosInstance.post(
-        "http://127.0.0.1:8000/authentication/login/",
+        "http://localhost:8000/authentication/login/",
         {
           username: values.name,
           password: values.password,
         }
       );
 
-      const token = response.data.token;
-      setAuthToken(token); // Store the token using sessionStorage
+      const userId = response.data.user.userid;
+      setUserId(userId);
 
+      const token = response.data.token;
+      setAuthToken(token);
       console.log("Login successful:", response.data);
-      console.log("token", token);
-      // Redirect based on user role
-      if (response.data.role === "admin") {
+      console.log("user id :", userId);
+      if (response.data.user.role === "admin") {
         history("/dashboard");
       } else {
         history("/home");

@@ -9,7 +9,8 @@ import { IoMdArrowRoundBack } from "react-icons/io";
 import axios from "axios";
 import { RecipeContext } from "../../context/recipeContext";
 const AddNewRecipe = () => {
-  const { distinctCategories } = useContext(RecipeContext);
+  const { distinctCategories, distinctSeasons, distinctDayOfTimeCooking } =
+    useContext(RecipeContext);
   const handleGoBack = () => {
     window.location.href = "/user/addedrecipes";
   };
@@ -117,7 +118,7 @@ const AddNewRecipe = () => {
 
     delete formData.hours;
     delete formData.minutes;
-    console.log(formData);
+
     try {
       // Send the request with Axios
       const response = await axios.post(
@@ -236,8 +237,7 @@ const AddNewRecipe = () => {
                     required
                   >
                     <option value="">Select nonveg or veg</option>
-                    <option value="nonveg(turkey)">nonveg(turkey)</option>
-                    <option value="veg(egg)">veg(egg)</option>
+                    <option value="nonveg">nonveg</option>
                     <option value="veg">veg</option>
                   </select>
                 </div>
@@ -252,9 +252,11 @@ const AddNewRecipe = () => {
                     required
                   >
                     <option value="">Select Time of Cooking</option>
-                    <option value="breakfast">Breakfast</option>
-                    <option value="lunch">Lunch</option>
-                    <option value="dinner">Dinner</option>
+                    {distinctDayOfTimeCooking.map((time) => (
+                      <option key={time} value={time}>
+                        {time}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 {/* Season Selection */}
@@ -268,9 +270,11 @@ const AddNewRecipe = () => {
                     required
                   >
                     <option value="">Select Season</option>
-                    <option value="summer">summer</option>
-                    <option value="winter">winter</option>
-                    <option value="fall">fall</option>
+                    {distinctSeasons.map((season) => (
+                      <option key={season} value={season}>
+                        {season}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
@@ -380,7 +384,7 @@ const AddNewRecipe = () => {
                     type="number"
                     id="calories"
                     name="calories"
-                    value={formData.calorie}
+                    value={formData.calories}
                     onChange={handleChange}
                     min="0"
                     onKeyDown={(e) => {

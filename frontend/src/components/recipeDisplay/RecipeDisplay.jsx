@@ -1,14 +1,12 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import "../../styles/RecipeDisplay.css";
 import { RecipeContext } from "../../context/recipeContext";
 import { Link } from "react-router-dom";
+import { getAuthToken, getUserId } from "../../utils/auth";
 import axios from "axios";
-import { getAuthToken } from "../../utils/auth";
-
 const RecipeDisplay = (props) => {
   const { recipe } = props;
   const { saveRecipe, isRecipeSaved } = useContext(RecipeContext);
-
   const [isSaved, setIsSaved] = useState(isRecipeSaved(recipe.id));
   if (!recipe) {
     return <div>Loading...</div>;
@@ -22,7 +20,6 @@ const RecipeDisplay = (props) => {
       .replace(/'/g, "")
       .split(", ");
   } else if (Array.isArray(recipe.ingredients)) {
-    // Assuming recipe.ingredients is already an array
     ingredientsArray = recipe.ingredients;
   }
 
@@ -31,9 +28,58 @@ const RecipeDisplay = (props) => {
       {ingredient}
     </li>
   ));
-  const handleSaveRecipe = () => {
-    saveRecipe(recipe.id);
-    setIsSaved(true);
+  const handleSaveRecipe = async () => {
+    try {
+      const authToken = getAuthToken();
+      if (!authToken) {
+        console.error("User not authenticated.");
+        return;
+      }
+
+      const userId = getUserId();
+      const response = await axios.post(
+        "http://localhost:8000/recipe/saved/",
+        {
+          userid: userId,
+          recipeid: recipe.recipeid,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      setIsSaved(true);
+    } catch (error) {
+      console.error("Error saving recipe:", error);
+      if (error.response && error.response.status === 401) {
+        console.error("Authentication failed. Redirecting to login page.");
+      } else {
+        console.error(
+          "An error occurred while saving the recipe:",
+          error.message
+        );
+      }
+    }
+  };
+
+  const handleShareRecipe = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: recipe.title,
+          text: `Check out this recipe: ${recipe.title}`,
+          url: window.location.href,
+        });
+      } else {
+        throw new Error("Web Share API not supported.");
+      }
+    } catch (error) {
+      console.error("Error sharing recipe:", error);
+      // Fallback behavior if sharing fails or Web Share API is not supported
+      alert(`Share ${recipe.title} using your preferred method.`);
+    }
   };
   return (
     <div className="recipedisplay">
@@ -74,7 +120,9 @@ const RecipeDisplay = (props) => {
                   SAVE RECIPE
                 </button>
               )}
-              <button className="share">SHARE</button>
+              <button onClick={handleShareRecipe} className="share">
+                SHARE
+              </button>
             </div>
           </div>
           <ul>{ingredientList}</ul>

@@ -22,12 +22,12 @@ const ReviewElement = (props) => {
           >
             {props.date}
           </div>
-          <div
+          {/*} <div
             className="star-rating"
             style={{ paddingRight: 10, paddingTop: 5 }}
           >
             <StarRating stars={props.stars} />
-          </div>
+            </div>*/}
         </div>
         <div className="review-describtion" style={{ paddingTop: 10 }}>
           " {props.review} "

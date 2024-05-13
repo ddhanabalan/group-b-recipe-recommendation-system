@@ -7,6 +7,7 @@ const ForgotPassword = () => {
     username: "",
     email: "",
   });
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -29,8 +30,10 @@ const ForgotPassword = () => {
       console.log(response.data);
       alert("Password reset email sent successfully.");
     } catch (error) {
-      console.error("Error sending password reset email:", error);
-      alert("Failed to send password reset email.");
+      console.error("Error sending password reset email:", error.response.data);
+      setError(
+        "Failed to send password reset email. Please check your inputs."
+      );
     }
   };
 
@@ -38,55 +41,34 @@ const ForgotPassword = () => {
     <div className="forgotpassword">
       <div className="card" style={{ height: 270 }}>
         <h1 align="center">Reset Your Password</h1>
+        {error && <div className="error-message">{error}</div>}
         <form className="form1" onSubmit={handleSubmit}>
           <table width="285" rules="none" cellPadding="10px">
             <tr>
-              <td style={{ fontSize: 20, fontFamily: "Poppins" }}>Username</td>
-              <td style={{ fontSize: 20, fontFamily: "Playfair Display" }}>
+              <td>Username</td>
+              <td>
                 <input
                   type="text"
                   name="username"
-                  className="txtname"
                   value={formData.username}
                   onChange={handleChange}
-                  style={{ fontSize: 18, fontFamily: "Playfair Display" }}
                 />
               </td>
             </tr>
             <tr>
-              <td style={{ fontSize: 20, fontFamily: "Poppins" }}>E-mail</td>
-              <td style={{ fontSize: 20, fontFamily: "Playfair Display" }}>
+              <td>E-mail</td>
+              <td>
                 <input
                   type="email"
                   name="email"
-                  className="txtemail"
                   value={formData.email}
                   onChange={handleChange}
-                  style={{ fontSize: 18, fontFamily: "Playfair Display" }}
                 />
               </td>
             </tr>
             <tr>
-              <td
-                colSpan="2"
-                align="center"
-                style={{ fontSize: 22, fontFamily: "Poppins" }}
-              >
-                <input
-                  type="submit"
-                  className="btnotp"
-                  id="btnotp"
-                  value="Submit"
-                  style={{
-                    background: "#e1792f",
-                    color: "#fff",
-                    cursor: "pointer",
-                    padding: 10,
-                    border: "none",
-                    borderRadius: 5,
-                    width: 100,
-                  }}
-                />
+              <td colSpan="2" align="center">
+                <input type="submit" value="Submit" className="Submitbtn" />
               </td>
             </tr>
           </table>

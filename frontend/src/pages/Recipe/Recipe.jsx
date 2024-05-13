@@ -14,7 +14,10 @@ const Recipe = () => {
   const { sortFunction } = useSortContext();
   const { filter } = useContext(FilterContext);
   const [searchQuery, setSearchQuery] = useState("");
-  console.log("allrecipes :", allRecipes);
+  const [currentPage, setCurrentPage] = useState(1);
+  const recipesPerPage = 51;
+  const maxPaginationButtons = 5;
+
   const filteredRecipes = allRecipes.filter((recipe) => {
     const searchQueryLowerCase = searchQuery.toLowerCase();
     const categoryFilter =
@@ -34,8 +37,82 @@ const Recipe = () => {
 
   const sortedRecipes = filteredRecipes.sort(sortFunction);
 
+  const indexOfLastRecipe = currentPage * recipesPerPage;
+  const indexOfFirstRecipe = indexOfLastRecipe - recipesPerPage;
+  const currentRecipes = sortedRecipes.slice(
+    indexOfFirstRecipe,
+    indexOfLastRecipe
+  );
+
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
+  };
+
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const getPaginationItems = () => {
+    const totalPages = Math.ceil(sortedRecipes.length / recipesPerPage);
+    const activePage = currentPage;
+    const pages = [];
+    if (totalPages <= maxPaginationButtons) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(
+          <button
+            key={i}
+            className={activePage === i ? "active" : ""}
+            onClick={() => paginate(i)}
+          >
+            {i}
+          </button>
+        );
+      }
+    } else {
+      const startPage = Math.max(
+        1,
+        activePage - Math.floor(maxPaginationButtons / 2)
+      );
+      const endPage = Math.min(
+        totalPages,
+        startPage + maxPaginationButtons - 1
+      );
+
+      if (startPage > 1) {
+        pages.push(
+          <button key={1} onClick={() => paginate(1)}>
+            1
+          </button>
+        );
+        if (startPage > 2) {
+          pages.push(<span key="ellipsis1">...</span>);
+        }
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(
+          <button
+            key={i}
+            className={activePage === i ? "active" : ""}
+            onClick={() => paginate(i)}
+          >
+            {i}
+          </button>
+        );
+      }
+
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          pages.push(<span key="ellipsis2">...</span>);
+        }
+        pages.push(
+          <button key={totalPages} onClick={() => paginate(totalPages)}>
+            {totalPages}
+          </button>
+        );
+      }
+    }
+    return pages;
   };
 
   return (
@@ -55,8 +132,8 @@ const Recipe = () => {
               </div>
               <hr />
               <div className="recipe-items">
-                {sortedRecipes.length > 0 ? (
-                  sortedRecipes.map((item, i) => (
+                {currentRecipes.length > 0 ? (
+                  currentRecipes.map((item, i) => (
                     <Items
                       key={i}
                       recipeid={item.recipeid}
@@ -71,6 +148,7 @@ const Recipe = () => {
                   <p>No recipes found.</p>
                 )}
               </div>
+              <div className="pagination">{getPaginationItems()}</div>
             </div>
           </div>
         </div>
