@@ -3,46 +3,70 @@ import Items from "../Items/Items";
 import { RecipeContext } from "../../context/recipeContext";
 import "../../styles/SavedItems.css";
 import { getUserId } from "../../utils/auth";
+import Swal from "sweetalert2"; // Import SweetAlert
 
 const SavedItems = () => {
-  const { allRecipes, unsaveRecipe, isRecipeSaved } = useContext(RecipeContext);
+  const { unsaveRecipe } = useContext(RecipeContext);
   const [savedRecipes, setSavedRecipes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchSavedRecipes = async () => {
       try {
-        // Get userId from API
         const userId = getUserId();
-        console.log("User ID in saveditems:", userId);
-
-        // Fetch saved recipes for the user
         const response = await fetch("http://localhost:8000/recipe/saved/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            userid: userId,
-          }),
+          body: JSON.stringify({ userid: userId }),
         });
+
         if (!response.ok) {
           throw new Error("Failed to fetch saved recipes");
         }
 
         const data = await response.json();
-        console.log("Saved recipes data:", data); // Log fetched data
-        setSavedRecipes(data.savedRecipes);
+
+        // Check if the response indicates "Recipe already favorited"
+        if (data.error && data.error === "Recipe already favorited") {
+          // Use SweetAlert to show an alert
+          Swal.fire({
+            icon: "info",
+            title: "Already Favorited",
+            text: "This recipe is already in your favorites.",
+            confirmButtonText: "OK",
+          });
+          setSavedRecipes([]);
+          setLoading(false);
+          return;
+        }
+
+        setSavedRecipes(data || []);
+        setLoading(false);
       } catch (error) {
-        console.error("Error fetching saved recipes:", error.message);
+        // Check if the error is related to the "Recipe already favorited" case
+        if (error.message !== "Failed to fetch saved recipes") {
+          setError(error.message);
+        }
+        setLoading(false);
       }
     };
-
     fetchSavedRecipes();
   }, []);
 
   const handleRemoveRecipe = (recipeId) => {
     unsaveRecipe(recipeId);
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div className="saveditems">
@@ -54,12 +78,12 @@ const SavedItems = () => {
               {savedRecipes.map((item, i) => (
                 <div className="saved-recipe-card" key={i}>
                   <Items
-                    id={item.recipeid}
+                    recipeid={item.recipeid}
                     title={item.title}
-                    imageurl={item.img}
+                    img={item.img}
                     total_mins={item.total_mins}
-                    calorie={item.calories}
-                    ratings={item.rating}
+                    calories={item.calories}
+                    rating={item.rating}
                   />
                   <button onClick={() => handleRemoveRecipe(item.id)}>
                     Remove

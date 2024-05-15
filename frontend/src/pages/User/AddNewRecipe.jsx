@@ -1,4 +1,3 @@
-// Import necessary dependencies
 import React, { useState, useContext } from "react";
 import Swal from "sweetalert2";
 import Navbar from "../../components/Navbar/Navbar";
@@ -8,6 +7,7 @@ import RecipeDisplay from "../../components/recipeDisplay/RecipeDisplay";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import axios from "axios";
 import { RecipeContext } from "../../context/recipeContext";
+import { getUserId } from "../../utils/auth";
 const AddNewRecipe = () => {
   const { distinctCategories, distinctSeasons, distinctDayOfTimeCooking } =
     useContext(RecipeContext);
@@ -19,7 +19,7 @@ const AddNewRecipe = () => {
 
   const [formData, setFormData] = useState({
     title: "",
-    img: null,
+    img: "https://thumbs.dreamstime.com/z/kebab-fast-food-dish-22677562.jpg?w=992",
     ingredients: [],
     total_mins: 0,
     categories: [],
@@ -104,8 +104,6 @@ const AddNewRecipe = () => {
       }));
     }
   };
-
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     const hours = parseInt(formData.hours) || 0;
@@ -119,46 +117,68 @@ const AddNewRecipe = () => {
     delete formData.hours;
     delete formData.minutes;
 
+    const userid = getUserId();
+    formData.userid = userid; // Send userID as a single value, not an array
+
     try {
-      // Send the request with Axios
-      const response = await axios.post(
-        "http://your-api-endpoint.com/add-new-recipe",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // Include the token in the Authorization header
-          },
-        }
+      const requestOptions = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...formData,
+          ingredients: JSON.stringify(formData.ingredients),
+        }),
+      };
+
+      const response = await fetch(
+        "http://localhost:8000/recipe/addrecipe/",
+        requestOptions
       );
+      const responseData = await response.json();
 
-      console.log("Recipe saved:", response.data);
+      console.log("Data sent to server:", requestOptions.body);
+      console.log("Response from server:", responseData);
 
-      // Show success message
-      Swal.fire({
-        title: "Saved!",
-        text: "Your recipe has been saved.",
-        icon: "success",
-        confirmButtonText: "OK",
-        icon: null,
-      });
-      // Clear form fields for adding a new recipe
-      setFormData({
-        title: "",
-        img: formData.img, // Keep the image URL here
-        ingredients: [],
-        total_mins: 0,
-        categories: [],
-        calories: 0,
-        veg_nonveg: "",
-        daytimeofcooking: "",
-        season: "",
-      });
-      setPhotoPreview("");
-      setShowPreview(false);
+      if (response.ok) {
+        console.log("Recipe saved:", responseData);
+
+        Swal.fire({
+          title: "Saved!",
+          text: "Your recipe has been saved.",
+          icon: "success",
+          confirmButtonText: "OK",
+          icon: null,
+        });
+
+        setFormData({
+          title: "",
+          img: "https://thumbs.dreamstime.com/z/kebab-fast-food-dish-22677562.jpg?w=992",
+          ingredients: [],
+          total_mins: 0,
+          categories: [],
+          calories: 0,
+          veg_nonveg: "",
+          daytimeofcooking: "",
+          season: "",
+        });
+        setPhotoPreview("");
+        setShowPreview(false);
+      } else {
+        console.error("Error saving recipe - Server response:", responseData);
+
+        Swal.fire({
+          title: "Error!",
+          text: "Failed to save the recipe. Please try again later.",
+          icon: "error",
+          confirmButtonText: "OK",
+          icon: null,
+        });
+      }
     } catch (error) {
       console.error("Error saving recipe:", error);
 
-      // Show error message
       Swal.fire({
         title: "Error!",
         text: "Failed to save the recipe. Please try again later.",

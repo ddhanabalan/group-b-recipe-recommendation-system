@@ -4,10 +4,66 @@ import { RecipeContext } from "../../context/recipeContext";
 import { Link } from "react-router-dom";
 import { getAuthToken, getUserId } from "../../utils/auth";
 import axios from "axios";
+import Swal from "sweetalert2";
+
 const RecipeDisplay = (props) => {
   const { recipe } = props;
   const { saveRecipe, isRecipeSaved } = useContext(RecipeContext);
   const [isSaved, setIsSaved] = useState(isRecipeSaved(recipe.id));
+
+  useEffect(() => {
+    // Check if the recipe is initially saved when the component mounts
+    setIsSaved(isRecipeSaved(recipe.recipeid));
+  }, [isRecipeSaved, recipe.recipeid]);
+  const handleSaveRecipe = async () => {
+    try {
+      const authToken = getAuthToken();
+      if (!authToken) {
+        console.error("User not authenticated.");
+        return;
+      }
+
+      const userId = getUserId();
+      const response = await axios.post(
+        "http://localhost:8000/recipe/saverecipe/",
+        {
+          userid: userId,
+          recipeid: recipe.recipeid,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      setIsSaved(true);
+      // console.log("Recipe ID saved:", recipe.recipeid);
+      // console.log("Save recipe response:", response.data); // Log the response from the server
+    } catch (error) {
+      //console.error("Error saving recipe:", error);
+      if (error.response && error.response.status === 401) {
+        //console.error("Authentication failed. Redirecting to login page.");
+      } else {
+        // console.error(
+        //  "An error occurred while saving the recipe:",
+        //  error.message
+        // );
+      }
+
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.error === "Recipe already favorited"
+      ) {
+        Swal.fire({
+          icon: "info",
+          title: "Recipe Already Favorited",
+          text: "You have already favorited this recipe.",
+        });
+      }
+    }
+  };
   if (!recipe) {
     return <div>Loading...</div>;
   }
@@ -28,41 +84,6 @@ const RecipeDisplay = (props) => {
       {ingredient}
     </li>
   ));
-  const handleSaveRecipe = async () => {
-    try {
-      const authToken = getAuthToken();
-      if (!authToken) {
-        console.error("User not authenticated.");
-        return;
-      }
-
-      const userId = getUserId();
-      const response = await axios.post(
-        "http://localhost:8000/recipe/saved/",
-        {
-          userid: userId,
-          recipeid: recipe.recipeid,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      setIsSaved(true);
-    } catch (error) {
-      console.error("Error saving recipe:", error);
-      if (error.response && error.response.status === 401) {
-        console.error("Authentication failed. Redirecting to login page.");
-      } else {
-        console.error(
-          "An error occurred while saving the recipe:",
-          error.message
-        );
-      }
-    }
-  };
 
   const handleShareRecipe = async () => {
     try {
@@ -120,6 +141,7 @@ const RecipeDisplay = (props) => {
                   SAVE RECIPE
                 </button>
               )}
+
               <button onClick={handleShareRecipe} className="share">
                 SHARE
               </button>

@@ -2,6 +2,7 @@
 .popularrecipe {
   height: 70vh;
   gap: 10px;
+  margin-bottom: 10px;
 }
 .popularrecipe h1 {
   color: black;
@@ -9,12 +10,12 @@
   font-family: serif;
   padding-left: 70px;
   padding-top: 40px;
-  padding-bottom: 10px;
 }
 /*new recipe*/
 .newrecipe {
   height: 70vh;
   gap: 10px;
+  margin-bottom: 10px;
 }
 .newrecipe h1 {
   color: black;
@@ -23,7 +24,6 @@
   font-family: serif;
   padding-left: 70px;
   padding-top: 40px;
-  padding-bottom: 10px;
 }
 
 .new-slider {

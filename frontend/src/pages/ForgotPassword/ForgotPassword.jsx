@@ -68,7 +68,7 @@ const ForgotPassword = () => {
             </tr>
             <tr>
               <td colSpan="2" align="center">
-                <input type="submit" value="Submit" className="Submitbtn" />
+                <input type="submit" value="Submit" className="submitbtn" />
               </td>
             </tr>
           </table>

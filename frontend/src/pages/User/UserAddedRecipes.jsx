@@ -37,7 +37,7 @@ const UserAddedRecipes = () => {
             </div>
           </div>
           <hr />
-          <div className="user-content-item"></div>
+          <div className="user-content-item">added recipes</div>
         </div>
       </div>
       <Footer />

@@ -33,8 +33,7 @@ const RatingAndReviewBox = (props) => {
       const reviewData = {
         userid: userId,
         recipeid: recipeId,
-        rating: currentValue,
-        review_text: reviewText,
+        review: reviewText,
       };
       console.log("Data sending to API:", reviewData);
       const response = await axios.post(
@@ -47,10 +46,8 @@ const RatingAndReviewBox = (props) => {
         }
       );
       console.log("Review posted successfully:", response.data);
-      // Optionally, update UI or perform other actions after successful post
     } catch (error) {
       console.error("Error posting review:", error.message);
-      // Handle error or show error message to the user
     }
   };
 
@@ -65,7 +62,7 @@ const RatingAndReviewBox = (props) => {
         />
       </div>
       <div className="ratingContainer-bottom">
-        <div className="ratingContainer-star">
+        {/*} <div className="ratingContainer-star">
           Your Rating :
           {stars.map((_, index) => {
             return (
@@ -87,7 +84,7 @@ const RatingAndReviewBox = (props) => {
               />
             );
           })}
-        </div>
+        </div>*/}
         <button
           style={{
             borderRadius: 15,

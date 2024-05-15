@@ -7,6 +7,7 @@ import {
   isAuthenticated,
   getAuthToken,
   clearAuthToken,
+  clearUserId,
 } from "../../utils/auth";
 import { FaUser } from "react-icons/fa";
 
@@ -81,10 +82,38 @@ function Navbar() {
     setSearchHistory(updatedHistory);
     sessionStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
   };
+  {
+    /*const handleLogout = async () => {
+    try {
+      // Call your logout API endpoint here
+      const response = await fetch(
+        "http://localhost:8000/authentication/logout/",
+        {
+          method: "POST", // Assuming your logout endpoint uses POST method
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to logout");
+      }
+
+      clearAuthToken();
+      clearUserId();
+
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  };*/
+  }
   const handleLogout = () => {
-    // Perform logout actions
-    clearAuthToken(); // Clear the authentication token
-    window.location.href = "/login"; // Redirect to the login page
+    clearAuthToken();
+    clearUserId();
+
+    window.location.href = "/login";
   };
   const toggleDropdown = () => {
     setOpen(!open);
@@ -187,7 +216,9 @@ function Navbar() {
                     <li>
                       <a href="/user/savedrecipes">Dashboard</a>
                     </li>
-                    <li>Change Password</li>
+                    <li>
+                      <a href="/passwordreset">Change Password</a>
+                    </li>
                     <li>
                       <button
                         style={{ border: "none", background: "none" }}
