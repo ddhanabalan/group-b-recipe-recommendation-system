@@ -1,5 +1,6 @@
 from django.db import models
 from authentication.models import User
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Category(models.Model):
     id = models.AutoField(primary_key=True)
@@ -47,6 +48,7 @@ class Reviews(models.Model):
     username = models.CharField(max_length=255)
     review = models.TextField()
     review_date = models.DateField()
+    rating = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)])
 
     class Meta:
         db_table = 'reviews'

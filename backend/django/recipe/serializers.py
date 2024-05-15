@@ -42,7 +42,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
 class ReviewsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reviews
-        fields = ['id','recipeid','userid','username','review','review_date']
+        fields = ['id','recipeid','userid','username','review','rating']
     def create(self, validated_data):
         # Automatically set the review_date to the current date
         validated_data['review_date'] = date.today()

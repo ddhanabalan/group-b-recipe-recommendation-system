@@ -146,13 +146,22 @@ class AddReview(generics.CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         recipe_id = request.data.get('recipeid')
+        rating = request.data.get('rating')
         serializer = ReviewsSerializer(data=request.data)
         #serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             recipe = Recipe.objects.get(pk=recipe_id)
-            recipe.total_reviews += 1
+            # Calculate the new average rating
+            new_total_reviews = recipe.total_reviews + 1
+            new_rating = ((recipe.rating * recipe.total_reviews) + float(rating)) / new_total_reviews
+            
+            # Update the recipe with new total_reviews and new_rating
+            recipe.total_reviews = new_total_reviews
+            recipe.rating = new_rating
             recipe.save()
+            # recipe.total_reviews += 1
+            # recipe.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -165,6 +174,7 @@ class DeleteReview(generics.DestroyAPIView):
             # Get the review object
             review = Reviews.objects.get(pk=review_id)
             recipe_id = review.recipeid_id 
+            rating = review.rating
         except Reviews.DoesNotExist:
             return Response({"message": "Review not found"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -173,7 +183,11 @@ class DeleteReview(generics.DestroyAPIView):
 
         try:
             recipe = Recipe.objects.get(pk=recipe_id)
-            recipe.total_reviews -= 1
+            new_total_reviews = recipe.total_reviews - 1
+            new_rating = ((recipe.rating * recipe.total_reviews) - float(rating)) / new_total_reviews
+
+            recipe.total_reviews = new_total_reviews
+            recipe.rating = new_rating
             recipe.save()
 
             return Response({"message": "Review deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
