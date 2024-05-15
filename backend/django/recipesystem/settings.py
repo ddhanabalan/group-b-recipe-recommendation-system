@@ -57,6 +57,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
+    # 'DEFAULT_PERMISSION_CLASSES': [
+    #     'rest_framework.permissions.IsAuthenticated',
+    # ],
 }
 
 SIMPLE_JWT = {
@@ -109,7 +112,7 @@ ROOT_URLCONF = 'recipesystem.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, ''),os.path.join(BASE_DIR, '../frontend/public')],
+        'DIRS': [os.path.join(BASE_DIR, ''),os.path.join(BASE_DIR, '../../frontend/public')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

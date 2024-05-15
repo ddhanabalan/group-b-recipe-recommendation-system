@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Recipe, Category, RecipeCategories, Favorite, Reviews
+from .models import Recipe, Category, RecipeCategories, Favorite, Reviews, History
 #from authentication.models import User
 from datetime import date
 
@@ -56,5 +56,15 @@ class RecipeWithCategoriesSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = ['recipeid', 'title', 'userid', 'ingredients', 'img', 'calories', 'season', 'daytimeofcooking', 'veg_nonveg', 'total_mins', 'categories']
 
-    
+class HistorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = History
+        fields = ['userid', 'recipeid']
+
+    def create(self, validated_data):
+        """
+        Override the create method to handle the saving of the favorite
+        """
+        return History.objects.create(**validated_data)
         

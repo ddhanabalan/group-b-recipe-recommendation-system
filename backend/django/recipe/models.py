@@ -51,4 +51,9 @@ class Reviews(models.Model):
     class Meta:
         db_table = 'reviews'
         
+class History(models.Model):
+    userid = models.ForeignKey(User, on_delete=models.CASCADE, db_column='userid')
+    recipeid = models.ForeignKey(Recipe, on_delete=models.CASCADE, db_column='recipeid')
 
+    class Meta:
+        db_table = 'user_history'
