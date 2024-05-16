@@ -1,6 +1,8 @@
 .review-container {
-  margin-right: 350px;
-  margin-left: 350px;
+  margin-right: 150px;
+  margin-left: 150px;
+  height: 600px;
+  overflow-y: auto;
 }
 .user-reviews {
   margin-bottom: 60px;

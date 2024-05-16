@@ -2,13 +2,17 @@ import React, { createContext, useContext, useState } from "react";
 
 const SortContext = createContext();
 
-export const useSortContext = () => useContext(SortContext);
+export const useSortContext = () => {
+  return useContext(SortContext);
+};
 
 export const SortProvider = ({ children }) => {
-  const [sortOption, setSortOption] = useState("");
+  const [sortOption, setSortOption] = useState("default"); // default sort option
+
   const sortRecipes = (option) => {
     setSortOption(option);
   };
+
   const sortFunction = (a, b) => {
     switch (sortOption) {
       case "lowestCalorie":
@@ -22,15 +26,13 @@ export const SortProvider = ({ children }) => {
       case "leasttime":
         return a.total_mins - b.total_mins;
       default:
-        return a.id - b.id;
+        return 0;
     }
   };
 
   return (
-    <SortContext.Provider value={{ sortOption, sortFunction, sortRecipes }}>
+    <SortContext.Provider value={{ sortOption, sortRecipes, sortFunction }}>
       {children}
     </SortContext.Provider>
   );
 };
-
-export default SortContext;

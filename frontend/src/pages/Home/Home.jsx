@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
 import HeroSection from "../../components/Herosection/Herosection";
@@ -9,15 +9,19 @@ import FastfoodIcon from "@mui/icons-material/Fastfood";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import SupervisedUserCircleRoundedIcon from "@mui/icons-material/SupervisedUserCircleRounded";
 import joinpic from "../../assets/joinnowpic.jpg";
+import { isAuthenticated } from "../../utils/auth";
 import "../../styles/Home.css";
+import { RecipeContext } from "../../context/recipeContext";
 
 function Home() {
+  const { loading, error } = useContext(RecipeContext);
   const [popularRecipes, setPopularRecipes] = useState([]);
   const [newRecipes, setNewRecipes] = useState([]);
+  const authToken = isAuthenticated();
 
   useEffect(() => {
     // Fetch popular recipes from the popular recipes API endpoint
-    fetch("http://127.0.0.1:8000/recipe/popularrecipes/")
+    fetch("http://localhost:8000/recipe/popularrecipes/")
       .then((response) => response.json())
       .then((data) => setPopularRecipes(data))
       .catch((error) =>
@@ -25,12 +29,18 @@ function Home() {
       );
 
     // Fetch new recipes from the new recipes API endpoint
-    fetch("http://127.0.0.1:8000/recipe/newrecipes/")
+    fetch("http://localhost:8000/recipe/newrecipes/")
       .then((response) => response.json())
       .then((data) => setNewRecipes(data))
       .catch((error) => console.error("Error fetching new recipes:", error));
   }, []);
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
   return (
     <div>
       <Navbar />
@@ -109,23 +119,30 @@ function Home() {
         </div>
       </div>
       {/*Join now section */}
-      <div className="joinnow">
-        <div className="joinnow-left">
-          <h1>DON'T MISS A THING</h1>
-          <h3>EXPLORE MORE RECIPES AND MAKE YOUR LIFE EASIER.</h3>
-          <p>
-            Unlock a world of culinary delights by creating an account with us
-            today – your gateway to personalized recipe collections, exclusive
-            content, and a community of fellow food enthusiasts.
-          </p>
-          <Link to="/Signup">
-            <button>Join Now</button>
-          </Link>
-        </div>
-        <div className="joinnow-right">
-          <img src={joinpic} alt="join with us" />
-        </div>
-      </div>
+      {authToken ? (
+        <></>
+      ) : (
+        <>
+          <div className="joinnow">
+            <div className="joinnow-left">
+              <h1>DON'T MISS A THING</h1>
+              <h3>EXPLORE MORE RECIPES AND MAKE YOUR LIFE EASIER.</h3>
+              <p>
+                Unlock a world of culinary delights by creating an account with
+                us today – your gateway to personalized recipe collections,
+                exclusive content, and a community of fellow food enthusiasts.
+              </p>
+              <Link to="/Signup">
+                <button>Join Now</button>
+              </Link>
+            </div>
+            <div className="joinnow-right">
+              <img src={joinpic} alt="join with us" />
+            </div>
+          </div>
+        </>
+      )}
+      {/*Footer section */}
       <Footer />
     </div>
   );

@@ -3,10 +3,39 @@ import "../../styles/Items.css";
 import LensIcon from "@mui/icons-material/Lens";
 import StarRating from "../starRating/StarRating";
 import { Link } from "react-router-dom";
+
 const Items = (props) => {
   const handleClick = () => {
+    const { userId, recipeId } = props; // Assuming userId and recipeId are passed as props
+    const data = { userId, recipeId };
+
+    // Scroll to the top of the page
     window.scrollTo({ top: 0, behavior: "auto" });
+
+    // Send data to the API
+    fetch("https://example.com/api/endpoint", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        // Handle response if needed
+        console.log("API request successful");
+      })
+      .catch((error) => {
+        console.error("Error sending data to API:", error);
+      });
   };
+
+  const formatDecimal = (number) => {
+    return Number(number).toFixed(1);
+  };
+
   return (
     <div className="item" onClick={handleClick}>
       <Link
@@ -21,11 +50,13 @@ const Items = (props) => {
             <b>{props.total_mins}</b> mins
           </div>
           <div className="calories" style={{ paddingTop: 3 }}>
-            <b>{props.calories} </b> Calorie
+            <b>{props.calories}</b> Calorie
           </div>
         </div>
         <div className="item-rating">
-          <b style={{ paddingTop: 2.5, paddingRight: 5 }}>{props.rating} </b>
+          <b style={{ paddingTop: 2.5, paddingRight: 5 }}>
+            {formatDecimal(props.rating)}
+          </b>
           <StarRating stars={props.rating} />
         </div>
       </Link>

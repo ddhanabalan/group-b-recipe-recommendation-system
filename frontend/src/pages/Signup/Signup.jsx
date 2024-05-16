@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import logo_dark from "../../assets/logo.svg";
 import Sign_image from "../../assets/signuppic.jpg";
-import Swal from "sweetalert2";
 import "../../styles/Signup.css";
+import axios from "axios";
+import { useNavigate } from "react-router-dom"; // Import useHistory for redirection
 
 function Signup() {
   const [formData, setFormData] = useState({
@@ -12,14 +13,13 @@ function Signup() {
   });
 
   const [passwordError, setPasswordError] = useState("");
+  const history = useNavigate(); // Create history object for redirection
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    // Trim leading spaces from the input value
-    const trimmedValue = value.trim();
     setFormData((prevData) => ({
       ...prevData,
-      [name]: trimmedValue,
+      [name]: value.trim(),
     }));
   };
 
@@ -28,9 +28,8 @@ function Signup() {
     return regex.test(password);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
-    console.log("Form Data:", formData);
 
     if (!validatePassword(formData.password)) {
       setPasswordError(
@@ -47,21 +46,20 @@ function Signup() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify({
+            username: formData.username,
+            email: formData.email,
+            password: formData.password,
+          }),
         }
       );
 
       if (response.ok) {
-        const data = await response.json();
-        console.log("Signup successful:", data);
-
-        window.location.href = "/login";
-
-        Swal.fire({
-          icon: "success",
-          title: "Registration Successful!",
-          text: "You can now login with your credentials.",
-        });
+        console.log("Signup successful");
+        const email = formData.email;
+        console.log("email", email);
+        localStorage.setItem("signupEmail", email);
+        history(`/otp/${email}`);
       } else {
         const errorData = await response.json();
         console.error("Signup failed:", errorData);
@@ -81,7 +79,7 @@ function Signup() {
         </div>
         <h2 className="sign-header">Create Your Account</h2>
 
-        <form className="sign-form" onSubmit={handleSubmit}>
+        <form className="sign-form" onSubmit={handleSignup}>
           <input
             type="text"
             name="username"

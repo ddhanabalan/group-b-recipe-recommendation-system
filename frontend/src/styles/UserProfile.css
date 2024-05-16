@@ -32,6 +32,7 @@
 
 .detail-item {
   margin-bottom: 10px;
+  display: flex;
 }
 
 .detail-item label {

@@ -18,6 +18,8 @@ import AddNewRecipe from "./pages/User/AddNewRecipe";
 import EditProfile from "./pages/User/EditProfile";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import PasswordReset from "./pages/PasswordReset/PasswordReset";
+import Otp from "./pages/Otp/Otp";
+import ReviewsList from "./pages/admin/ReviewsList";
 function App() {
   return (
     <div>
@@ -32,6 +34,7 @@ function App() {
           <Route path="/SingleRecipe/:RecipeId" element={<SingleRecipe />} />
           <Route path="/dashboard" element={<Admin />} />
           <Route path="/admin/users" element={<UsersList />} />
+          <Route path="/admin/reviews" element={<ReviewsList />} />
           <Route path="/user/savedrecipes" element={<UserSavedRecipes />} />
           <Route path="/user/addedrecipes" element={<UserAddedRecipes />} />
           <Route path="/user/feedbacks" element={<UserFeedback />} />
@@ -40,6 +43,7 @@ function App() {
           <Route path="/editprofile" element={<EditProfile />} />
           <Route path="/forgotpassword" element={<ForgotPassword />} />
           <Route path="/passwordreset" element={<PasswordReset />} />
+          <Route path="/otp/:email" element={<Otp />} />
         </Routes>
       </Router>
     </div>
