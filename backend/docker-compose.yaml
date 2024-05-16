@@ -6,6 +6,13 @@ services:
       context: ./mysqldb
       dockerfile: Dockerfile
     restart: always
+    env_file:
+      - .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=${ROOT_PASSWORD}
+      - MYSQL_DATABASE=${DATABASE} 
+      - MYSQL_USER=${USER}
+      - MYSQL_PASSWORD=${PASSWORD}
     # ports:
     #   - "3306:3306"
     healthcheck:
@@ -18,13 +25,13 @@ services:
 
   recipesystem:
     build:
-      context: ./
+      context: ./django
       dockerfile: Dockerfile
     # command: python manage.py runserver 0.0.0.0:8000
     command: sh -c "python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"
     restart: always
     volumes:
-      - .:/app
+      - .:/app/django
     ports:
       - "8000:8000"
     depends_on:
