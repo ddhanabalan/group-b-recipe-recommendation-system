@@ -45,6 +45,12 @@ class UserDetailSerializer(serializers.ModelSerializer):
 class FeedbackSerializer(serializers.ModelSerializer):
     class Meta:
         model = Feedback
-        fields = ['id','userid','category','feedback']
+        fields = ['id','userid','category','feedback','feedback_date']
     def create(self, validated_data):
         return super().create(validated_data)
+
+class AllUserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ["userid","username", "email", 'created_at']

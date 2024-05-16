@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status, generics
 from .models import User, Temp, Feedback
 from .serializers import UserSerializer, PasswordResetSerializer, TempSerializer, ChangeUsernameSerializer, UserDetailSerializer
-from .serializers import FeedbackSerializer
+from .serializers import FeedbackSerializer, AllUserSerializer
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
@@ -251,4 +251,54 @@ class DeleteFeedback(generics.DestroyAPIView):
 
         # Delete the feedback object
         review.delete()
-        return Response({"message": "Review deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"message": "Feedback deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+    
+class AllFeedbacksLimited(generics.ListAPIView):
+    # permission_classes = [IsAuthenticated]
+    serializer_class = FeedbackSerializer
+
+    def list(self, request, *args, **kwargs):
+        limit = int(request.data.get('page'))
+        queryset = Feedback.objects.all()[((limit-1)*10):(limit*10)]
+        serializer = FeedbackSerializer(queryset, many=True)
+        data = serializer.data
+        
+        return Response(data)
+    
+class AllUsersLimited(generics.ListAPIView):
+    # permission_classes = [IsAuthenticated]
+    serializer_class = AllUserSerializer
+
+    def list(self, request, *args, **kwargs):
+        limit = int(request.data.get('page'))
+        queryset = User.objects.all()[((limit-1)*10):(limit*10)]
+        serializer = AllUserSerializer(queryset, many=True)
+        data = serializer.data
+        
+        return Response(data)
+    
+class UsersCount(APIView):
+
+    def get(self, request, *args, **kwargs):
+        count = User.objects.count()
+        return Response(count)
+
+class FeedbackCount(APIView):
+
+    def get(self, request, *args, **kwargs):
+        count = Feedback.objects.count()
+        return Response(count)
+    
+class DeleteUser(generics.DestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    #permission_classes = [IsAuthenticated]
+
+    def delete(self, request, *args, **kwargs):
+        user_id = request.data.get('userid')
+        try:
+            user = User.objects.get(pk=user_id)
+            user.delete()
+            return Response({"message": "User deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        except User.DoesNotExist:
+            return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)

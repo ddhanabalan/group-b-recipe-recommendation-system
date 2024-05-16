@@ -262,7 +262,21 @@ class AddRecipe(generics.CreateAPIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({"message": "Recipe with this title already exists"}, status=status.HTTP_400_BAD_REQUEST)
-        
+
+class DeleteRecipe(generics.DestroyAPIView):
+    queryset = Recipe.objects.all()
+    serializer_class = RecipeSerializer
+    #permission_classes = [IsAuthenticated]
+
+    def delete(self, request, *args, **kwargs):
+        recipe_id = request.data.get('recipeid')
+        try:
+            recipe = Recipe.objects.get(pk=recipe_id)
+            recipe.delete()
+            return Response({"message": "Recipe deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        except Recipe.DoesNotExist:
+            return Response({"message": "Recipe not found"}, status=status.HTTP_404_NOT_FOUND)
+
 class AllCategories(generics.ListAPIView):
     queryset = Category.objects.values('name')
     serializer_class = CategorySerializer
@@ -307,3 +321,9 @@ class UserHistory(APIView):
             serializer.save(userid=user_id, recipeid=recipe_id)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class RecipeCount(APIView):
+
+    def get(self, request, *args, **kwargs):
+        count = Recipe.objects.count()
+        return Response(count)
