@@ -16,7 +16,7 @@ from django.conf import settings
 from django.utils.html import strip_tags
 import re
 from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+from rest_framework_simplejwt.tokens import AccessToken
 
 def generate_unique_userid():
     while True:
@@ -116,16 +116,18 @@ class UserLogin(APIView):
         try:
             user = User.objects.get(username=username)
             if user is not None and check_password(password, user.password):
-                refresh = RefreshToken.for_user(user)
-                serializer = UserSerializer(user)
-                return Response({
-                    'refresh': str(refresh),
-                    'access': str(refresh.access_token),
-                    'user': serializer.data
-                }, status=status.HTTP_200_OK)
-                # token = AccessToken.for_user(user)
+                user.is_active = True
+                user.save()
+                # refresh = RefreshToken.for_user(user)
                 # serializer = UserSerializer(user)
-                # return Response({'token': str(token), 'user': serializer.data}, status=status.HTTP_200_OK)
+                # return Response({
+                #     'refresh': str(refresh),
+                #     'access': str(refresh.access_token),
+                #     'user': serializer.data
+                # }, status=status.HTTP_200_OK)
+                token = AccessToken.for_user(user)
+                serializer = UserSerializer(user)
+                return Response({'token': str(token), 'user': serializer.data}, status=status.HTTP_200_OK)
             else:
                 return Response({"error": "Invalid username or password"}, status=status.HTTP_401_UNAUTHORIZED)
         except User.DoesNotExist:
@@ -136,12 +138,12 @@ class Logout(APIView):
 
     def post(self, request):
         try:
-            refresh_token = request.data["refresh"]
-            token = RefreshToken(refresh_token)
-            token.blacklist()
+            user = request.user
+            user.is_active = False
+            user.save()
             return Response({"message": "Successfully logged out."}, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as error:
+            return Response({"error": str(error)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 # ForgotPassword view for initiating the password reset process
 class ForgotPassword(APIView):
@@ -228,7 +230,7 @@ class FetchUsernameAndEmail(APIView):
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
         
 class AddFeedback(generics.CreateAPIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     serializer_class = FeedbackSerializer
 
     def post(self, request, *args, **kwargs):
@@ -239,6 +241,7 @@ class AddFeedback(generics.CreateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class DeleteFeedback(generics.DestroyAPIView):
+    permission_classes = [IsAuthenticated]
     def destroy(self, request, *args, **kwargs):
         # Extract the ID from the request data
         feedback_id = request.data.get('id')
@@ -253,11 +256,11 @@ class DeleteFeedback(generics.DestroyAPIView):
         review.delete()
         return Response({"message": "Feedback deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
     
-class AllFeedbacksLimited(generics.ListAPIView):
+class AllFeedbacksLimited(APIView):
     # permission_classes = [IsAuthenticated]
     serializer_class = FeedbackSerializer
 
-    def list(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         limit = int(request.data.get('page'))
         queryset = Feedback.objects.all()[((limit-1)*10):(limit*10)]
         serializer = FeedbackSerializer(queryset, many=True)
@@ -265,11 +268,11 @@ class AllFeedbacksLimited(generics.ListAPIView):
         
         return Response(data)
     
-class AllUsersLimited(generics.ListAPIView):
+class AllUsersLimited(APIView):
     # permission_classes = [IsAuthenticated]
     serializer_class = AllUserSerializer
 
-    def list(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         limit = int(request.data.get('page'))
         queryset = User.objects.all()[((limit-1)*10):(limit*10)]
         serializer = AllUserSerializer(queryset, many=True)
@@ -290,9 +293,9 @@ class FeedbackCount(APIView):
         return Response(count)
     
 class DeleteUser(generics.DestroyAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    #permission_classes = [IsAuthenticated]
 
     def delete(self, request, *args, **kwargs):
         user_id = request.data.get('userid')
