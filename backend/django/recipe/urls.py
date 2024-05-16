@@ -16,7 +16,7 @@ urlpatterns = [
     path('addreview/', AddReview.as_view(), name='addreview'),
     path('deletereview/', DeleteReview.as_view(), name='deletereview'),
     path('addrecipe/', AddRecipe.as_view(), name='addrecipe'),
-    path('allcategories/', AllCategories.as_view(), name='allcategories'),
     path('userrecipes/', UserRecipes.as_view(), name='userrecipes'),
+    path('allcategories/', AllCategories.as_view(), name='allcategories'),
     path('userhistory/', UserHistory.as_view(), name='userhistory'),
 ]

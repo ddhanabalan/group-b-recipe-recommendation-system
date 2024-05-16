@@ -20,3 +20,13 @@ class User(models.Model):
     
     class Meta:
         db_table = 'users'
+
+class Feedback(models.Model):
+    id = models.AutoField(primary_key=True)
+    userid = models.ForeignKey(User, on_delete=models.CASCADE, db_column='userid')
+    category = models.CharField(max_length=255)
+    feedback = models.TextField()
+    feedback_date = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'feedbacks'
