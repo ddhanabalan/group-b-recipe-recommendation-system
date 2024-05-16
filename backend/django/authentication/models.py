@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 
 class Temp(models.Model):
     userid = models.IntegerField(primary_key=True,unique=True)
@@ -9,7 +10,7 @@ class Temp(models.Model):
     class Meta:
         db_table = 'temp'
         
-class User(models.Model):
+class User(AbstractBaseUser, PermissionsMixin):
     userid = models.IntegerField(primary_key=True, unique=True)
     username = models.CharField(max_length=255,unique=True)
     email = models.EmailField(unique=False)
@@ -17,7 +18,16 @@ class User(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     role = models.CharField(max_length=255,default='user')
     is_active = models.BooleanField(default=False)
-    
+    first_name = ''
+    last_name = ''
+    is_superuser = False
+    last_login = None
+    date_joined = ''
+    is_staff = False
+
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email']
+
     class Meta:
         db_table = 'users'
 

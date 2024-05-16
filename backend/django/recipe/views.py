@@ -5,13 +5,10 @@ from .serializers import RecipeSerializer, FavoriteSerializer, ReviewsSerializer
 from .serializers import RecipeWithCategoriesSerializer, CategorySerializer, HistorySerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-from rest_framework_simplejwt.authentication import JWTAuthentication
 import random
 import string
 
 class AllRecipes(generics.ListAPIView):
-    # authentication_classes = [JWTAuthentication]
-    # permission_classes = [IsAuthenticated]
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
 
@@ -29,7 +26,6 @@ class AllRecipes(generics.ListAPIView):
         return Response(data)
 
 class PopularRecipes(generics.ListAPIView):
-    # permission_classes = [IsAuthenticated]
     queryset = Recipe.objects.order_by("-total_reviews")[:10]
     serializer_class = RecipeSerializer
 
@@ -47,7 +43,6 @@ class PopularRecipes(generics.ListAPIView):
         return Response(data)
     
 class NewRecipes(generics.ListAPIView):
-    # permission_classes = [IsAuthenticated]
     queryset = Recipe.objects.order_by("-created_at")[:10]
     serializer_class = RecipeSerializer
 
@@ -65,7 +60,7 @@ class NewRecipes(generics.ListAPIView):
         return Response(data)
 
 class AddFavorite(APIView):
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         serializer = FavoriteSerializer(data=request.data)
@@ -81,6 +76,7 @@ class AddFavorite(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class RemoveFavourites(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request, *args, **kwargs):
         user_id = request.data.get('userid')
         recipe_id=request.data.get('recipeid')
@@ -95,7 +91,7 @@ class RemoveFavourites(APIView):
             return Response({'error': 'Favorite not found'}, status=status.HTTP_404_NOT_FOUND)
 
 class AllFavourites(APIView):
-    #permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         user_id = request.data.get('userid')
@@ -154,11 +150,11 @@ class AllReviews(generics.ListAPIView):
         
         return Response(data)
 
-class AllReviewsLimited(generics.ListAPIView):
+class AllReviewsLimited(APIView):
     # permission_classes = [IsAuthenticated]
     serializer_class = ReviewsSerializer
 
-    def list(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         limit = int(request.data.get('page'))
         queryset = Reviews.objects.all()[((limit-1)*10):(limit*10)]
         serializer = ReviewsSerializer(queryset, many=True)
@@ -167,7 +163,7 @@ class AllReviewsLimited(generics.ListAPIView):
         return Response(data)
 
 class AddReview(generics.CreateAPIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     serializer_class = ReviewsSerializer
 
     def post(self, request, *args, **kwargs):
@@ -192,6 +188,8 @@ class AddReview(generics.CreateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class DeleteReview(generics.DestroyAPIView):
+    permission_classes = [IsAuthenticated]
+
     def destroy(self, request, *args, **kwargs):
         # Extract the ID from the request data
         review_id = request.data.get('id')
@@ -240,6 +238,7 @@ def generate_unique_userid():
             return recipeid
 
 class AddRecipe(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = RecipeWithCategoriesSerializer
 
     def post(self, request, *args, **kwargs):
@@ -264,9 +263,9 @@ class AddRecipe(generics.CreateAPIView):
             return Response({"message": "Recipe with this title already exists"}, status=status.HTTP_400_BAD_REQUEST)
 
 class DeleteRecipe(generics.DestroyAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
-    #permission_classes = [IsAuthenticated]
 
     def delete(self, request, *args, **kwargs):
         recipe_id = request.data.get('recipeid')
