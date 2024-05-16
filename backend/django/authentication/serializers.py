@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from .models import User,Temp
+from .models import User, Temp, Feedback
 from django.contrib.auth.hashers import make_password
+from datetime import date
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -35,3 +36,15 @@ class ChangeUsernameSerializer(serializers.Serializer):
         if User.objects.filter(username=value).exists():
             raise serializers.ValidationError("This username is already taken.")
         return value
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'email']
+
+class FeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Feedback
+        fields = ['id','userid','category','feedback']
+    def create(self, validated_data):
+        return super().create(validated_data)

@@ -1,8 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
-from .models import User,Temp
-from .serializers import UserSerializer, PasswordResetSerializer, TempSerializer, ChangeUsernameSerializer
+from rest_framework import status, generics
+from .models import User, Temp, Feedback
+from .serializers import UserSerializer, PasswordResetSerializer, TempSerializer, ChangeUsernameSerializer, UserDetailSerializer
+from .serializers import FeedbackSerializer
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
@@ -216,3 +217,38 @@ class ChangeUsername(APIView):
             user.save()
             return Response({"message": "Username changed successfully"}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class FetchUsernameAndEmail(APIView):
+    def get(self, request, *args, **kwargs):
+        try:
+            user = User.objects.get(pk=request.data.get('userid'))
+            serializer = UserDetailSerializer(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+class AddFeedback(generics.CreateAPIView):
+    # permission_classes = [IsAuthenticated]
+    serializer_class = FeedbackSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = FeedbackSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class DeleteFeedback(generics.DestroyAPIView):
+    def destroy(self, request, *args, **kwargs):
+        # Extract the ID from the request data
+        feedback_id = request.data.get('id')
+
+        try:
+            # Get the feedback object
+            review = Feedback.objects.get(pk=feedback_id)
+        except Feedback.DoesNotExist:
+            return Response({"message": "Feedback not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Delete the feedback object
+        review.delete()
+        return Response({"message": "Review deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
