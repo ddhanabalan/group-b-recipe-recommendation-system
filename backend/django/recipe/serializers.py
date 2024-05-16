@@ -51,7 +51,6 @@ class ReviewsSerializer(serializers.ModelSerializer):
 class RecipeWithCategoriesSerializer(serializers.ModelSerializer):
     categories = serializers.ListField(child=serializers.CharField())
 
-
     class Meta:
         model = Recipe
         fields = ['recipeid', 'title', 'userid', 'ingredients', 'img', 'calories', 'season', 'daytimeofcooking', 'veg_nonveg', 'total_mins', 'categories']

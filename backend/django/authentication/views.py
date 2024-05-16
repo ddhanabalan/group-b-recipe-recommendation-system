@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import User,Temp
-from .serializers import UserSerializer, PasswordResetSerializer, TempSerializer
+from .serializers import UserSerializer, PasswordResetSerializer, TempSerializer, ChangeUsernameSerializer
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
@@ -13,9 +13,9 @@ from django.contrib.auth.hashers import check_password, make_password
 from .tokens import custom_token_generator
 from django.conf import settings
 from django.utils.html import strip_tags
-from rest_framework_simplejwt.tokens import AccessToken
 import re
 from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 
 def generate_unique_userid():
     while True:
@@ -115,9 +115,16 @@ class UserLogin(APIView):
         try:
             user = User.objects.get(username=username)
             if user is not None and check_password(password, user.password):
-                token = AccessToken.for_user(user)
+                refresh = RefreshToken.for_user(user)
                 serializer = UserSerializer(user)
-                return Response({'token': str(token), 'user': serializer.data}, status=status.HTTP_200_OK)
+                return Response({
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token),
+                    'user': serializer.data
+                }, status=status.HTTP_200_OK)
+                # token = AccessToken.for_user(user)
+                # serializer = UserSerializer(user)
+                # return Response({'token': str(token), 'user': serializer.data}, status=status.HTTP_200_OK)
             else:
                 return Response({"error": "Invalid username or password"}, status=status.HTTP_401_UNAUTHORIZED)
         except User.DoesNotExist:
@@ -127,9 +134,13 @@ class Logout(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        # Perform logout logic here, such as removing the authentication token
-        request.user.auth_token.delete()  # Assuming you're using TokenAuthentication
-        return Response({"message": "Successfully logged out."}, status=status.HTTP_200_OK)
+        try:
+            refresh_token = request.data["refresh"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response({"message": "Successfully logged out."}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
 # ForgotPassword view for initiating the password reset process
 class ForgotPassword(APIView):
@@ -145,8 +156,8 @@ class ForgotPassword(APIView):
         
         uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
         token = custom_token_generator.make_token(user)
-        reset_link = f"{request.scheme}://{request.get_host()}/authentication/reset/{uidb64}/{token}/"
-        print(f"reset link = {reset_link}\nuidb64 = {uidb64}\ntoken = {token}\nuser = {user}")
+        reset_link = f"{request.scheme}://{request.get_host()}/PasswordReset/{uidb64}/{token}/"
+        # print(f"reset link = {reset_link}\nuidb64 = {uidb64}\ntoken = {token}\nuser = {user}")
         email_subject = 'Password Reset'
         email_body = render_to_string('./authentication/password_reset_email.html', {
             'user': user,
@@ -192,3 +203,16 @@ class PasswordResetConfirmView(APIView):
                 return Response({'error': 'Invalid reset link'}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ChangeUsername(APIView):
+    # permission_classes = [IsAuthenticated]
+
+    def put(self, request, *args, **kwargs):
+        serializer = ChangeUsernameSerializer(data=request.data)
+        if serializer.is_valid():
+            new_username = serializer.validated_data['new_username']
+            user = User.objects.get(pk=request.data.get('userid'))
+            user.username = new_username
+            user.save()
+            return Response({"message": "Username changed successfully"}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

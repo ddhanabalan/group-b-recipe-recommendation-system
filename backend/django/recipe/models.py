@@ -48,7 +48,7 @@ class Reviews(models.Model):
     username = models.CharField(max_length=255)
     review = models.TextField()
     review_date = models.DateField()
-    rating = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)])
+    rating = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)], default=0)
 
     class Meta:
         db_table = 'reviews'

@@ -1,7 +1,8 @@
-from rest_framework import generics,status
+from rest_framework import generics, status
 from rest_framework.response import Response
 from .models import Recipe, Category, RecipeCategories, Favorite, Reviews, History
-from .serializers import RecipeSerializer, FavoriteSerializer, ReviewsSerializer, TitleSerializer, RecipeWithCategoriesSerializer, CategorySerializer, HistorySerializer
+from .serializers import RecipeSerializer, FavoriteSerializer, ReviewsSerializer, TitleSerializer
+from .serializers import RecipeWithCategoriesSerializer, CategorySerializer, HistorySerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -127,6 +128,19 @@ class RecipeReviews(APIView):
 
         return Response(data)
     
+class RecipeReviewsLimited(APIView):
+    #permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        recipe_id = request.data.get('recipeid')
+        limit = int(request.data.get('page'))
+        if not recipe_id:
+            return Response({'error': 'Recipe ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+        queryset = Reviews.objects.filter(recipeid=recipe_id)[((limit-1)*10):(limit*10)]
+        serializer = ReviewsSerializer(queryset, many=True)
+        data = serializer.data
+
+        return Response(data)
 
 class AllReviews(generics.ListAPIView):
     # permission_classes = [IsAuthenticated]
@@ -135,6 +149,18 @@ class AllReviews(generics.ListAPIView):
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
+        serializer = ReviewsSerializer(queryset, many=True)
+        data = serializer.data
+        
+        return Response(data)
+
+class AllReviewsLimited(generics.ListAPIView):
+    # permission_classes = [IsAuthenticated]
+    serializer_class = ReviewsSerializer
+
+    def list(self, request, *args, **kwargs):
+        limit = int(request.data.get('page'))
+        queryset = Reviews.objects.all()[((limit-1)*10):(limit*10)]
         serializer = ReviewsSerializer(queryset, many=True)
         data = serializer.data
         

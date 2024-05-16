@@ -27,3 +27,11 @@ class TempSerializer(serializers.ModelSerializer):
     class Meta:
         model = Temp
         fields = ['userid','username', 'email', 'password']
+
+class ChangeUsernameSerializer(serializers.Serializer):
+    new_username = serializers.CharField(max_length=255)
+
+    def validate_new_username(self, value):
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError("This username is already taken.")
+        return value
