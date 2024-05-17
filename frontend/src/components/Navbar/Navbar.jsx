@@ -7,6 +7,7 @@ import {
   isAuthenticated,
   getAuthToken,
   clearAuthToken,
+  clearUserId,
 } from "../../utils/auth";
 import { FaUser } from "react-icons/fa";
 
@@ -18,6 +19,7 @@ function Navbar() {
   const [searchHistory, setSearchHistory] = useState([]);
   const searchRef = useRef(null);
   const storedToken = getAuthToken();
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     console.log("Stored Token:", storedToken);
@@ -63,35 +65,58 @@ function Navbar() {
     }
   };
 
-  const handleRecipeClick = (recipeId, recipeTitle) => {
-    console.log("Redirecting to Recipe ID:", recipeId);
+  const handleRecipeClick = (recipeid, recipeTitle) => {
     if (!isAuthenticated()) {
-      window.location.href = "/login"; // Redirect to the login page
+      window.location.href = "/login";
       return;
     }
 
-    window.location.href = `/singlerecipe/${recipeId}`;
+    // Redirect to the single recipe page
+    window.location.href = `/singlerecipe/${recipeid}`;
 
-    setSearchHistory((prevHistory) => [
-      ...prevHistory,
-      { id: recipeId, title: recipeTitle },
-    ]);
-    sessionStorage.setItem(
-      "searchHistory",
-      JSON.stringify([...searchHistory, { id: recipeId, title: recipeTitle }])
-    );
+    // Update search history in sessionStorage
+    const updatedHistory = [
+      ...searchHistory,
+      { id: recipeid, title: recipeTitle },
+    ];
+    setSearchHistory(updatedHistory);
+    sessionStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
   };
+  {
+    /*const handleLogout = async () => {
+    try {
+      // Call your logout API endpoint here
+      const response = await fetch(
+        "http://localhost:8000/authentication/logout/",
+        {
+          method: "POST", // Assuming your logout endpoint uses POST method
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-  const handleLogout = async () => {
-    setShowDropdown(false);
-    setSearchHistory([]); // Clear search history when logging out
-    sessionStorage.removeItem("searchHistory");
-    clearAuthToken(); // Clear the authentication token
-    window.location.href = "/home";
+      if (!response.ok) {
+        throw new Error("Failed to logout");
+      }
+
+      clearAuthToken();
+      clearUserId();
+
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  };*/
+  }
+  const handleLogout = () => {
+    clearAuthToken();
+    clearUserId();
+
+    window.location.href = "/login";
   };
-
   const toggleDropdown = () => {
-    setShowDropdown(!showDropdown);
+    setOpen(!open);
   };
 
   const authToken = isAuthenticated(); // Determine if the user is authenticated
@@ -124,7 +149,7 @@ function Navbar() {
                   <li
                     key={index}
                     className="search-item-history"
-                    onClick={() => setSearchTerm(item)}
+                    onClick={() => handleRecipeClick(item.id, item.title)}
                   >
                     {item.title}
                   </li>
@@ -133,9 +158,11 @@ function Navbar() {
               <div>
                 {filteredRecipes.map((recipe) => (
                   <li
-                    key={recipe.id}
+                    key={recipe.recipeid}
                     className="search-item"
-                    onClick={() => handleRecipeClick(recipe.id, recipe.title)}
+                    onClick={() =>
+                      handleRecipeClick(recipe.recipeid, recipe.title)
+                    }
                   >
                     {recipe.title}
                   </li>
@@ -148,9 +175,11 @@ function Navbar() {
               <div>
                 {filteredRecipes.map((recipe) => (
                   <li
-                    key={recipe.id}
+                    key={recipe.reciepid}
                     className="search-item"
-                    onClick={() => handleRecipeClick(recipe.id, recipe.title)}
+                    onClick={() =>
+                      handleRecipeClick(recipe.recipeid, recipe.title)
+                    }
                   >
                     {recipe.title}
                   </li>
@@ -178,6 +207,46 @@ function Navbar() {
               <a href="/about">About Us</a>
             </li>
             {authToken ? (
+              <li>
+                <span className="user-heading" onClick={toggleDropdown}>
+                  User
+                </span>
+                {open && (
+                  <ul className="dropdown-menu">
+                    <li>
+                      <a href="/user/savedrecipes">Dashboard</a>
+                    </li>
+                    <li>
+                      <a href="/passwordreset">Change Password</a>
+                    </li>
+                    <li>
+                      <button
+                        style={{ border: "none", background: "none" }}
+                        onClick={handleLogout}
+                      >
+                        Logout
+                      </button>
+                    </li>
+                  </ul>
+                )}
+              </li>
+            ) : (
+              <li>
+                <span
+                  className="user-heading"
+                  style={{
+                    border: "2px dashed #e49963",
+                    padding: " 8px 30px",
+                    color: "black",
+                  }}
+                  onClick={() => (window.location.href = "/login")}
+                >
+                  Login
+                </span>
+              </li>
+            )}
+
+            {/*{authToken ? (
               <li className="dropdown-container">
                 <div
                   className="user-icon"
@@ -207,7 +276,7 @@ function Navbar() {
                   login
                 </span>
               </li>
-            )}
+            )}*/}
           </ul>
         </nav>
       </div>

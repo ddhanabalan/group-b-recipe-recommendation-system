@@ -8,36 +8,55 @@ const RecipeContextProvider = ({ children }) => {
   const [savedRecipes, setSavedRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [dataLoaded, setDataLoaded] = useState(false);
+  const [distinctSeasons, setDistinctSeasons] = useState([]);
+  const [distinctDayOfTimeCooking, setDistinctDayOfTimeCooking] = useState([]);
+  const [distinctVegNonVeg, setDistinctVegNonVeg] = useState([]);
 
   useEffect(() => {
-    const fetchRecipes = async () => {
-      try {
-        const response = await fetch("http://127.0.0.1:8000/recipe/allrecipes");
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
+    if (!dataLoaded) {
+      const fetchRecipes = async () => {
+        try {
+          const response = await fetch(
+            "http://localhost:8000/recipe/allrecipes"
+          );
+          if (!response.ok) {
+            throw new Error("Failed to fetch data");
+          }
+          const data = await response.json();
+          setAllRecipes(data);
+          setLoading(false);
+          setDataLoaded(true);
+        } catch (error) {
+          setError(error);
+          setLoading(false);
         }
-        const data = await response.json();
-        setAllRecipes(data);
-        setLoading(false);
-      } catch (error) {
-        setError(error);
-        setLoading(false);
-      }
-    };
+      };
 
-    fetchRecipes();
-  }, []);
+      fetchRecipes();
+    }
+  }, [dataLoaded]);
 
   useEffect(() => {
     if (!loading && allRecipes) {
       const categoriesSet = new Set();
+      const seasonsSet = new Set();
+      const dayOfTimeCookingSet = new Set();
+      const vegNonVegSet = new Set();
+
       allRecipes.forEach((recipe) => {
         if (recipe.categories) {
           recipe.categories.forEach((cat) => categoriesSet.add(cat));
         }
+        seasonsSet.add(recipe.season);
+        dayOfTimeCookingSet.add(recipe.daytimeofcooking);
+        vegNonVegSet.add(recipe.veg_nonveg);
       });
-      const categoriesArray = Array.from(categoriesSet);
-      setDistinctCategories(categoriesArray);
+
+      setDistinctCategories(Array.from(categoriesSet));
+      setDistinctSeasons(Array.from(seasonsSet));
+      setDistinctDayOfTimeCooking(Array.from(dayOfTimeCookingSet));
+      setDistinctVegNonVeg(Array.from(vegNonVegSet));
     }
   }, [allRecipes, loading]);
 
@@ -68,6 +87,9 @@ const RecipeContextProvider = ({ children }) => {
       value={{
         allRecipes,
         distinctCategories,
+        distinctSeasons,
+        distinctDayOfTimeCooking,
+        distinctVegNonVeg,
         saveRecipe,
         unsaveRecipe,
         isRecipeSaved,
