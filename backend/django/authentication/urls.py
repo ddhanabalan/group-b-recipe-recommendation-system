@@ -1,7 +1,7 @@
 from django.urls import path
 from authentication.views import UserSignup, UserLogin, ForgotPassword, VerifyEmail, Logout, PasswordResetConfirmView
 from authentication.views import ChangeUsername, FetchUsernameAndEmail, AddFeedback, DeleteFeedback, AllUsersLimited
-from authentication.views import UsersCount, FeedbackCount, AllFeedbacksLimited, DeleteUser
+from authentication.views import UsersCount, FeedbackCount, AllFeedbacksLimited, DeleteUser, NewUsersLast30Days
 #from .views import PasswordResetConfirmView
 
 urlpatterns = [
@@ -20,4 +20,5 @@ urlpatterns = [
     path('userscount/', UsersCount.as_view(), name='userscount'),
     path('feedbackcount/', FeedbackCount.as_view(), name='feedbackcount'),
     path('deleteuser/', DeleteUser.as_view(), name='deleteuser'),
+    path('newuserscount/', NewUsersLast30Days.as_view(), name='newuserscount'),
 ]

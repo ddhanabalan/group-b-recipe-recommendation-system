@@ -17,6 +17,9 @@ from django.utils.html import strip_tags
 import re
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import AccessToken
+from django.utils import timezone
+from datetime import timedelta
+from dateutil.relativedelta import relativedelta
 
 def generate_unique_userid():
     while True:
@@ -230,7 +233,7 @@ class FetchUsernameAndEmail(APIView):
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
         
 class AddFeedback(generics.CreateAPIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     serializer_class = FeedbackSerializer
 
     def post(self, request, *args, **kwargs):
@@ -262,7 +265,7 @@ class AllFeedbacksLimited(APIView):
 
     def post(self, request, *args, **kwargs):
         limit = int(request.data.get('page'))
-        queryset = Feedback.objects.all()[((limit-1)*10):(limit*10)]
+        queryset = Feedback.objects.all().order_by('-feedback_date')[((limit-1)*50):(limit*50)]
         serializer = FeedbackSerializer(queryset, many=True)
         data = serializer.data
         
@@ -274,7 +277,7 @@ class AllUsersLimited(APIView):
 
     def post(self, request, *args, **kwargs):
         limit = int(request.data.get('page'))
-        queryset = User.objects.all()[((limit-1)*10):(limit*10)]
+        queryset = User.objects.all().order_by('-created_at')[((limit-1)*50):(limit*50)]
         serializer = AllUserSerializer(queryset, many=True)
         data = serializer.data
         
@@ -305,3 +308,11 @@ class DeleteUser(generics.DestroyAPIView):
             return Response({"message": "User deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
         except User.DoesNotExist:
             return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+class NewUsersLast30Days(APIView):
+
+    def get(self, request, *args, **kwargs):
+        start_date = timezone.now() - timedelta(days=30)
+        # Filter users created in the last 30 days
+        new_users = User.objects.filter(created_at__gte=start_date).count()
+        return Response(new_users)

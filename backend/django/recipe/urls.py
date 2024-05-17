@@ -1,10 +1,11 @@
 from django.urls import path
 from recipe.views import AllRecipes,PopularRecipes,NewRecipes, AddFavorite, AllFavourites, RecipeReviews,RecipeReviewsLimited
 from recipe.views import AllReviews, AllReviewsLimited, AllTitles, AddReview, DeleteReview,AddRecipe, AllCategories, UserRecipes
-from recipe.views import RemoveFavourites, UserHistory, RecipeCount, DeleteRecipe
+from recipe.views import RemoveFavourites, UserHistory, RecipesCount, ReviewsCount, DeleteRecipe, AllRecipesLimited, NewRecipesLast30Days
 
 urlpatterns = [
     path('allrecipes/', AllRecipes.as_view(), name='allrecipes'),
+    path('allrecipeslimited/', AllRecipesLimited.as_view(), name='allrecipeslimited'),
     path('popularrecipes/', PopularRecipes.as_view(), name='popularrecipes'),
     path('newrecipes/', NewRecipes.as_view(), name='newrecipes'),
     path('saverecipe/', AddFavorite.as_view(), name='saverecipes'),
@@ -22,5 +23,7 @@ urlpatterns = [
     path('userrecipes/', UserRecipes.as_view(), name='userrecipes'),
     path('allcategories/', AllCategories.as_view(), name='allcategories'),
     path('userhistory/', UserHistory.as_view(), name='userhistory'),
-    path('recipecount/', RecipeCount.as_view(), name='recipecount'),
+    path('recipescount/', RecipesCount.as_view(), name='recipescount'),
+    path('reviewscount/', ReviewsCount.as_view(), name='reviewscount'),
+    path('newrecipescount/', NewRecipesLast30Days.as_view(), name='newrecipescount'),
 ]
