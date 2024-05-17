@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import "../../styles/PasswordReset.css";
+import { getUserId, getAuthToken } from "../../utils/auth"; // Importing the functions from auth.js
 
 const PasswordReset = () => {
   const [newPassword, setNewPassword] = useState("");
@@ -15,7 +16,6 @@ const PasswordReset = () => {
       setConfirmNewPassword(value);
     }
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -24,14 +24,30 @@ const PasswordReset = () => {
       return;
     }
 
+    const userId = getUserId().toString();
+    const authToken = getAuthToken().toString();
+
     try {
-      const response = await axios.post(
-        "http://localhost:8000/authentication/update-password",
+      const response = await fetch(
+        `http://localhost:8000/authentication/reset/${userId}/${authToken}/`, // Ensure this URL matches your Django endpoint
         {
-          new_password: newPassword,
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json", // Set Content-Type header
+          },
+          body: JSON.stringify({
+            new_password: newPassword,
+            confirm_password: confirmNewPassword,
+          }),
         }
       );
-      console.log(response.data);
+
+      if (!response.ok) {
+        throw new Error("Failed to update password.");
+      }
+
+      // Optionally, you can check the response data here if needed
+
       alert("Password updated successfully.");
     } catch (error) {
       console.error("Error updating password:", error);

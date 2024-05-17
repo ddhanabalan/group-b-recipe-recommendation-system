@@ -1,23 +1,83 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import "../../styles/RecipeDisplay.css";
 import { RecipeContext } from "../../context/recipeContext";
 import { Link } from "react-router-dom";
+import { getAuthToken, getUserId } from "../../utils/auth";
 import axios from "axios";
-import { getAuthToken } from "../../utils/auth";
+import Swal from "sweetalert2";
 
 const RecipeDisplay = (props) => {
   const { recipe } = props;
   const { saveRecipe, isRecipeSaved } = useContext(RecipeContext);
   const [isSaved, setIsSaved] = useState(isRecipeSaved(recipe.id));
 
+  useEffect(() => {
+    // Check if the recipe is initially saved when the component mounts
+    setIsSaved(isRecipeSaved(recipe.recipeid));
+  }, [isRecipeSaved, recipe.recipeid]);
+  const handleSaveRecipe = async () => {
+    try {
+      const authToken = getAuthToken();
+      if (!authToken) {
+        console.error("User not authenticated.");
+        return;
+      }
+
+      const userId = getUserId();
+      const response = await axios.post(
+        "http://localhost:8000/recipe/saverecipe/",
+        {
+          userid: userId,
+          recipeid: recipe.recipeid,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      setIsSaved(true);
+      // console.log("Recipe ID saved:", recipe.recipeid);
+      // console.log("Save recipe response:", response.data); // Log the response from the server
+    } catch (error) {
+      //console.error("Error saving recipe:", error);
+      if (error.response && error.response.status === 401) {
+        //console.error("Authentication failed. Redirecting to login page.");
+      } else {
+        // console.error(
+        //  "An error occurred while saving the recipe:",
+        //  error.message
+        // );
+      }
+
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.error === "Recipe already favorited"
+      ) {
+        Swal.fire({
+          icon: "info",
+          title: "Recipe Already Favorited",
+          text: "You have already favorited this recipe.",
+        });
+      }
+    }
+  };
   if (!recipe) {
     return <div>Loading...</div>;
   }
-
-  // Parse ingredients text into an array
-  const ingredientsArray = recipe.ingredients
-    .split("\n")
-    .filter((ingredient) => ingredient.trim() !== "");
+  let ingredientsArray = [];
+  if (typeof recipe.ingredients === "string") {
+    ingredientsArray = recipe.ingredients
+      .replace(/"/g, "")
+      .replace(/\['/g, "")
+      .replace(/'\]/g, "")
+      .replace(/'/g, "")
+      .split(", ");
+  } else if (Array.isArray(recipe.ingredients)) {
+    ingredientsArray = recipe.ingredients;
+  }
 
   const ingredientList = ingredientsArray.map((ingredient, index) => (
     <li key={index} style={{ paddingBottom: 5 }}>
@@ -25,41 +85,23 @@ const RecipeDisplay = (props) => {
     </li>
   ));
 
-  const handleSaveRecipe = async () => {
+  const handleShareRecipe = async () => {
     try {
-      // Assuming you have access to user ID and recipe ID
-      const userId = userId(); // Implement this function to get the user ID
-      const recipeId = recipe.recipeid;
-
-      // Prepare the request body
-      const requestBody = JSON.stringify({ userId, recipeId });
-
-      // Send a POST request using fetch
-      const response = await fetch("http://127.0.0.1:8000/recipe/saveRecipe", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${getAuthToken()}`,
-        },
-        body: requestBody,
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to save recipe");
+      if (navigator.share) {
+        await navigator.share({
+          title: recipe.title,
+          text: `Check out this recipe: ${recipe.title}`,
+          url: window.location.href,
+        });
+      } else {
+        throw new Error("Web Share API not supported.");
       }
-
-      // Handle the response from the API as needed
-      const responseData = await response.json();
-      console.log("Save Recipe Response:", responseData);
-
-      // Update state to indicate that the recipe is saved
-      setIsSaved(true);
     } catch (error) {
-      console.error("Error saving recipe:", error);
-      // Handle any errors that occur during the save process
+      console.error("Error sharing recipe:", error);
+      // Fallback behavior if sharing fails or Web Share API is not supported
+      alert(`Share ${recipe.title} using your preferred method.`);
     }
   };
-
   return (
     <div className="recipedisplay">
       <div className="recipedisplay-left">
@@ -99,7 +141,10 @@ const RecipeDisplay = (props) => {
                   SAVE RECIPE
                 </button>
               )}
-              <button className="share">SHARE</button>
+
+              <button onClick={handleShareRecipe} className="share">
+                SHARE
+              </button>
             </div>
           </div>
           <ul>{ingredientList}</ul>

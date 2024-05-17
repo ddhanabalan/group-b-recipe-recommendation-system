@@ -74,6 +74,7 @@ nav ul li a {
   color: black;
 }
 
+/*}
 nav ul li:last-child a {
   border: 0.5px solid black;
   border-radius: 5px;
@@ -84,7 +85,8 @@ nav ul li:last-child a:hover {
   border: 0.5px solid #e49963;
   padding: 8px 30px;
   color: black;
-}
+}*/
+
 .search-bar-container {
   position: relative;
 }
@@ -111,7 +113,7 @@ nav ul li.selected a {
 
   overflow-y: auto; /* Enable vertical scrolling if needed */
   color: black;
-  width: 250px;
+  width: 300px;
   font-size: 12px;
 }
 .search-item-history {
@@ -129,27 +131,38 @@ nav ul li.selected a {
 .search-item {
   list-style-type: none;
 }
-.dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  z-index: 100;
-  display: block;
-  background-color: #fff;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  border-radius: 5px;
-  padding: 10px;
-}
-
-.dropdown li {
+.dropdown-menu {
   list-style-type: none;
-  padding: 8px 10px;
-  cursor: pointer;
+  position: absolute;
+  display: block;
+  background-color: #ffffff; /* Grey background color */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  z-index: 1001; /* Ensure the dropdown is above the search bar */
+  color: black;
+  width: auto;
+  font-size: 12px;
+  right: 50px;
 }
 
-.dropdown li:hover {
+.dropdown-menu li {
+  list-style-type: none;
+  padding: 8px 12px;
+  display: list-item;
+  margin-right: 0px;
+  text-align: left;
+}
+.dropdown-menu li a {
+  text-decoration: none;
+}
+.dropdown-menu li a:hover {
+  color: black;
+}
+.dropdown-menu li:hover {
   background-color: #f0f0f0;
+  text-decoration: none;
 }
 .user-heading {
   color: black;
+  display: inline-block;
 }
