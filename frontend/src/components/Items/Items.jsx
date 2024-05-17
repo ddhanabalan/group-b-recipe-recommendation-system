@@ -1,6 +1,5 @@
 import React from "react";
 import "../../styles/Items.css";
-
 import StarRating from "../starRating/StarRating";
 import { Link } from "react-router-dom";
 import { getUserId, isAuthenticated } from "../../utils/auth";
@@ -11,11 +10,10 @@ const Items = (props) => {
     window.scrollTo({ top: 0, behavior: "auto" });
 
     if (isAuthenticated()) {
-      const userId = getUserId();
-      const recipeId = props.recipeid;
-      console.log("userid:", userId);
-      console.log("recipeid :", recipeId);
-      const data = { userId, recipeId };
+      const userid = getUserId();
+      const recipeid = props.recipeid;
+
+      const data = { userid, recipeid };
 
       // Send data to the API
       fetch("http://localhost:8000/recipe/userhistory/", {
@@ -29,8 +27,6 @@ const Items = (props) => {
           if (!response.ok) {
             throw new Error("Network response was not ok");
           }
-          // Handle response if needed
-          console.log("API request successful");
         })
         .catch((error) => {
           console.error("Error sending data to API:", error);
@@ -53,7 +49,7 @@ const Items = (props) => {
         <h3>{props.title}</h3>
         <div className="items-details">
           <div className="mins">
-            <b>{props.total_mins}</b> mins
+            <b>{props.total_mins === 0 ? "Unknown" : props.total_mins}</b> mins
           </div>
           <div className="calories" style={{ paddingTop: 3 }}>
             <b>{props.calories}</b> Calorie

@@ -2,7 +2,7 @@
   display: flex;
 }
 
-.userslist-content {
+.feedbacklist-content {
   flex-grow: 1;
   padding: 20px;
 }
@@ -36,18 +36,18 @@
   background-color: #dc6c1c;
 }
 
-.users-table {
+.feedback-table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.users-table th,
-.users-table td {
+.feedback-table th,
+.feedback-table td {
   border: 1px solid #ddd;
   padding: 8px;
 }
 
-.users-table th {
+.feedback-table th {
   background-color: #f2f2f2;
 }
 
@@ -72,22 +72,6 @@
 .highlighted-row {
   background-color: #ffcccc;
 }
-.pagination-input-container {
-  margin-bottom: 20px;
-}
-
-.pagination-input-form {
-  display: flex;
-}
-
-.pagination-input-field {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  margin-right: 10px;
-  font-size: 16px;
-}
-
 .pagination-input-button {
   padding: 8px 16px;
   background-color: #e19660;

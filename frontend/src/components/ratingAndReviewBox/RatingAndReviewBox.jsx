@@ -2,9 +2,15 @@ import React, { useState } from "react";
 import { MdOutlineStar } from "react-icons/md";
 import "../../styles/RatingAndReviewBox.css";
 import { FaRegCircleUser } from "react-icons/fa6";
-import { getUserId, getUserName } from "../../utils/auth";
+import {
+  getUserId,
+  getUserName,
+  getAuthToken,
+  clearAuthData,
+} from "../../utils/auth";
 import axios from "axios";
-
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 const colors = {
   orange: "rgb(255, 174, 0)",
   grey: "#a9a9a9",
@@ -30,9 +36,12 @@ const RatingAndReviewBox = (props) => {
   };
 
   const handlePostReview = async () => {
+    const history = useNavigate;
+
     try {
       const userId = getUserId();
       const userName = getUserName();
+      const authToken = getAuthToken();
 
       if (!userId || !userName || !reviewText || !currentValue) {
         console.error("Missing required fields");
@@ -53,19 +62,23 @@ const RatingAndReviewBox = (props) => {
         {
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
           },
         }
       );
-
-      //console.log("Review posted successfully:", response.data);
 
       setCurrentValue(0);
       setReviewText("");
     } catch (error) {
       console.error("Error posting review:", error.message);
       if (error.response) {
-        console.error("Server responded with status:", error.response.status);
-        console.error("Response data:", error.response.data);
+        if (error.response.status === 401) {
+          clearAuthData();
+          window.location.href = "/login";
+        } else {
+          console.error("Server responded with status:", error.response.status);
+          console.error("Response data:", error.response.data);
+        }
       }
     }
   };

@@ -14,7 +14,7 @@ const Reviews = ({ reviews }) => {
           date={review.date}
           username={review.username}
           review={review.review}
-          stars={review.stars}
+          stars={review.rating}
         />
       </li>
     ));

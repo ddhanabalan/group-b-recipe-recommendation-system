@@ -5,7 +5,7 @@ import { Search } from "@mui/icons-material";
 import { RecipeContext } from "../../context/recipeContext";
 import { isAuthenticated, getAuthToken, clearAuthData } from "../../utils/auth";
 import { FaUser } from "react-icons/fa";
-
+import axios from "axios";
 function Navbar() {
   const { allRecipes } = useContext(RecipeContext);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -103,10 +103,28 @@ function Navbar() {
     }
   };*/
   }
-  const handleLogout = () => {
-    clearAuthData();
-
-    window.location.href = "/login";
+  const handleLogout = async () => {
+    try {
+      const authToken = getAuthToken();
+      await axios.post(
+        "http://localhost:8000/authentication/logout/",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+      clearAuthData();
+      window.location.href = "/login";
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        clearAuthData();
+        window.location.href = "/login";
+      } else {
+        console.error("Error logging out:", error);
+      }
+    }
   };
   const toggleDropdown = () => {
     setOpen(!open);

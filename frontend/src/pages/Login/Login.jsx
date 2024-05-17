@@ -9,6 +9,7 @@ import {
   setUserId,
   setUserEmail,
   setUserName,
+  setUserRole,
 } from "../../utils/auth";
 import { Navigate, useNavigate } from "react-router-dom";
 
@@ -43,12 +44,13 @@ function Login() {
       const userId = response.data.user.userid;
       const userName = response.data.user.username;
       const userEmail = response.data.user.email;
-
+      const userRole = response.data.user.role;
       setUserId(userId);
       setUserName(userName);
       setUserEmail(userEmail);
+      setUserRole(userRole);
 
-      const token = response.data.access;
+      const token = response.data.token;
       setAuthToken(token);
 
       if (response.data.user.role === "admin") {

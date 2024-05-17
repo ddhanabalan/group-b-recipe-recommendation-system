@@ -1,25 +1,29 @@
-import React, { useState } from "react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import UserSideBar from "../../components/userSideBar/UserSideBar";
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
 import { FaPencilAlt } from "react-icons/fa";
 import "../../styles/UserProfile.css";
 import {
-  getUserName,
+  isAuthenticated,
+  getUserRole,
   getUserId,
+  getUserName,
   getUserEmail,
   setUserName,
 } from "../../utils/auth";
 import axios from "axios";
 
 const UserProfile = () => {
+  const history = useNavigate();
   const userId = getUserId();
 
-  const [editedData, setEditedData] = useState({
+  const [editedData, setEditedData] = React.useState({
     name: getUserName(),
     email: getUserEmail(),
   });
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = React.useState(false);
 
   const handleToggleEdit = () => {
     setIsEditing(!isEditing);
@@ -45,6 +49,12 @@ const UserProfile = () => {
       console.error("Error updating username:", error);
     }
   };
+
+  React.useEffect(() => {
+    if (!isAuthenticated() || getUserRole() !== "user") {
+      history("/login");
+    }
+  }, [history]);
 
   return (
     <div>

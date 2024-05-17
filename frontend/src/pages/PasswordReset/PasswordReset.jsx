@@ -57,9 +57,12 @@ const PasswordReset = () => {
 
   return (
     <div className="changepassword">
-      <div className="card">
+      <div className="card-reset">
+        <h1 className="reset-head" align="center">
+          Password Reset
+        </h1>
         <form id="form1" name="form1" onSubmit={handleSubmit}>
-          <table width="285" rules="none" cellPadding="10px">
+          <table width="285" rules="none" cellPadding="10px" id="reset-table">
             <tr>
               <td
                 style={{

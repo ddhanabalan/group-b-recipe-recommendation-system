@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import "../../styles/ForgotPassword.css";
+import "../../styles/Otp.css";
 
 const Otp = () => {
   const location = useLocation();
@@ -67,11 +67,13 @@ const Otp = () => {
   };
 
   return (
-    <div className="forgotpassword">
-      <div className="card" style={{ height: 270 }}>
-        <h1 align="center">Enter OTP</h1>
+    <div className="otp-section">
+      <div className="card-otp" style={{ height: 200 }}>
+        <h1 className="otp-head" align="center">
+          Enter OTP
+        </h1>
         <form className="form1" onSubmit={handleOTPSubmit}>
-          <table width="285" rules="none" cellPadding="10px">
+          <table width="400" rules="none" cellPadding="10px">
             <tr>
               <td style={{ fontSize: 20, fontFamily: "Playfair Display" }}>
                 <input

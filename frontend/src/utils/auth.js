@@ -55,10 +55,23 @@ export const getUserEmail = () => {
 export const clearUserEmail = () => {
   sessionStorage.removeItem("userEmail");
 };
+//role section
+export const setUserRole = (userRole) => {
+  sessionStorage.setItem("userRole", userRole);
+};
+
+export const getUserRole = () => {
+  return sessionStorage.getItem("userRole");
+};
+
+export const clearUserRole = () => {
+  sessionStorage.removeItem("userRole");
+};
 //clear all
 export const clearAuthData = () => {
   clearAuthToken();
   clearUserId();
   clearUserName();
   clearUserEmail();
+  clearUserRole();
 };

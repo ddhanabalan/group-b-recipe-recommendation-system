@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import "../../styles/RecipeDisplay.css";
 import { RecipeContext } from "../../context/recipeContext";
 import { Link } from "react-router-dom";
-import { getAuthToken, getUserId } from "../../utils/auth";
+import { clearAuthData, getAuthToken, getUserId } from "../../utils/auth";
 import axios from "axios";
 import Swal from "sweetalert2";
 
@@ -12,7 +12,6 @@ const RecipeDisplay = (props) => {
   const [isSaved, setIsSaved] = useState(isRecipeSaved(recipe.id));
 
   useEffect(() => {
-    // Check if the recipe is initially saved when the component mounts
     setIsSaved(isRecipeSaved(recipe.recipeid));
   }, [isRecipeSaved, recipe.recipeid]);
   const handleSaveRecipe = async () => {
@@ -33,6 +32,7 @@ const RecipeDisplay = (props) => {
         {
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
           },
         }
       );
@@ -43,7 +43,8 @@ const RecipeDisplay = (props) => {
     } catch (error) {
       //console.error("Error saving recipe:", error);
       if (error.response && error.response.status === 401) {
-        //console.error("Authentication failed. Redirecting to login page.");
+        clearAuthData();
+        window.location.href = "/login";
       } else {
         // console.error(
         //  "An error occurred while saving the recipe:",
@@ -64,6 +65,7 @@ const RecipeDisplay = (props) => {
       }
     }
   };
+
   if (!recipe) {
     return <div>Loading...</div>;
   }

@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import AdminSideBar from "../../components/admin/AdminSideBar";
 import AdminNavbar from "../../components/adminNavbar/AdminNavbar";
 import Footer from "../../components/Footer/Footer";
 import { clearAuthToken, getAuthToken } from "../../utils/auth";
 import { isAuthenticated, getUserRole } from "../../utils/auth";
-import "../../styles/ReviewsList.css";
+import "../../styles/FeedbackList.css";
 
-const ReviewsList = () => {
-  const [reviews, setReviews] = useState([]);
+const FeedbackList = () => {
+  const [feedbacks, setFeedbacks] = useState([]);
+  const [filteredFeedbacks, setFilteredFeedbacks] = useState([]);
   const [pageNo, setPageNo] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [inputPageNo, setInputPageNo] = useState("");
@@ -23,15 +24,23 @@ const ReviewsList = () => {
     fetchData(pageNo);
   }, [pageNo, history]);
 
+  useEffect(() => {
+    // Filter feedbacks based on search query
+    const filtered = feedbacks.filter((feedback) =>
+      feedback.category.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredFeedbacks(filtered);
+  }, [feedbacks, searchQuery]);
+
   const fetchData = async (pageNumber) => {
     try {
       const response = await axios.post(
-        "http://localhost:8000/recipe/allreviewslimited/",
+        "http://localhost:8000/authentication/allfeedbacklimited/",
         { page: pageNumber }
       );
-      setReviews(response.data);
+      setFeedbacks(response.data);
     } catch (error) {
-      console.error("Error fetching reviews:", error);
+      console.error("Error fetching feedbacks:", error);
     }
   };
 
@@ -43,6 +52,10 @@ const ReviewsList = () => {
 
   const handleNextPage = () => {
     setPageNo(pageNo + 1);
+  };
+
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
   };
 
   const handlePageChange = (e) => {
@@ -58,47 +71,41 @@ const ReviewsList = () => {
     setInputPageNo("");
   };
 
-  const handleRemoveReview = async (id) => {
-    const token = getAuthToken();
+  const handleRemoveFeedback = async (id) => {
+    const authToken = getAuthToken();
     try {
-      await axios.delete("http://localhost:8000/recipe/deletereview", {
-        data: { id: id },
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      setReviews(reviews.filter((review) => review.id !== id));
+      await axios.delete(
+        "http://localhost:8000/authentication/deletefeedback/",
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+          data: {
+            id: id,
+          },
+        }
+      );
+      setFeedbacks(feedbacks.filter((feedback) => feedback.id !== id));
     } catch (error) {
       if (error.response && error.response.status === 401) {
         clearAuthToken();
-        window.location.href = "/login";
+        history("/login");
       } else {
-        console.error("Error deleting review:", error);
+        console.error("Error removing feedback:", error);
       }
     }
   };
-
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
-  };
-
-  const filteredReviews = reviews.filter(
-    (review) =>
-      review.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      review.recipeid.toString().includes(searchQuery)
-  );
 
   return (
     <div>
       <AdminNavbar />
       <div className="dashboard-area">
         <AdminSideBar />
-        <div className="reviewslist-content">
+        <div className="feedbacklist-content">
           <h2
             style={{ marginBottom: 20, display: "flex", alignItems: "center" }}
           >
-            All Reviews
+            All Feedbacks
             <div className="page-number-input" style={{ marginLeft: "auto" }}>
               <form
                 onSubmit={handleSubmitPage}
@@ -108,7 +115,7 @@ const ReviewsList = () => {
                   type="number"
                   value={inputPageNo}
                   onChange={handlePageChange}
-                  placeholder="No:"
+                  placeholder="No"
                   min="1"
                   className="page-input"
                   style={{ width: "50px", marginRight: "5px" }}
@@ -124,41 +131,39 @@ const ReviewsList = () => {
               </form>
             </div>
           </h2>
-          <div className="review-actions">
+          <div className="feedback-actions">
             <input
               type="text"
-              placeholder="Search by username or recipe ID..."
+              placeholder="Search by category..."
               value={searchQuery}
               onChange={handleSearch}
               className="search-input"
             />
           </div>
-          <table className="review-table">
+          <table className="feedback-table">
             <thead>
               <tr>
-                <th>Recipe ID</th>
                 <th>User ID</th>
-                <th>Username</th>
-                <th>Review</th>
-                <th>Rating</th>
+                <th>Category</th>
+                <th>Feedback</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              {filteredReviews.map((review, index) => (
+              {filteredFeedbacks.map((feedback, index) => (
                 <tr
                   key={index}
-                  className={review.rating <= 2 ? "highlighted-row" : ""}
+                  className={
+                    feedback.category === "complaint" ? "highlighted-row" : ""
+                  }
                 >
-                  <td>{review.recipeid}</td>
-                  <td>{review.userid}</td>
-                  <td>{review.username}</td>
-                  <td style={{ width: 700 }}>{review.review}</td>
-                  <td>{review.rating}</td>
+                  <td>{feedback.userid}</td>
+                  <td>{feedback.category}</td>
+                  <td style={{ width: 700 }}>{feedback.feedback}</td>
                   <td>
                     <button
                       className="remove-button"
-                      onClick={() => handleRemoveReview(review.id)}
+                      onClick={() => handleRemoveFeedback(feedback.id)}
                     >
                       Remove
                     </button>
@@ -170,14 +175,14 @@ const ReviewsList = () => {
           <div className="pagination-buttons">
             <button
               onClick={handlePrevPage}
-              style={{ backgroundColor: "#e19660", border: "1px solid #ccc" }}
+              style={{ backgroundColor: " #e19660", border: "1px solid #ccc" }}
             >
               Prev
             </button>
             <span>{pageNo}</span>
             <button
               onClick={handleNextPage}
-              style={{ backgroundColor: "#e19660", border: "1px solid #ccc" }}
+              style={{ backgroundColor: " #e19660", border: "1px solid #ccc" }}
             >
               Next
             </button>
@@ -189,4 +194,4 @@ const ReviewsList = () => {
   );
 };
 
-export default ReviewsList;
+export default FeedbackList;

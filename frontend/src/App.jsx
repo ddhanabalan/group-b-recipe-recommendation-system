@@ -19,6 +19,8 @@ import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import PasswordReset from "./pages/PasswordReset/PasswordReset";
 import Otp from "./pages/Otp/Otp";
 import ReviewsList from "./pages/admin/ReviewsList";
+import RecipesList from "./pages/admin/RecipesList";
+import FeedbackList from "./pages/admin/FeedbackList";
 function App() {
   return (
     <div>
@@ -34,6 +36,8 @@ function App() {
           <Route path="/dashboard" element={<Admin />} />
           <Route path="/admin/users" element={<UsersList />} />
           <Route path="/admin/reviews" element={<ReviewsList />} />
+          <Route path="/admin/recipes" element={<RecipesList />} />
+          <Route path="/admin/feedbacks" element={<FeedbackList />} />
           <Route path="/user/savedrecipes" element={<UserSavedRecipes />} />
           <Route path="/user/addedrecipes" element={<UserAddedRecipes />} />
           <Route path="/user/feedbacks" element={<UserFeedback />} />

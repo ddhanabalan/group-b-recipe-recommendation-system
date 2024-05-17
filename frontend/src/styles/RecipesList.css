@@ -1,0 +1,42 @@
+.dashboard-area {
+  display: flex;
+}
+
+.recipeslist-content {
+  flex-grow: 1;
+  padding: 20px;
+}
+
+.recipes-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.recipes-table th,
+.recipes-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.recipes-table th {
+  background-color: #f2f2f2;
+}
+
+.pagination-buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.view-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.view-button:hover {
+  background-color: #0056b3;
+}

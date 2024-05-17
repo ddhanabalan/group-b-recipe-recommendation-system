@@ -1,17 +1,28 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import UserSideBar from "../../components/userSideBar/UserSideBar";
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
 import "../../styles/User.css";
 import "../../styles/UserFeedback.css";
-import { getAuthToken, getUserId } from "../../utils/auth";
+import { clearAuthData, getAuthToken, getUserId } from "../../utils/auth";
+import { isAuthenticated, getUserRole } from "../../utils/auth";
+import { useNavigate } from "react-router-dom";
 
 const UserFeedback = () => {
   const [formData, setFormData] = useState({
     category: "",
     message: "",
   });
+
+  const history = useNavigate();
+
+  useEffect(() => {
+    if (!isAuthenticated() || getUserRole() !== "user") {
+      history("/login");
+      return;
+    }
+  }, [history]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,17 +36,17 @@ const UserFeedback = () => {
     e.preventDefault();
     const userId = getUserId();
     const accessToken = getAuthToken();
+
     if (formData.category && formData.message) {
       const dataToSend = {
         userid: userId,
         category: formData.category,
         feedback: formData.message,
       };
-      console.log("Data to send to API:", dataToSend); // Log the data being sent
 
       try {
         const response = await fetch(
-          "http://localhost:8000/authentication/addfeedback",
+          "http://localhost:8000/authentication/addfeedback/",
           {
             method: "POST",
             headers: {
@@ -46,13 +57,15 @@ const UserFeedback = () => {
           }
         );
 
-        const responseData = await response.json(); // Parse response data as JSON
-
-        if (!response.ok) {
-          throw new Error(responseData.message || "Server Error");
+        if (response.status === 401) {
+          clearAuthData();
+          window.location.href = "/login";
+          return;
         }
 
-        if (responseData.success) {
+        const responseData = await response.json();
+
+        if (response.status === 201) {
           setFormData({
             category: "",
             message: "",
@@ -60,11 +73,13 @@ const UserFeedback = () => {
           Swal.fire({
             title: "Thank you!",
             text: "Your feedback has been submitted successfully.",
-
             confirmButtonText: "OK",
           });
         } else {
-          throw new Error(responseData.message || "Failed to submit feedback");
+          throw new Error(
+            responseData.message ||
+              `Failed to submit feedback (${response.status})`
+          );
         }
       } catch (error) {
         console.error("Error submitting feedback:", error.message);
@@ -73,7 +88,6 @@ const UserFeedback = () => {
           text:
             error.message ||
             "Failed to submit feedback. Please try again later.",
-
           confirmButtonText: "OK",
         });
       }
@@ -81,7 +95,6 @@ const UserFeedback = () => {
       Swal.fire({
         title: "Error",
         text: "Please fill in all fields before submitting.",
-
         confirmButtonText: "OK",
       });
     }
@@ -120,7 +133,6 @@ const UserFeedback = () => {
                   >
                     <option value="">Select Category</option>
                     <option value="complaint">Complaint</option>
-                    <option value="bug">Bug</option>
                     <option value="general">General</option>
                     <option value="suggestion">Suggestion</option>
                   </select>
