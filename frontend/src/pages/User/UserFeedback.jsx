@@ -5,11 +5,10 @@ import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
 import "../../styles/User.css";
 import "../../styles/UserFeedback.css";
+import { getAuthToken, getUserId } from "../../utils/auth";
 
 const UserFeedback = () => {
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
     category: "",
     message: "",
   });
@@ -22,33 +21,67 @@ const UserFeedback = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (
-      formData.name &&
-      formData.email &&
-      formData.category &&
-      formData.message
-    ) {
-      // Process form submission
-      setFormData({
-        name: "",
-        email: "",
-        category: "",
-        message: "",
-      });
-      Swal.fire({
-        title: "Thank you!",
-        text: "Your feedback has been submitted successfully.",
-        icon: "success",
-        confirmButtonText: "OK",
-        icon: null,
-      });
+    const userId = getUserId();
+    const accessToken = getAuthToken();
+    if (formData.category && formData.message) {
+      const dataToSend = {
+        userid: userId,
+        category: formData.category,
+        feedback: formData.message,
+      };
+      console.log("Data to send to API:", dataToSend); // Log the data being sent
+
+      try {
+        const response = await fetch(
+          "http://localhost:8000/authentication/addfeedback",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify(dataToSend),
+          }
+        );
+
+        const responseData = await response.json(); // Parse response data as JSON
+
+        if (!response.ok) {
+          throw new Error(responseData.message || "Server Error");
+        }
+
+        if (responseData.success) {
+          setFormData({
+            category: "",
+            message: "",
+          });
+          Swal.fire({
+            title: "Thank you!",
+            text: "Your feedback has been submitted successfully.",
+
+            confirmButtonText: "OK",
+          });
+        } else {
+          throw new Error(responseData.message || "Failed to submit feedback");
+        }
+      } catch (error) {
+        console.error("Error submitting feedback:", error.message);
+        Swal.fire({
+          title: "Error",
+          text:
+            error.message ||
+            "Failed to submit feedback. Please try again later.",
+
+          confirmButtonText: "OK",
+        });
+      }
     } else {
       Swal.fire({
         title: "Error",
         text: "Please fill in all fields before submitting.",
-        icon: "error",
+
         confirmButtonText: "OK",
       });
     }
@@ -74,30 +107,8 @@ const UserFeedback = () => {
             <hr />
           </div>
           <div className="user-content-item">
-            <div className="card">
+            <div className="card-feedback">
               <form onSubmit={handleSubmit}>
-                <div>
-                  <label htmlFor="name">Name:</label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div>
-                  <label htmlFor="email">Email:</label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
                 <div>
                   <label htmlFor="category">Category:</label>
                   <select

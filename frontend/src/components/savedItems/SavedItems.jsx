@@ -56,8 +56,40 @@ const SavedItems = () => {
     fetchSavedRecipes();
   }, []);
 
-  const handleRemoveRecipe = (recipeId) => {
-    unsaveRecipe(recipeId);
+  const handleRemoveRecipe = async (recipeId) => {
+    try {
+      const userId = getUserId();
+      const response = await fetch(
+        "http://localhost:8000/recipe/deletefavourite/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userid: userId, recipeid: recipeId }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to remove recipe");
+      }
+
+      setSavedRecipes((prevRecipes) =>
+        prevRecipes.filter((recipe) => recipe.recipeid !== recipeId)
+      );
+
+      Swal.fire({
+        title: "Removed",
+        text: "Recipe has been removed from your favorites.",
+        confirmButtonText: "OK",
+      });
+    } catch (error) {
+      Swal.fire({
+        title: "Error",
+        text: error.message,
+        confirmButtonText: "OK",
+      });
+    }
   };
 
   if (loading) {
@@ -85,7 +117,7 @@ const SavedItems = () => {
                     calories={item.calories}
                     rating={item.rating}
                   />
-                  <button onClick={() => handleRemoveRecipe(item.id)}>
+                  <button onClick={() => handleRemoveRecipe(item.recipeid)}>
                     Remove
                   </button>
                 </div>

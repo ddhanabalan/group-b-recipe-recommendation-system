@@ -2,36 +2,27 @@ import React, { useState } from "react";
 import UserSideBar from "../../components/userSideBar/UserSideBar";
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
-import { FaUserCircle } from "react-icons/fa";
+import { FaPencilAlt } from "react-icons/fa";
 import "../../styles/UserProfile.css";
+import {
+  getUserName,
+  getUserId,
+  getUserEmail,
+  setUserName,
+} from "../../utils/auth";
+import axios from "axios";
 
 const UserProfile = () => {
-  // Sample user data (replace with actual user data from your context or API)
-  const [userData, setUserData] = useState({
-    name: "John Doe",
-    email: "johndoe@example.com",
-    password: "password", // Just an example, never store passwords in state
-  });
+  const userId = getUserId();
 
-  const [editedData, setEditedData] = useState({ ...userData });
+  const [editedData, setEditedData] = useState({
+    name: getUserName(),
+    email: getUserEmail(),
+  });
   const [isEditing, setIsEditing] = useState(false);
 
-  const handleEditProfile = () => {
-    setIsEditing(true);
-  };
-
-  const handleSaveChanges = () => {
-    // Here you can add code to save the edited data, such as making an API request
-
-    // For now, we'll update the userData state with the edited data
-    setUserData({ ...editedData });
-    setIsEditing(false);
-  };
-
-  const handleCancelEdit = () => {
-    // Reset editedData to userData to cancel editing
-    setEditedData({ ...userData });
-    setIsEditing(false);
+  const handleToggleEdit = () => {
+    setIsEditing(!isEditing);
   };
 
   const handleChange = (e) => {
@@ -40,6 +31,19 @@ const UserProfile = () => {
       ...prevData,
       [name]: value,
     }));
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const response = await axios.put(
+        `http://localhost:8000/authentication/change-username/`,
+        { new_username: editedData.name, userid: userId }
+      );
+      setUserName(editedData.name);
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error updating username:", error);
+    }
   };
 
   return (
@@ -59,45 +63,32 @@ const UserProfile = () => {
             <div className="detail-item">
               <label>Name:</label>
               {isEditing ? (
-                <input
-                  type="text"
-                  name="name"
-                  value={editedData.name}
-                  onChange={handleChange}
-                />
+                <>
+                  <input
+                    type="text"
+                    name="name"
+                    value={editedData.name}
+                    onChange={handleChange}
+                    className="username_field"
+                  />
+                  <button onClick={handleSubmit} className="okbtn">
+                    Submit
+                  </button>
+                </>
               ) : (
-                <span>{userData.name}</span>
+                <>
+                  <span>{editedData.name}</span>
+                  <FaPencilAlt
+                    className="edit-icon"
+                    onClick={handleToggleEdit}
+                  />
+                </>
               )}
             </div>
             <div className="detail-item">
               <label>Email:</label>
-              {isEditing ? (
-                <input
-                  type="email"
-                  name="email"
-                  value={editedData.email}
-                  onChange={handleChange}
-                />
-              ) : (
-                <span>{userData.email}</span>
-              )}
+              <span>{editedData.email}</span>
             </div>
-          </div>
-          <div className="button-group">
-            {isEditing ? (
-              <>
-                <button className="save-button" onClick={handleSaveChanges}>
-                  Save Changes
-                </button>
-                <button className="cancel-button" onClick={handleCancelEdit}>
-                  Cancel
-                </button>
-              </>
-            ) : (
-              <button className="edit-button" onClick={handleEditProfile}>
-                Edit Profile
-              </button>
-            )}
           </div>
         </div>
       </div>

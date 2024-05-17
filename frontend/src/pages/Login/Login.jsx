@@ -4,7 +4,12 @@ import logo_dark from "../../assets/logo.svg";
 import login_image from "../../assets/loginpic.jpg";
 import "../../styles/Login.css";
 import Validation from "./Validation";
-import { setAuthToken, setUserId } from "../../utils/auth";
+import {
+  setAuthToken,
+  setUserId,
+  setUserEmail,
+  setUserName,
+} from "../../utils/auth";
 import { Navigate, useNavigate } from "react-router-dom";
 
 function Login() {
@@ -36,12 +41,16 @@ function Login() {
       );
 
       const userId = response.data.user.userid;
-      setUserId(userId);
+      const userName = response.data.user.username;
+      const userEmail = response.data.user.email;
 
-      const token = response.data.token;
+      setUserId(userId);
+      setUserName(userName);
+      setUserEmail(userEmail);
+
+      const token = response.data.access;
       setAuthToken(token);
-      console.log("Login successful:", response.data);
-      console.log("user id :", userId);
+
       if (response.data.user.role === "admin") {
         history("/dashboard");
       } else {

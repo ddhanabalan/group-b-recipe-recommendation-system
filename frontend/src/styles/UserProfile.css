@@ -44,20 +44,22 @@
   margin-right: 10px;
 }
 
-.edit-button {
+.okbtn {
   background-color: #e16d19;
   color: #fff;
   border: none;
-  padding: 8px 12px;
+  padding: 6px 12px;
   border-radius: 5px;
   cursor: pointer;
+  width: 100px;
+  font-size: 16px;
 }
-
-.password-button {
-  background-color: #e16d19;
-  color: #fff;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 5px;
-  cursor: pointer;
+.username_field {
+  width: 300px;
+  padding: 8px;
+  margin: 5px 0;
+  box-sizing: border-box;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-right: 10px;
 }

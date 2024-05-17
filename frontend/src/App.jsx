@@ -15,7 +15,6 @@ import UserAddedRecipes from "./pages/User/UserAddedRecipes";
 import UserFeedback from "./pages/User/UserFeedback";
 import UserProfile from "./pages/User/UserProfile";
 import AddNewRecipe from "./pages/User/AddNewRecipe";
-import EditProfile from "./pages/User/EditProfile";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import PasswordReset from "./pages/PasswordReset/PasswordReset";
 import Otp from "./pages/Otp/Otp";
@@ -40,7 +39,6 @@ function App() {
           <Route path="/user/feedbacks" element={<UserFeedback />} />
           <Route path="/user/profile" element={<UserProfile />} />
           <Route path="/addnewrecipe" element={<AddNewRecipe />} />
-          <Route path="/editprofile" element={<EditProfile />} />
           <Route path="/forgotpassword" element={<ForgotPassword />} />
           <Route path="/passwordreset" element={<PasswordReset />} />
           <Route path="/otp/:email" element={<Otp />} />

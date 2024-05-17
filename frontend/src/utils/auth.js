@@ -31,3 +31,34 @@ export const clearUserId = () => {
 export const isUserIdSet = () => {
   return !!getUserId();
 };
+//username case
+export const setUserName = (userName) => {
+  sessionStorage.setItem("userName", userName);
+};
+
+export const getUserName = () => {
+  return sessionStorage.getItem("userName");
+};
+
+export const clearUserName = () => {
+  sessionStorage.removeItem("userName");
+};
+//useremail case
+export const setUserEmail = (userEmail) => {
+  sessionStorage.setItem("userEmail", userEmail);
+};
+
+export const getUserEmail = () => {
+  return sessionStorage.getItem("userEmail");
+};
+
+export const clearUserEmail = () => {
+  sessionStorage.removeItem("userEmail");
+};
+//clear all
+export const clearAuthData = () => {
+  clearAuthToken();
+  clearUserId();
+  clearUserName();
+  clearUserEmail();
+};

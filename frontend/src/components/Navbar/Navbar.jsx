@@ -3,12 +3,7 @@ import "../../styles/Navbar.css";
 import logo_dark from "../../assets/logo.svg";
 import { Search } from "@mui/icons-material";
 import { RecipeContext } from "../../context/recipeContext";
-import {
-  isAuthenticated,
-  getAuthToken,
-  clearAuthToken,
-  clearUserId,
-} from "../../utils/auth";
+import { isAuthenticated, getAuthToken, clearAuthData } from "../../utils/auth";
 import { FaUser } from "react-icons/fa";
 
 function Navbar() {
@@ -22,7 +17,6 @@ function Navbar() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    console.log("Stored Token:", storedToken);
     const storedSearchHistory = sessionStorage.getItem("searchHistory");
     if (storedSearchHistory) {
       setSearchHistory(JSON.parse(storedSearchHistory));
@@ -110,8 +104,7 @@ function Navbar() {
   };*/
   }
   const handleLogout = () => {
-    clearAuthToken();
-    clearUserId();
+    clearAuthData();
 
     window.location.href = "/login";
   };
@@ -221,7 +214,13 @@ function Navbar() {
                     </li>
                     <li>
                       <button
-                        style={{ border: "none", background: "none" }}
+                        style={{
+                          border: "none",
+                          background: "none",
+                          color: "black",
+                          fontSize: "12px",
+                          paddingLeft: 0,
+                        }}
                         onClick={handleLogout}
                       >
                         Logout

@@ -15,7 +15,7 @@
   flex-direction: column;
   align-items: left;
   margin-right: 20px;
-  width: 250px;
+
   margin-top: 20px;
   overflow-y: scroll;
   height: 300px;
@@ -24,7 +24,7 @@
   display: flex;
   align-items: center;
   margin-right: 20px;
-  width: 100px;
+  width: 250px;
   font-size: smaller;
 }
 label {
@@ -101,4 +101,49 @@ input[type="range"]::-moz-range-thumb {
 
 .reset-filter:hover {
   background-color: #b64d02;
+}
+#filter_cat {
+  width: 50px;
+}
+.season-label,
+.time-of-day-label,
+.veg-non-veg-label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 15px;
+}
+
+select {
+  width: 100%;
+  padding: 7px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  font-size: 16px;
+  color: #333;
+  outline: none;
+}
+
+option {
+  padding: 5px;
+}
+
+option:hover {
+  background-color: #f0f0f0;
+}
+
+select:focus {
+  border-color: #6cb2eb;
+  box-shadow: 0 0 5px rgba(108, 178, 235, 0.5);
+}
+#recipe_search {
+  width: 100%;
+  padding: 7px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  font-size: 16px;
+  color: #333;
+  outline: none;
+  margin-bottom: 10px;
 }

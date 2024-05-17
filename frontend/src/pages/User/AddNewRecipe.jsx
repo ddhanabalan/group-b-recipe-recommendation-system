@@ -316,6 +316,7 @@ const AddNewRecipe = () => {
                     />
                   )}
                 </div>
+                {/* ingredient section*/}
                 <div className="ingredient-container">
                   <label htmlFor="ingredients">Ingredients:</label>
                   <textarea
@@ -332,6 +333,7 @@ const AddNewRecipe = () => {
                     placeholder="Enter ingredients separated by commas"
                   />
                 </div>
+                {/*cooking time section*/}
                 <div>
                   <label htmlFor="hours">Cooking Time (Hours):</label>
                   <input
@@ -381,19 +383,21 @@ const AddNewRecipe = () => {
                 </div>
 
                 <div></div>
+                {/*category section*/}
                 <div className="category-section">
                   <label htmlFor="categories">Category:</label>
                   <div className="category-part">
                     {distinctCategories.map((category) => (
-                      <label key={category} className="category-label">
+                      <label key={category} className="category_label">
                         <input
+                          id="catcheck"
                           type="checkbox"
                           name="categories"
                           value={category}
                           onChange={handleCategoryChange}
                           checked={formData.categories.includes(category)}
                         />
-                        {category}
+                        <span className="category-name">{category}</span>
                       </label>
                     ))}
                   </div>

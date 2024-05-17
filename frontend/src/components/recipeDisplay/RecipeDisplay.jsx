@@ -71,10 +71,13 @@ const RecipeDisplay = (props) => {
   if (typeof recipe.ingredients === "string") {
     ingredientsArray = recipe.ingredients
       .replace(/"/g, "")
+      .replace(/\[|\]/g, "")
       .replace(/\['/g, "")
       .replace(/'\]/g, "")
+      .replace(/\["/g, "")
+      .replace(/"\]/g, "")
       .replace(/'/g, "")
-      .split(", ");
+      .split(/,\s*|\s+or\s+|,\s*/);
   } else if (Array.isArray(recipe.ingredients)) {
     ingredientsArray = recipe.ingredients;
   }
