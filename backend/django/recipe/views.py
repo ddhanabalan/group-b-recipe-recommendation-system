@@ -7,6 +7,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 import random
 import string
+from django.utils import timezone
+from datetime import timedelta
+from dateutil.relativedelta import relativedelta
 
 class AllRecipes(generics.ListAPIView):
     queryset = Recipe.objects.all()
@@ -23,6 +26,24 @@ class AllRecipes(generics.ListAPIView):
             categories = RecipeCategories.objects.filter(recipeid=recipe_id).values_list('category_id', flat=True)
             category_names = Category.objects.filter(id__in=categories).values_list('name', flat=True)
             recipe_data['categories'] = list(category_names)
+        return Response(data)
+
+class AllRecipesLimited(APIView):
+    # permission_classes = [IsAuthenticated]
+    serializer_class = RecipeSerializer
+
+    def post(self, request, *args, **kwargs):
+        limit = int(request.data.get('page'))
+        queryset = Recipe.objects.all().order_by('-created_at')[((limit-1)*20):(limit*20)]
+        serializer = RecipeSerializer(queryset, many=True)
+        data = serializer.data
+        # Fetching categories for each recipe and adding them to the response
+        for recipe_data in data:
+            recipe_id = recipe_data['recipeid']
+            categories = RecipeCategories.objects.filter(recipeid=recipe_id).values_list('category_id', flat=True)
+            category_names = Category.objects.filter(id__in=categories).values_list('name', flat=True)
+            recipe_data['categories'] = list(category_names)
+        
         return Response(data)
 
 class PopularRecipes(generics.ListAPIView):
@@ -156,7 +177,7 @@ class AllReviewsLimited(APIView):
 
     def post(self, request, *args, **kwargs):
         limit = int(request.data.get('page'))
-        queryset = Reviews.objects.all()[((limit-1)*10):(limit*10)]
+        queryset = Reviews.objects.all().order_by('-review_date')[((limit-1)*30):(limit*30)]
         serializer = ReviewsSerializer(queryset, many=True)
         data = serializer.data
         
@@ -315,14 +336,28 @@ class UserHistory(APIView):
             user_id = serializer.validated_data.get('userid')
             # Check if the favorite already exists
             if History.objects.filter(userid=user_id, recipeid=recipe_id).exists():
-                return Response({'error': 'History already saved'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': 'History already saved'}, status=status.HTTP_200_OK)
             # Save the favorite
             serializer.save(userid=user_id, recipeid=recipe_id)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class RecipeCount(APIView):
+class RecipesCount(APIView):
 
     def get(self, request, *args, **kwargs):
         count = Recipe.objects.count()
         return Response(count)
+
+class ReviewsCount(APIView):
+
+    def get(self, request, *args, **kwargs):
+        count = Reviews.objects.count()
+        return Response(count)
+
+class NewRecipesLast30Days(APIView):
+
+    def get(self, request, *args, **kwargs):
+        start_date = timezone.now() - timedelta(days=30)
+        # Filter recipes created in the last 30 days
+        new_recipes = Recipe.objects.filter(created_at__gte=start_date).count()
+        return Response(new_recipes)
