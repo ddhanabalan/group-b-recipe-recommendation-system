@@ -159,7 +159,7 @@ class ForgotPassword(APIView):
         
         uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
         token = custom_token_generator.make_token(user)
-        reset_link = f"{request.scheme}://{request.get_host()}/PasswordReset/{uidb64}/{token}/"
+        reset_link = f"http://localhost:3000/PasswordReset/{uidb64}/{token}/"
         # print(f"reset link = {reset_link}\nuidb64 = {uidb64}\ntoken = {token}\nuser = {user}")
         email_subject = 'Password Reset'
         email_body = render_to_string('./authentication/password_reset_email.html', {
@@ -221,7 +221,7 @@ class ChangeUsername(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class FetchUsernameAndEmail(APIView):
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         try:
             user = User.objects.get(pk=request.data.get('userid'))
             serializer = UserDetailSerializer(user)

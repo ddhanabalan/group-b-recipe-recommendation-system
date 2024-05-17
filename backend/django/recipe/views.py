@@ -315,7 +315,7 @@ class UserHistory(APIView):
             user_id = serializer.validated_data.get('userid')
             # Check if the favorite already exists
             if History.objects.filter(userid=user_id, recipeid=recipe_id).exists():
-                return Response({'error': 'History already saved'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': 'History already saved'}, status=status.HTTP_200_OK)
             # Save the favorite
             serializer.save(userid=user_id, recipeid=recipe_id)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
