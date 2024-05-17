@@ -129,3 +129,27 @@ nav ul li.selected a {
 .search-item {
   list-style-type: none;
 }
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 100;
+  display: block;
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.dropdown li {
+  list-style-type: none;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.dropdown li:hover {
+  background-color: #f0f0f0;
+}
+.user-heading {
+  color: black;
+}

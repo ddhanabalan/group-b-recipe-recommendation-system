@@ -12,11 +12,7 @@ root.render(
   <RecipeContextProvider>
     <UserReviewContextProvider>
       <SortProvider>
-        <FilterContextProvider>
-          <SearchProvider>
-            <App />
-          </SearchProvider>
-        </FilterContextProvider>
+        <App />
       </SortProvider>
     </UserReviewContextProvider>
   </RecipeContextProvider>

@@ -6,7 +6,9 @@ const SavedItems = () => {
   const { all_recipe, unsaveRecipe, isRecipeSaved } = useContext(RecipeContext);
   console.log("isRecipesaved", isRecipeSaved);
 
-  const savedRecipes = all_recipe.filter((recipe) => isRecipeSaved(recipe.id));
+  const savedRecipes = all_recipe
+    ? all_recipe.filter((recipe) => isRecipeSaved(recipe.id))
+    : null;
   console.log("savedRecipes", savedRecipes);
   const handleRemoveRecipe = (recipeId) => {
     unsaveRecipe(recipeId);
