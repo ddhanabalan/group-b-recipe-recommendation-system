@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import User, Temp, Feedback
 from django.contrib.auth.hashers import make_password
 from datetime import date
+import re
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -18,11 +19,30 @@ class PasswordResetSerializer(serializers.Serializer):
     confirm_password = serializers.CharField(write_only=True)
 
     def validate(self, data):
-        """
-        Ensure the passwords match.
-        """
+        password = data.get('new_password')
+        if len(password) < 6:
+            raise serializers.ValidationError("Password must be at least 6 characters long")
+
+        # Ensure at least one uppercase letter
+        if not any(char.isupper() for char in password):
+             raise serializers.ValidationError("Password must contain at least one uppercase letter")
+
+        # Ensure at least one lowercase letter
+        if not any(char.islower() for char in password):
+            raise serializers.ValidationError("Password must contain at least one lowercase letter")
+
+        # Ensure at least one integer
+        if not any(char.isdigit() for char in password):
+            raise serializers.ValidationError("Password must contain at least one digit")
+
+        # Ensure at least one special character
+        if not re.search(r'[!@#$%^&*()_+=\[\]{};\'\\:"|,.<>?]', password):
+            raise serializers.ValidationError("Password must contain at least one special character")
+        
+        #Ensure the passwords match.
         if data.get('new_password') != data.get('confirm_password'):
             raise serializers.ValidationError("The passwords do not match.")
+        
         return data
 class TempSerializer(serializers.ModelSerializer):
     class Meta:

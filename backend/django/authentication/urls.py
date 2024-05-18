@@ -1,8 +1,7 @@
 from django.urls import path
-from authentication.views import UserSignup, UserLogin, ForgotPassword, VerifyEmail, Logout, PasswordResetConfirmView
-from authentication.views import ChangeUsername, FetchUsernameAndEmail, AddFeedback, DeleteFeedback, AllUsersLimited
-from authentication.views import UsersCount, FeedbackCount, AllFeedbacksLimited, DeleteUser, NewUsersLast30Days
-#from .views import PasswordResetConfirmView
+from authentication.views import UserSignup, UserLogin, ForgotPassword, VerifyEmail, Logout, PasswordResetConfirmView, DeleteUser
+from authentication.views import ChangeUsername, FetchUsernameAndEmail, AddFeedback, DeleteFeedback, AllUsersLimited, UsersCount
+from authentication.views import FeedbackCount, AllFeedbacksLimited, NewUsersLast30Days, ChangePassword, NewUsersLast30DaysDetails
 
 urlpatterns = [
     path('signup/', UserSignup.as_view(), name='signup'),
@@ -12,6 +11,7 @@ urlpatterns = [
     path('verify-email/', VerifyEmail.as_view(), name='verify_email'),
     path('logout/', Logout.as_view(), name='logout'),
     path('change-username/', ChangeUsername.as_view(), name='change-username'),
+    path('change-password/', ChangePassword.as_view(), name='change-password'),
     path('userdetails/', FetchUsernameAndEmail.as_view(), name='userdetails'),
     path('addfeedback/', AddFeedback.as_view(), name='addfeedback'),
     path('deletefeedback/', DeleteFeedback.as_view(), name='deletefeedback'),
@@ -21,4 +21,5 @@ urlpatterns = [
     path('feedbackcount/', FeedbackCount.as_view(), name='feedbackcount'),
     path('deleteuser/', DeleteUser.as_view(), name='deleteuser'),
     path('newuserscount/', NewUsersLast30Days.as_view(), name='newuserscount'),
+    path('newusersdetails/', NewUsersLast30DaysDetails.as_view(), name='newusersdetails'),
 ]

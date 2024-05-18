@@ -361,3 +361,21 @@ class NewRecipesLast30Days(APIView):
         # Filter recipes created in the last 30 days
         new_recipes = Recipe.objects.filter(created_at__gte=start_date).count()
         return Response(new_recipes)
+
+class NewRecipesLast30DaysDetails(APIView):      
+    serializer_class = RecipeSerializer
+
+    def post(self, request, *args, **kwargs):
+        limit = int(request.data.get('page'))
+        start_date = timezone.now() - timedelta(days=30)
+        queryset = Recipe.objects.filter(created_at__gte=start_date).order_by('-created_at')[((limit-1)*20):(limit*20)]
+        serializer = RecipeSerializer(queryset, many=True)
+        data = serializer.data
+        # Fetching categories for each recipe and adding them to the response
+        for recipe_data in data:
+            recipe_id = recipe_data['recipeid']
+            categories = RecipeCategories.objects.filter(recipeid=recipe_id).values_list('category_id', flat=True)
+            category_names = Category.objects.filter(id__in=categories).values_list('name', flat=True)
+            recipe_data['categories'] = list(category_names)
+        
+        return Response(data)
