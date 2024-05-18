@@ -187,18 +187,12 @@ class ForgotPassword(APIView):
 class PasswordResetConfirmView(APIView):
     
     def post(self, request, uidb64, token):
-        # print("Received uidb64:", uidb64)
-        # print("Received token:", token)
-        
         serializer = PasswordResetSerializer(data=request.data)
         if serializer.is_valid():
             try:
                 uid = urlsafe_base64_decode(uidb64).decode()
-                # print("Decoded uid:", uid)
                 user = User.objects.get(pk=uid)
-                # print("Retrieved user:", user,"\npk =",user.pk)
             except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-                # print("except")
                 user = None
             if user is not None and custom_token_generator.check_token(user, token):
                 new_password = serializer.validated_data.get('new_password')
@@ -211,7 +205,7 @@ class PasswordResetConfirmView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ChangeUsername(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def put(self, request, *args, **kwargs):
         serializer = ChangeUsernameSerializer(data=request.data)
@@ -233,7 +227,7 @@ class FetchUsernameAndEmail(APIView):
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
         
 class AddFeedback(generics.CreateAPIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     serializer_class = FeedbackSerializer
 
     def post(self, request, *args, **kwargs):
@@ -268,7 +262,10 @@ class AllFeedbacksLimited(APIView):
         queryset = Feedback.objects.all().order_by('-feedback_date')[((limit-1)*50):(limit*50)]
         serializer = FeedbackSerializer(queryset, many=True)
         data = serializer.data
-        
+        for feedback_data in data:
+            user_id = feedback_data['userid']
+            user = User.objects.get(pk=user_id)
+            feedback_data['email'] = user.email
         return Response(data)
     
 class AllUsersLimited(APIView):
@@ -316,3 +313,36 @@ class NewUsersLast30Days(APIView):
         # Filter users created in the last 30 days
         new_users = User.objects.filter(created_at__gte=start_date).count()
         return Response(new_users)
+    
+class NewUsersLast30DaysDetails(APIView):
+
+    serializer_class = AllUserSerializer
+
+    def post(self, request, *args, **kwargs):
+        limit = int(request.data.get('page'))
+        start_date = timezone.now() - timedelta(days=30)
+        # Filter users created in the last 30 days
+        queryset = User.objects.filter(created_at__gte=start_date).order_by('-created_at')[((limit-1)*50):(limit*50)]
+        serializer = AllUserSerializer(queryset, many=True)
+        data = serializer.data
+        
+        return Response(data)
+
+class ChangePassword(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, *args, **kwargs):
+        serializer = PasswordResetSerializer(data=request.data)
+        try:
+            user = request.user
+            password=request.data.get('password')
+            if user is not None and check_password(password, user.password):
+                if serializer.is_valid():
+                    new_password = serializer.validated_data.get('new_password')
+                    user.password= make_password(new_password)
+                    user.save()
+                    return Response({'message': 'Password changed successfully'}, status=status.HTTP_200_OK)
+                else:
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as error:
+            return Response({"error": str(error)}, status=status.HTTP_400_BAD_REQUEST)

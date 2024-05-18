@@ -1,7 +1,8 @@
 from django.urls import path
 from recipe.views import AllRecipes,PopularRecipes,NewRecipes, AddFavorite, AllFavourites, RecipeReviews,RecipeReviewsLimited
 from recipe.views import AllReviews, AllReviewsLimited, AllTitles, AddReview, DeleteReview,AddRecipe, AllCategories, UserRecipes
-from recipe.views import RemoveFavourites, UserHistory, RecipesCount, ReviewsCount, DeleteRecipe, AllRecipesLimited, NewRecipesLast30Days
+from recipe.views import RemoveFavourites, UserHistory, RecipesCount, ReviewsCount, DeleteRecipe, AllRecipesLimited
+from recipe.views import NewRecipesLast30Days, NewRecipesLast30DaysDetails
 
 urlpatterns = [
     path('allrecipes/', AllRecipes.as_view(), name='allrecipes'),
@@ -26,4 +27,5 @@ urlpatterns = [
     path('recipescount/', RecipesCount.as_view(), name='recipescount'),
     path('reviewscount/', ReviewsCount.as_view(), name='reviewscount'),
     path('newrecipescount/', NewRecipesLast30Days.as_view(), name='newrecipescount'),
+    path('newrecipesdetails/', NewRecipesLast30DaysDetails.as_view(), name='newrecipesdetails'),
 ]
