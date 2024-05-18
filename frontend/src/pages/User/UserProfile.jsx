@@ -12,6 +12,7 @@ import {
   getUserName,
   getUserEmail,
   setUserName,
+  getAuthToken,
 } from "../../utils/auth";
 import axios from "axios";
 
@@ -39,23 +40,37 @@ const UserProfile = () => {
 
   const handleSubmit = async () => {
     try {
+      const token = getAuthToken();
       const response = await axios.put(
         `http://localhost:8000/authentication/change-username/`,
-        { new_username: editedData.name, userid: userId }
+        { new_username: editedData.name, userid: userId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       setUserName(editedData.name);
       setIsEditing(false);
+      alert("Username updated successfully!");
     } catch (error) {
-      console.error("Error updating username:", error);
+      if (error.response && error.response.status === 401) {
+        console.error("Unauthorized error:", error);
+        history("/login");
+      } else {
+        console.error("Error updating username:", error);
+        alert("Failed to update username. Please try again later.");
+      }
     }
   };
-
   React.useEffect(() => {
     if (!isAuthenticated() || getUserRole() !== "user") {
       history("/login");
     }
   }, [history]);
-
+  const handleChangePassword = () => {
+    history("/changepassword");
+  };
   return (
     <div>
       <Navbar />
@@ -98,6 +113,14 @@ const UserProfile = () => {
             <div className="detail-item">
               <label>Email:</label>
               <span>{editedData.email}</span>
+            </div>
+            <div className="detail-item">
+              <button
+                onClick={handleChangePassword}
+                className="changepasswordbtn"
+              >
+                Change Password
+              </button>
             </div>
           </div>
         </div>

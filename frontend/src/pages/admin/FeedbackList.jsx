@@ -14,6 +14,8 @@ const FeedbackList = () => {
   const [pageNo, setPageNo] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [inputPageNo, setInputPageNo] = useState("");
+  const [totalFeedbacks, setTotalFeedbacks] = useState(0);
+  const [readComplaints, setReadComplaints] = useState([]);
   const history = useNavigate();
 
   useEffect(() => {
@@ -22,10 +24,16 @@ const FeedbackList = () => {
       return;
     }
     fetchData(pageNo);
+    fetchTotalFeedbacks();
   }, [pageNo, history]);
 
   useEffect(() => {
-    // Filter feedbacks based on search query
+    const storedReadComplaints =
+      JSON.parse(localStorage.getItem("readComplaints")) || [];
+    setReadComplaints(storedReadComplaints);
+  }, []);
+
+  useEffect(() => {
     const filtered = feedbacks.filter((feedback) =>
       feedback.category.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -44,6 +52,18 @@ const FeedbackList = () => {
     }
   };
 
+  const fetchTotalFeedbacks = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:8000/authentication/feedbackcount/"
+      );
+
+      setTotalFeedbacks(response.data || 0);
+    } catch (error) {
+      console.error("Error fetching total feedbacks:", error);
+    }
+  };
+
   const handlePrevPage = () => {
     if (pageNo > 1) {
       setPageNo(pageNo - 1);
@@ -51,7 +71,10 @@ const FeedbackList = () => {
   };
 
   const handleNextPage = () => {
-    setPageNo(pageNo + 1);
+    const totalPages = Math.ceil(totalFeedbacks / 20);
+    if (pageNo < totalPages) {
+      setPageNo(pageNo + 1);
+    }
   };
 
   const handleSearch = (e) => {
@@ -64,11 +87,21 @@ const FeedbackList = () => {
 
   const handleSubmitPage = (e) => {
     e.preventDefault();
+    const totalPages = Math.ceil(totalFeedbacks / 20);
     const pageNumber = parseInt(inputPageNo);
-    if (!isNaN(pageNumber) && pageNumber >= 1) {
+    if (!isNaN(pageNumber) && pageNumber >= 1 && pageNumber <= totalPages) {
       setPageNo(pageNumber);
     }
     setInputPageNo("");
+  };
+
+  const handleMarkAsRead = (id) => {
+    const updatedReadComplaints = [...readComplaints, id];
+    setReadComplaints(updatedReadComplaints);
+    localStorage.setItem(
+      "readComplaints",
+      JSON.stringify(updatedReadComplaints)
+    );
   };
 
   const handleRemoveFeedback = async (id) => {
@@ -86,6 +119,14 @@ const FeedbackList = () => {
         }
       );
       setFeedbacks(feedbacks.filter((feedback) => feedback.id !== id));
+      const updatedReadComplaints = readComplaints.filter(
+        (complaintId) => complaintId !== id
+      );
+      setReadComplaints(updatedReadComplaints);
+      localStorage.setItem(
+        "readComplaints",
+        JSON.stringify(updatedReadComplaints)
+      );
     } catch (error) {
       if (error.response && error.response.status === 401) {
         clearAuthToken();
@@ -103,7 +144,7 @@ const FeedbackList = () => {
         <AdminSideBar />
         <div className="feedbacklist-content">
           <h2
-            style={{ marginBottom: 20, display: "flex", alignItems: "center" }}
+            style={{ marginBottom: 10, display: "flex", alignItems: "center" }}
           >
             All Feedbacks
             <div className="page-number-input" style={{ marginLeft: "auto" }}>
@@ -118,7 +159,8 @@ const FeedbackList = () => {
                   placeholder="No"
                   min="1"
                   className="page-input"
-                  style={{ width: "50px", marginRight: "5px" }}
+                  max={Math.ceil(totalFeedbacks / 20)}
+                  style={{ width: "100px", marginRight: "5px" }}
                   onKeyDown={(e) => {
                     if (e.code === "Minus" || e.key === "-" || e.key === ".") {
                       e.preventDefault();
@@ -131,6 +173,7 @@ const FeedbackList = () => {
               </form>
             </div>
           </h2>
+          <p>Total Feedbacks: {totalFeedbacks}</p>
           <div className="feedback-actions">
             <input
               type="text"
@@ -144,9 +187,10 @@ const FeedbackList = () => {
             <thead>
               <tr>
                 <th>User ID</th>
+                <th>Email</th>
                 <th>Category</th>
                 <th>Feedback</th>
-                <th>Action</th>
+                <th style={{ width: "150px" }}>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -154,13 +198,27 @@ const FeedbackList = () => {
                 <tr
                   key={index}
                   className={
-                    feedback.category === "complaint" ? "highlighted-row" : ""
+                    feedback.category === "complaint" &&
+                    !readComplaints.includes(feedback.id)
+                      ? "highlighted-row"
+                      : ""
                   }
                 >
                   <td>{feedback.userid}</td>
+                  <td>{feedback.email}</td>
                   <td>{feedback.category}</td>
                   <td style={{ width: 700 }}>{feedback.feedback}</td>
                   <td>
+                    {" "}
+                    {feedback.category === "complaint" &&
+                      !readComplaints.includes(feedback.id) && (
+                        <button
+                          className="mark-as-read-button"
+                          onClick={() => handleMarkAsRead(feedback.id)}
+                        >
+                          Mark
+                        </button>
+                      )}
                     <button
                       className="remove-button"
                       onClick={() => handleRemoveFeedback(feedback.id)}
@@ -175,14 +233,16 @@ const FeedbackList = () => {
           <div className="pagination-buttons">
             <button
               onClick={handlePrevPage}
-              style={{ backgroundColor: " #e19660", border: "1px solid #ccc" }}
+              style={{ backgroundColor: "#e19660", border: "1px solid #ccc" }}
             >
               Prev
             </button>
-            <span>{pageNo}</span>
+            <span>
+              {pageNo} of {Math.ceil(totalFeedbacks / 20)}
+            </span>
             <button
               onClick={handleNextPage}
-              style={{ backgroundColor: " #e19660", border: "1px solid #ccc" }}
+              style={{ backgroundColor: "#e19660", border: "1px solid #ccc" }}
             >
               Next
             </button>

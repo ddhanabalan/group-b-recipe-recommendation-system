@@ -111,7 +111,7 @@ const ReviewsList = () => {
                   placeholder="No:"
                   min="1"
                   className="page-input"
-                  style={{ width: "50px", marginRight: "5px" }}
+                  style={{ width: "100px", marginRight: "5px" }}
                   onKeyDown={(e) => {
                     if (e.code === "Minus" || e.key === "-" || e.key === ".") {
                       e.preventDefault();

@@ -12,11 +12,11 @@ const Otp = () => {
   const [verificationError, setVerificationError] = useState("");
 
   useEffect(() => {
-    const pathnameSegments = location.pathname.split("/"); // Split URL path into segments
-    const emailSegmentIndex = pathnameSegments.indexOf("otp") + 1; // Get index of email segment
+    const pathnameSegments = location.pathname.split("/");
+    const emailSegmentIndex = pathnameSegments.indexOf("otp") + 1;
     if (emailSegmentIndex > 0 && emailSegmentIndex < pathnameSegments.length) {
-      const email = pathnameSegments[emailSegmentIndex]; // Extract email from URL path
-      setFormData((prevData) => ({ ...prevData, email })); // Update form data state with email
+      const email = pathnameSegments[emailSegmentIndex];
+      setFormData((prevData) => ({ ...prevData, email }));
     }
   }, [location.pathname]);
 
@@ -52,9 +52,9 @@ const Otp = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log("Response from server:", data); // Log the response content
+        console.log("Response from server:", data);
         alert("Email verified successfully.");
-        // Redirect to login page after successful email verification
+
         window.location.href = "/login";
       } else {
         const data = await response.json();

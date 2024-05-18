@@ -219,7 +219,21 @@ function Navbar() {
             </li>
             {authToken ? (
               <li>
-                <span className="user-heading" onClick={toggleDropdown}>
+                <span
+                  className="user-heading"
+                  style={{
+                    cursor: "pointer",
+                  }}
+                  onClick={toggleDropdown}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = "#e49963";
+                    e.target.style.textDecoration = "underline";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = "black";
+                    e.target.style.textDecoration = "none";
+                  }}
+                >
                   User
                 </span>
                 {open && (
@@ -228,7 +242,7 @@ function Navbar() {
                       <a href="/user/savedrecipes">Dashboard</a>
                     </li>
                     <li>
-                      <a href="/passwordreset">Change Password</a>
+                      <a href="/changepassword">Change Password</a>
                     </li>
                     <li>
                       <button
@@ -238,6 +252,7 @@ function Navbar() {
                           color: "black",
                           fontSize: "12px",
                           paddingLeft: 0,
+                          cursor: "pointer",
                         }}
                         onClick={handleLogout}
                       >
@@ -255,8 +270,17 @@ function Navbar() {
                     border: "2px dashed #e49963",
                     padding: " 8px 30px",
                     color: "black",
+                    cursor: "pointer",
                   }}
                   onClick={() => (window.location.href = "/login")}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = "#e49963";
+                    e.target.style.textDecoration = "underline";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = "black";
+                    e.target.style.textDecoration = "none";
+                  }}
                 >
                   Login
                 </span>

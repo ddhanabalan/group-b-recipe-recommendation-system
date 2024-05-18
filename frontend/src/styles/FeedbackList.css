@@ -85,3 +85,17 @@
 .pagination-input-button:hover {
   background-color: #c17645;
 }
+.mark-as-read-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-right: 10px;
+  height: 30px;
+}
+
+.mark-as-read-button:hover {
+  background-color: #0056b3;
+}

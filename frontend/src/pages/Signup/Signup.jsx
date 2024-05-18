@@ -55,9 +55,7 @@ function Signup() {
       );
 
       if (response.ok) {
-        console.log("Signup successful");
         const email = formData.email;
-        console.log("email", email);
         localStorage.setItem("signupEmail", email);
         history(`/otp/${email}`);
       } else {

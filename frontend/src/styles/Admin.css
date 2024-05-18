@@ -40,7 +40,17 @@
 .card-feedbacks {
   background-color: #f1c40f;
 }
+.card-new-users {
+  background: #e7f3ff;
+  border-left: 5px solid #36a2eb;
+  color: #36a2eb;
+}
 
+.card-new-recipes {
+  background: #ffe7e7;
+  border-left: 5px solid #ff6384;
+  color: #ff6384;
+}
 .card-link {
   text-decoration: none;
   color: inherit;
@@ -87,4 +97,18 @@
 
 .more-info:hover {
   color: rgba(255, 255, 255, 1);
+}
+.admin-graph {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.admin-graph h3 {
+  margin-bottom: 20px;
 }

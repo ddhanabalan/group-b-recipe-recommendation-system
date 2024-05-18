@@ -67,20 +67,20 @@ const RecipeModal = ({ recipe, onClose }) => {
   );
 };
 
-const RecipesList = () => {
+const NewRecipesList = () => {
   const [recipes, setRecipes] = useState([]);
   const [filteredRecipes, setFilteredRecipes] = useState([]);
-  const [totalRecipes, setTotalRecipes] = useState(0);
   const [pageNo, setPageNo] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [inputPageNo, setInputPageNo] = useState("");
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [totalRecipes, setTotalRecipes] = useState(0); // State to store total number of recipes
   const history = useNavigate();
 
   useEffect(() => {
     fetchData(pageNo);
-    fetchTotalRecipes();
+    fetchTotalRecipes(); // Fetch total number of recipes when component mounts
   }, [pageNo]);
 
   useEffect(() => {
@@ -95,7 +95,7 @@ const RecipesList = () => {
   const fetchData = async (pageNumber) => {
     try {
       const response = await axios.post(
-        "http://localhost:8000/recipe/allrecipeslimited/",
+        "http://localhost:8000/recipe/newrecipesdetails/",
         { page: pageNumber }
       );
       setRecipes(response.data);
@@ -107,7 +107,7 @@ const RecipesList = () => {
   const fetchTotalRecipes = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/recipe/recipescount/"
+        "http://localhost:8000/recipe/newrecipescount/"
       );
       setTotalRecipes(response.data || 0);
     } catch (error) {
@@ -184,7 +184,7 @@ const RecipesList = () => {
         <AdminSideBar />
         <div className="recipeslist-content">
           <h2
-            style={{ marginBottom: 20, display: "flex", alignItems: "center" }}
+            style={{ marginBottom: 10, display: "flex", alignItems: "center" }}
           >
             All Recipes
             <div className="page-number-input" style={{ marginLeft: "auto" }}>
@@ -290,4 +290,4 @@ const RecipesList = () => {
   );
 };
 
-export default RecipesList;
+export default NewRecipesList;

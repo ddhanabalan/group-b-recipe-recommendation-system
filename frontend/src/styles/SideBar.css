@@ -1,14 +1,15 @@
 .sidebar {
-  width: 300px;
+  width: 280px;
   background-color: #ffebdc;
   color: black;
   height: 100%;
+  position: relative;
 }
 
 .sidebar ul {
   list-style-type: none;
   padding: 0;
-  padding-top: 20%;
+  padding-top: 10%;
   height: 100vh;
 }
 
@@ -23,4 +24,16 @@
   text-decoration: none;
   font-size: x-large;
   font-weight: 300;
+}
+.sidebar ul li:hover {
+  background-color: #f7af78;
+}
+.sidebar::after {
+  content: "";
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 5px;
+  height: 100%;
+  box-shadow: -10px 0px 10px rgba(0, 0, 0, 0.1);
 }

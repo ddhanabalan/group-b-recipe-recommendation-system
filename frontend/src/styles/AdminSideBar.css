@@ -1,13 +1,14 @@
 .admin-sidebar {
-  width: 300px;
+  width: 280px;
   background-color: #ffebdc;
   color: black;
+  position: relative;
 }
 
 .admin-sidebar ul {
   list-style-type: none;
   padding: 0;
-  padding-top: 20%;
+
   height: 100vh;
 }
 
@@ -22,4 +23,16 @@
   text-decoration: none;
   font-size: x-large;
   font-weight: 300;
+}
+.admin-sidebar::after {
+  content: "";
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 5px;
+  height: 100%;
+  box-shadow: -10px 0px 10px rgba(0, 0, 0, 0.1);
+}
+.admin-sidebar ul li:hover {
+  background-color: #ffd3b1;
 }
