@@ -1,37 +1,33 @@
-import React, { useState } from "react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import UserSideBar from "../../components/userSideBar/UserSideBar";
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
-import { FaUserCircle } from "react-icons/fa";
+import { FaPencilAlt } from "react-icons/fa";
 import "../../styles/UserProfile.css";
+import {
+  isAuthenticated,
+  getUserRole,
+  getUserId,
+  getUserName,
+  getUserEmail,
+  setUserName,
+  getAuthToken,
+} from "../../utils/auth";
+import axios from "axios";
 
 const UserProfile = () => {
-  // Sample user data (replace with actual user data from your context or API)
-  const [userData, setUserData] = useState({
-    name: "John Doe",
-    email: "johndoe@example.com",
-    password: "password", // Just an example, never store passwords in state
+  const history = useNavigate();
+  const userId = getUserId();
+
+  const [editedData, setEditedData] = React.useState({
+    name: getUserName(),
+    email: getUserEmail(),
   });
+  const [isEditing, setIsEditing] = React.useState(false);
 
-  const [editedData, setEditedData] = useState({ ...userData });
-  const [isEditing, setIsEditing] = useState(false);
-
-  const handleEditProfile = () => {
-    setIsEditing(true);
-  };
-
-  const handleSaveChanges = () => {
-    // Here you can add code to save the edited data, such as making an API request
-
-    // For now, we'll update the userData state with the edited data
-    setUserData({ ...editedData });
-    setIsEditing(false);
-  };
-
-  const handleCancelEdit = () => {
-    // Reset editedData to userData to cancel editing
-    setEditedData({ ...userData });
-    setIsEditing(false);
+  const handleToggleEdit = () => {
+    setIsEditing(!isEditing);
   };
 
   const handleChange = (e) => {
@@ -42,6 +38,39 @@ const UserProfile = () => {
     }));
   };
 
+  const handleSubmit = async () => {
+    try {
+      const token = getAuthToken();
+      const response = await axios.put(
+        `http://localhost:8000/authentication/change-username/`,
+        { new_username: editedData.name, userid: userId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setUserName(editedData.name);
+      setIsEditing(false);
+      alert("Username updated successfully!");
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        console.error("Unauthorized error:", error);
+        history("/login");
+      } else {
+        console.error("Error updating username:", error);
+        alert("Failed to update username. Please try again later.");
+      }
+    }
+  };
+  React.useEffect(() => {
+    if (!isAuthenticated() || getUserRole() !== "user") {
+      history("/login");
+    }
+  }, [history]);
+  const handleChangePassword = () => {
+    history("/changepassword");
+  };
   return (
     <div>
       <Navbar />
@@ -59,45 +88,40 @@ const UserProfile = () => {
             <div className="detail-item">
               <label>Name:</label>
               {isEditing ? (
-                <input
-                  type="text"
-                  name="name"
-                  value={editedData.name}
-                  onChange={handleChange}
-                />
+                <>
+                  <input
+                    type="text"
+                    name="name"
+                    value={editedData.name}
+                    onChange={handleChange}
+                    className="username_field"
+                  />
+                  <button onClick={handleSubmit} className="okbtn">
+                    Submit
+                  </button>
+                </>
               ) : (
-                <span>{userData.name}</span>
+                <>
+                  <span>{editedData.name}</span>
+                  <FaPencilAlt
+                    className="edit-icon"
+                    onClick={handleToggleEdit}
+                  />
+                </>
               )}
             </div>
             <div className="detail-item">
               <label>Email:</label>
-              {isEditing ? (
-                <input
-                  type="email"
-                  name="email"
-                  value={editedData.email}
-                  onChange={handleChange}
-                />
-              ) : (
-                <span>{userData.email}</span>
-              )}
+              <span>{editedData.email}</span>
             </div>
-          </div>
-          <div className="button-group">
-            {isEditing ? (
-              <>
-                <button className="save-button" onClick={handleSaveChanges}>
-                  Save Changes
-                </button>
-                <button className="cancel-button" onClick={handleCancelEdit}>
-                  Cancel
-                </button>
-              </>
-            ) : (
-              <button className="edit-button" onClick={handleEditProfile}>
-                Edit Profile
+            <div className="detail-item">
+              <button
+                onClick={handleChangePassword}
+                className="changepasswordbtn"
+              >
+                Change Password
               </button>
-            )}
+            </div>
           </div>
         </div>
       </div>

@@ -9,11 +9,11 @@ import { clearAuthToken, getAuthToken } from "../../utils/auth";
 import { isAuthenticated, getUserRole } from "../../utils/auth";
 import "../../styles/UsersList.css";
 
-const UsersList = () => {
+const NewUsersList = () => {
   const [users, setUsers] = useState([]);
-  const [totalUsers, setTotalUsers] = useState(0);
   const [pageNo, setPageNo] = useState(1);
   const [inputPageNo, setInputPageNo] = useState("");
+  const [totalUsers, setTotalUsers] = useState(0); // State to store total number of users
   const history = useNavigate();
 
   useEffect(() => {
@@ -22,16 +22,13 @@ const UsersList = () => {
       return;
     }
     fetchData(pageNo);
+    fetchTotalUsers(); // Fetch total number of users when component mounts
   }, [pageNo, history]);
-
-  useEffect(() => {
-    fetchTotalUsers();
-  }, []);
 
   const fetchData = async (pageNumber) => {
     try {
       const response = await axios.post(
-        "http://localhost:8000/authentication/alluserslimited/",
+        "http://localhost:8000/authentication/newusersdetails/",
         { page: pageNumber }
       );
       setUsers(response.data || []);
@@ -43,9 +40,8 @@ const UsersList = () => {
   const fetchTotalUsers = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/authentication/userscount"
+        "http://localhost:8000/authentication/newuserscount"
       );
-
       setTotalUsers(response.data || 0);
     } catch (error) {
       console.error("Error fetching total users:", error);
@@ -186,4 +182,4 @@ const UsersList = () => {
   );
 };
 
-export default UsersList;
+export default NewUsersList;

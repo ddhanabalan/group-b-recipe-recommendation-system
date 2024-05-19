@@ -1,0 +1,92 @@
+.dashboard-area {
+  display: flex;
+}
+
+.recipeslist-content {
+  flex-grow: 1;
+  padding: 20px;
+}
+
+.recipes-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.recipes-table th,
+.recipes-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.recipes-table th {
+  background-color: #f2f2f2;
+}
+
+.pagination-buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.view-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-right: 10px;
+}
+
+.view-button:hover {
+  background-color: #0056b3;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(249, 116, 20, 0);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  background-color: #fff;
+  width: 80%;
+  max-width: 600px;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 0 5px rgba(243, 182, 113, 0.489);
+  position: relative;
+  z-index: 1001;
+}
+
+.modal-content {
+  position: relative;
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  font-size: 20px;
+}
+.pagination-input-button {
+  padding: 8px 16px;
+  background-color: #e19660;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.pagination-input-button:hover {
+  background-color: #c17645;
+}

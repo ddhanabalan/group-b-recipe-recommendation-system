@@ -19,7 +19,7 @@ const SingleRecipe = () => {
     const fetchReviews = async () => {
       try {
         const response = await fetch(
-          "http://localhost:8000/recipe/recipereview/",
+          "http://localhost:8000/recipe/recipereviews/",
           {
             method: "POST",
             headers: {

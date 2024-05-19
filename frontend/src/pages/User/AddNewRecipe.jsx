@@ -7,7 +7,7 @@ import RecipeDisplay from "../../components/recipeDisplay/RecipeDisplay";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import axios from "axios";
 import { RecipeContext } from "../../context/recipeContext";
-import { getUserId } from "../../utils/auth";
+import { clearAuthData, getAuthToken, getUserId } from "../../utils/auth";
 const AddNewRecipe = () => {
   const { distinctCategories, distinctSeasons, distinctDayOfTimeCooking } =
     useContext(RecipeContext);
@@ -116,7 +116,7 @@ const AddNewRecipe = () => {
 
     delete formData.hours;
     delete formData.minutes;
-
+    const authToken = getAuthToken();
     const userid = getUserId();
     formData.userid = userid; // Send userID as a single value, not an array
 
@@ -125,6 +125,7 @@ const AddNewRecipe = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
         },
         body: JSON.stringify({
           ...formData,
@@ -136,6 +137,13 @@ const AddNewRecipe = () => {
         "http://localhost:8000/recipe/addrecipe/",
         requestOptions
       );
+
+      if (response.status === 401) {
+        clearAuthData();
+        window.location.href = "/login";
+        return;
+      }
+
       const responseData = await response.json();
 
       console.log("Data sent to server:", requestOptions.body);
@@ -316,6 +324,7 @@ const AddNewRecipe = () => {
                     />
                   )}
                 </div>
+                {/* ingredient section*/}
                 <div className="ingredient-container">
                   <label htmlFor="ingredients">Ingredients:</label>
                   <textarea
@@ -332,6 +341,7 @@ const AddNewRecipe = () => {
                     placeholder="Enter ingredients separated by commas"
                   />
                 </div>
+                {/*cooking time section*/}
                 <div>
                   <label htmlFor="hours">Cooking Time (Hours):</label>
                   <input
@@ -381,19 +391,21 @@ const AddNewRecipe = () => {
                 </div>
 
                 <div></div>
+                {/*category section*/}
                 <div className="category-section">
                   <label htmlFor="categories">Category:</label>
                   <div className="category-part">
                     {distinctCategories.map((category) => (
-                      <label key={category} className="category-label">
+                      <label key={category} className="category_label">
                         <input
+                          id="catcheck"
                           type="checkbox"
                           name="categories"
                           value={category}
                           onChange={handleCategoryChange}
                           checked={formData.categories.includes(category)}
                         />
-                        {category}
+                        <span className="category-name">{category}</span>
                       </label>
                     ))}
                   </div>

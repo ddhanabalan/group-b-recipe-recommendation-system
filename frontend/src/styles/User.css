@@ -17,6 +17,7 @@
 .user-content-heading {
   display: flex;
   align-items: center;
+  justify-content: space-between;
 }
 .btn {
   margin-left: 60%;
@@ -25,7 +26,7 @@
 .add-new-recipe {
   width: auto;
   height: auto;
-  font-size: 18px;
+  font-size: 20px;
   padding: 5px 20px;
   background-color: #353535;
 }

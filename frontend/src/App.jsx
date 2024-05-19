@@ -15,11 +15,15 @@ import UserAddedRecipes from "./pages/User/UserAddedRecipes";
 import UserFeedback from "./pages/User/UserFeedback";
 import UserProfile from "./pages/User/UserProfile";
 import AddNewRecipe from "./pages/User/AddNewRecipe";
-import EditProfile from "./pages/User/EditProfile";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import PasswordReset from "./pages/PasswordReset/PasswordReset";
 import Otp from "./pages/Otp/Otp";
 import ReviewsList from "./pages/admin/ReviewsList";
+import RecipesList from "./pages/admin/RecipesList";
+import FeedbackList from "./pages/admin/FeedbackList";
+import ChangePassword from "./pages/changePassword/ChangePassword";
+import NewUsersList from "./pages/admin/NewUsersList";
+import NewRecipesList from "./pages/admin/NewRecipesList";
 function App() {
   return (
     <div>
@@ -34,16 +38,24 @@ function App() {
           <Route path="/SingleRecipe/:RecipeId" element={<SingleRecipe />} />
           <Route path="/dashboard" element={<Admin />} />
           <Route path="/admin/users" element={<UsersList />} />
+          <Route path="/admin/newusers" element={<NewUsersList />} />
           <Route path="/admin/reviews" element={<ReviewsList />} />
+          <Route path="/admin/recipes" element={<RecipesList />} />
+          <Route path="/admin/newrecipes" element={<NewRecipesList />} />
+          <Route path="/admin/feedbacks" element={<FeedbackList />} />
           <Route path="/user/savedrecipes" element={<UserSavedRecipes />} />
           <Route path="/user/addedrecipes" element={<UserAddedRecipes />} />
           <Route path="/user/feedbacks" element={<UserFeedback />} />
           <Route path="/user/profile" element={<UserProfile />} />
           <Route path="/addnewrecipe" element={<AddNewRecipe />} />
-          <Route path="/editprofile" element={<EditProfile />} />
           <Route path="/forgotpassword" element={<ForgotPassword />} />
-          <Route path="/passwordreset" element={<PasswordReset />} />
+          <Route
+            path="/passwordreset/:userid/:token"
+            element={<PasswordReset />}
+          />
+
           <Route path="/otp/:email" element={<Otp />} />
+          <Route path="/changepassword" element={<ChangePassword />} />
         </Routes>
       </Router>
     </div>

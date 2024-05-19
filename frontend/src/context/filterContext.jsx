@@ -5,8 +5,11 @@ const FilterContext = createContext();
 const initialState = {
   searchQuery: "",
   category: [],
-  maxTime: 120,
-  maxCalories: 1000,
+  maxTime: null,
+  maxCalories: null,
+  vegNonVeg: null,
+  season: null,
+  timeOfDay: null,
 };
 
 const filterReducer = (state, action) => {
@@ -15,12 +18,6 @@ const filterReducer = (state, action) => {
       return { ...state, ...action.payload };
     case "RESET_FILTER":
       return initialState;
-    case "TOGGLE_CATEGORY":
-      const { category } = action.payload;
-      const updatedCategories = state.category.includes(category)
-        ? state.category.filter((cat) => cat !== category)
-        : [...state.category, category];
-      return { ...state, category: updatedCategories };
     default:
       return state;
   }
