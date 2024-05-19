@@ -5,8 +5,6 @@
 
 
 import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
 import re
 
 from nltk.tokenize import word_tokenize
@@ -133,17 +131,6 @@ df.head()
 # In[11]:
 
 
-num_features = df[['calories', 'avg_rating', 'no_reviews', 'total_mins', 'no_ingredients']]
-plt.figure(figsize=(10, 8))
-corr_matrix = num_features.corr()
-sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5)
-plt.title('Correlation Matrix Heatmap')
-plt.show()
-
-
-# In[12]:
-
-
 pattern = re.compile(r'\s*\([^)]*\)')
 records = df['diet_type']
 
@@ -151,7 +138,7 @@ cleaned_records = [re.sub(pattern, '', record) for record in records]
 df['diet_type'] = cleaned_records
 
 
-# In[13]:
+# In[12]:
 
 
 def clean_text(text):
@@ -164,123 +151,7 @@ df['diet_type'] = df['diet_type'].apply(clean_text)
 df.head()
 
 
-# In[14]:
-
-
-sns.boxplot(x="no_ingredients", showmeans=True, data=df)
-
-plt.title("Distribution of number of ingredients")
-plt.xlabel("ingredients count")
-plt.ylabel("Value")
-plt.xticks(rotation=45)
-plt.grid(axis='y', linestyle='--', alpha=0.8)
-
-plt.show()
-
-
-# In[15]:
-
-
-calories = df["calories"]
-
-plt.figure(figsize=(10, 6))
-
-plt.subplot(1, 2, 1)
-calories.hist(bins=20)
-plt.xlabel("Calories")
-plt.ylabel("Frequency")
-plt.title("Histogram of Calories")
-
-plt.subplot(1, 2, 2)
-plt.boxplot(calories)
-plt.xlabel("Calories")
-plt.ylabel("Value")
-plt.title("Boxplot of Calories")
-
-plt.tight_layout()
-plt.show()
-
-# Identify outliers (consider IQR method)
-q1 = calories.quantile(0.25)
-q3 = calories.quantile(0.75)
-iqr = q3 - q1
-outliers_low = calories[calories < (q1 - 1.5 * iqr)]
-outliers_high = calories[calories > (q3 + 1.5 * iqr)]
-
-# Print the results
-print("Mean calories:", calories.mean())
-print("Median calories:", calories.median())
-print("Skewness:", calories.skew())
-
-if len(outliers_low) > 0:
-  print("Number of outliers (low):", len(outliers_low))
-if len(outliers_high) > 0:
-  print("Number of outliers (high):", len(outliers_high))
-
-
-# In[16]:
-
-
-time = df["total_mins"]
-
-plt.figure(figsize=(10, 6))
-
-plt.subplot(1, 2, 1)
-time.hist(bins=20)
-plt.xlabel("Cooking Time")
-plt.ylabel("Frequency")
-plt.title("Histogram of Cooking Time")
-
-plt.subplot(1, 2, 2)
-plt.boxplot(time)
-plt.xlabel("Cooking Time")
-plt.ylabel("Value")
-plt.title("Boxplot of Cooking Time")
-
-plt.tight_layout()
-plt.show()
-
-# Identify outliers (consider IQR method)
-q1 = time.quantile(0.25)
-q3 = time.quantile(0.75)
-iqr = q3 - q1
-outliers_low = time[time < (q1 - 1.5 * iqr)]
-outliers_high = time[time > (q3 + 1.5 * iqr)]
-
-# Print the results
-print("Mean Cooking Time:", time.mean())
-print("Median Cooking Time:", time.median())
-print("Skewness:", time.skew())
-
-if len(outliers_low) > 0:
-    print("Number of outliers (low):", len(outliers_low))
-if len(outliers_high) > 0:
-    print("Number of outliers (high):", len(outliers_high))
-
-
-# In[17]:
-
-
-avg_ratings = df["avg_rating"]
-
-# Visualize the distribution using histograms or boxplots
-plt.figure(figsize=(8, 6))
-
-plt.subplot(1, 1, 1)
-avg_ratings.hist(bins=10)
-plt.xlabel("Average Rating")
-plt.ylabel("Frequency")
-plt.title("Histogram of Average Ratings")
-
-plt.tight_layout()
-plt.show()
-
-# Explore descriptive statistics (optional)
-print("Descriptive Statistics:")
-print(avg_ratings.describe())
-
-
-# In[18]:
+# In[13]:
 
 
 # Define a threshold for identifying significant outliers (e.g., 3 standard deviations above the mean)
@@ -293,13 +164,13 @@ outliers_df = df[df['total_mins'] > threshold]
 print(outliers_df)
 
 
-# In[19]:
+# In[14]:
 
 
 df.describe()
 
 
-# In[20]:
+# In[15]:
 
 
 df.describe(include="object").T
@@ -314,7 +185,7 @@ df.describe(include="object").T
 #     Extremely high or low calories.
 #     Unusually large or small numbers of ingredients.
 
-# In[21]:
+# In[16]:
 
 
 def iqr_method(outlier):
@@ -332,75 +203,11 @@ iqr_method('no_ingredients')
 iqr_method('total_mins')
 
 
-# In[22]:
-
-
-sns.boxplot(df['calories'])
-
-
-# In[23]:
-
-
-sns.boxplot(df['no_ingredients'])
-
-
-# In[24]:
-
-
-sns.boxplot(df['total_mins'])
-
-
-# In[25]:
-
-
-categorical_features = ['diet_type']
-numerical_feature = 'calories'
-
-for feature in categorical_features:
-    plt.figure(figsize=(12, 6))
-    sns.violinplot(x=feature, y=numerical_feature, data=df)
-    plt.title(f'Violin plot of {numerical_feature} by {feature}')
-    plt.xlabel(feature)
-    plt.ylabel(numerical_feature)
-    plt.xticks(rotation=45)
-    plt.show()
-
-
-# In[26]:
+# In[17]:
 
 
 df_exploded = df.explode('season')
 df_exploded2 = df.explode('meal_type')
-
-
-# In[27]:
-
-
-categorical_features = ['season']
-numerical_feature = 'calories'
-
-for feature in categorical_features:
-    plt.figure(figsize=(12, 6))
-    sns.violinplot(x=feature, y=numerical_feature, data=df_exploded)
-    plt.title(f'Violin plot of {numerical_feature} by {feature}')
-    plt.xlabel(feature)
-    plt.ylabel(numerical_feature)
-    plt.xticks(rotation=45)
-    plt.show()
-
-
-# In[28]:
-
-
-def plot_pie_chart(data, column, title):
-    counts = data[column].value_counts()
-    plt.figure(figsize=(8, 8))
-    plt.pie(counts, labels=counts.index, autopct='%1.1f%%', startangle=140)
-    plt.title(title)
-    plt.show()
-plot_pie_chart(df_exploded, 'season', 'Distribution of Seasons')
-plot_pie_chart(df_exploded2, 'meal_type', 'Distribution of Daytime of Cooking')
-plot_pie_chart(df, 'diet_type', 'Distribution of Veg/NonVeg Recipes')
 
 
 # **TOKENIZATION OF TITLE COLUMN**
@@ -415,7 +222,7 @@ plot_pie_chart(df, 'diet_type', 'Distribution of Veg/NonVeg Recipes')
 # 
 # punctuations and other decorators were also removed for simplicity and accurate prediction of model.
 
-# In[29]:
+# In[18]:
 
 
 def clean_text(text):
@@ -427,7 +234,7 @@ def clean_text(text):
 df['cleaned_titles'] = df['title'].apply(clean_text)
 
 
-# In[30]:
+# In[19]:
 
 
 lemmatizer = WordNetLemmatizer()
@@ -448,7 +255,7 @@ data = lemmatize_feature(df, 'cleaned_titles')
 # removal of any special characters, conversion to lower cases and lemmatization of words for better computation
 # after lemmatization, the stop words were removed.
 
-# In[31]:
+# In[20]:
 
 
 def lemmatize_category_list(category_list):
@@ -462,7 +269,7 @@ def lemmatize_category_list(category_list):
 df['category_lemmatized'] = df['category'].apply(lemmatize_category_list)
 
 
-# In[32]:
+# In[21]:
 
 
 def preprocess_ingredients(ingredients):
@@ -520,13 +327,13 @@ df['category_lemmatized']=df['category_lemmatized'].apply(lambda x: ', '.join(x)
 df.head()
 
 
-# In[33]:
+# In[22]:
 
 
 df=df.drop(['title','category','ingredients'],axis=1)
 
 
-# In[34]:
+# In[23]:
 
 
 for i in df['ingredients_filtered']:
@@ -542,7 +349,7 @@ df['ingredients_filtered']=df['ingredients_filtered'].apply(to_string)
 ingredients_filtered=df[['recipe_id','ingredients_filtered']]
 
 
-# In[35]:
+# In[24]:
 
 
 df.head()
@@ -556,7 +363,7 @@ df.head()
 # 
 # THIS MODEL SUGGESTS SIMILAR RECIPES WHEN ONE RECIPE IS VIEWED. THIS COULD GIVE OPTIONS FOR THE USER TO PICK.
 
-# In[36]:
+# In[25]:
 
 
 vectorizer=TfidfVectorizer()
@@ -571,13 +378,12 @@ similarity=cosine_similarity(recipe_text_features, recipe_text_features)
 similarity
 
 
-# In[37]:
+# In[26]:
 
 
 knn = NearestNeighbors(n_neighbors=10, algorithm='auto', metric='cosine')
 knn.fit(recipe_text_features)
 
-# Function to recommend recipes based on KNN and recipe ID
 def recommend_recipe(recipe_id):
     
     if recipe_id not in df['recipe_id'].values:
@@ -586,7 +392,7 @@ def recommend_recipe(recipe_id):
     
     recipe_index = df.index[df['recipe_id'] == recipe_id].tolist()[0]
     
-    # Get the nearest neighbors for the recipe at the found index
+    #fetching nearest neighbors for the recipe at the found index
     distances, indices = knn.kneighbors(recipe_text_features[recipe_index].reshape(1, -1), n_neighbors=10)
     recommendations = []
 
@@ -596,12 +402,12 @@ def recommend_recipe(recipe_id):
     
     return recommendations
 
-#Replace with an actual recipe ID from your dataset
+#example
 recommendations_list = recommend_recipe(220596)
 print("Recommendations list:", recommendations_list)
 
 
-# In[38]:
+# In[27]:
 
 
 pickle.dump(recommend_recipe, open('KNN_model.pkl','wb'))
@@ -609,7 +415,7 @@ loaded_recommend_recipes = pickle.load(open("KNN_model.pkl", "rb"))
 print(loaded_recommend_recipes(222337))
 
 
-# In[39]:
+# In[28]:
 
 
 df['ingredients_filtered'] = df['ingredients_filtered'].apply(lambda x: ''.join(x))
@@ -623,7 +429,7 @@ df['cleaned_titles'] = df['cleaned_titles'].apply(lambda x: ' '.join(x))
 # FOR THIS MODEL, THE INPUT IS USER_ID AND OUTPUT IS A SERIES OF RECIPE_ID'S
 # 
 
-# In[40]:
+# In[29]:
 
 
 user_recipe_df=df2.merge(df,on='recipe_id')
@@ -635,7 +441,7 @@ rating_matrix=user_recipe_df.pivot_table(values='rating',index='user_id',columns
 rating_matrix
 
 
-# In[41]:
+# In[30]:
 
 
 num_factors=10
@@ -656,29 +462,22 @@ def recommend_recipes(user_id, top_n=10):
     user_index = user_id_to_index[user_id]
     user_factor = user_factors[user_index]
     predicted_ratings = user_factor.dot(recipe_factors)
-    top_recipe_indices = predicted_ratings.argsort()[-top_n:][::-1]  # Get top_n indices, sorted in descending order
+    top_recipe_indices = predicted_ratings.argsort()[-top_n:][::-1]  # Get top n indices, sorted in descending order
     
     # Map indices back to recipe IDs
     top_recipe_ids = rating_matrix.columns[top_recipe_indices]
     return top_recipe_ids
 
-#recommendations for user with ID 10
-recommended_recipes_CF=recommend_recipes(935)
+#recommendations for user with ID
+recommended_recipes_CF=recommend_recipes(16)
 
 print(recommended_recipes_CF)
 
 
-# In[47]:
+# In[31]:
 
 
 pickle.dump(recommend_recipes, open('CF_model.pkl','wb'))
 CF_recommend_recipes = pickle.load(open("CF_model.pkl", "rb"))
-user = 935
-CF_recommend_recipes(user)
-
-
-# In[ ]:
-
-
-
+CF_recommend_recipes(16)
 
