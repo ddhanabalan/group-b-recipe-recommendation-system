@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[47]:
+# In[1]:
 
 
 import pandas as pd
@@ -17,6 +17,8 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.decomposition import NMF
+
+import pickle
 
 
 # In[2]:
@@ -330,19 +332,19 @@ iqr_method('no_ingredients')
 iqr_method('total_mins')
 
 
-# In[55]:
+# In[22]:
 
 
 sns.boxplot(df['calories'])
 
 
-# In[56]:
+# In[23]:
 
 
 sns.boxplot(df['no_ingredients'])
 
 
-# In[57]:
+# In[24]:
 
 
 sns.boxplot(df['total_mins'])
@@ -524,7 +526,7 @@ df.head()
 df=df.drop(['title','category','ingredients'],axis=1)
 
 
-# In[35]:
+# In[34]:
 
 
 for i in df['ingredients_filtered']:
@@ -540,7 +542,7 @@ df['ingredients_filtered']=df['ingredients_filtered'].apply(to_string)
 ingredients_filtered=df[['recipe_id','ingredients_filtered']]
 
 
-# In[36]:
+# In[35]:
 
 
 df.head()
@@ -554,7 +556,7 @@ df.head()
 # 
 # THIS MODEL SUGGESTS SIMILAR RECIPES WHEN ONE RECIPE IS VIEWED. THIS COULD GIVE OPTIONS FOR THE USER TO PICK.
 
-# In[38]:
+# In[36]:
 
 
 vectorizer=TfidfVectorizer()
@@ -569,23 +571,45 @@ similarity=cosine_similarity(recipe_text_features, recipe_text_features)
 similarity
 
 
-# In[41]:
+# In[37]:
 
 
 knn = NearestNeighbors(n_neighbors=10, algorithm='auto', metric='cosine')
 knn.fit(recipe_text_features)
 
-#function to recommend recipes based on KNN
-def recommend_recipe(recipe_index):
-    distances, indices = knn.kneighbors(recipe_text_features[recipe_index], n_neighbors=10)
-    print(f"Recommendations for '{df['cleaned_titles'][recipe_index]}':")
+# Function to recommend recipes based on KNN and recipe ID
+def recommend_recipe(recipe_id):
+    
+    if recipe_id not in df['recipe_id'].values:
+        print("Recipe ID not found.")
+        return []
+    
+    recipe_index = df.index[df['recipe_id'] == recipe_id].tolist()[0]
+    
+    # Get the nearest neighbors for the recipe at the found index
+    distances, indices = knn.kneighbors(recipe_text_features[recipe_index].reshape(1, -1), n_neighbors=10)
+    recommendations = []
+
     for i in range(1, len(distances.flatten())):
-        print(f"{df['recipe_id'][indices.flatten()[i]]}")
+        recommended_recipe_id = df['recipe_id'][indices.flatten()[i]]
+        recommendations.append(recommended_recipe_id)
+    
+    return recommendations
 
-recommend_recipe(1)
+#Replace with an actual recipe ID from your dataset
+recommendations_list = recommend_recipe(220596)
+print("Recommendations list:", recommendations_list)
 
 
-# In[43]:
+# In[38]:
+
+
+pickle.dump(recommend_recipe, open('KNN_model.pkl','wb'))
+loaded_recommend_recipes = pickle.load(open("KNN_model.pkl", "rb"))
+print(loaded_recommend_recipes(222337))
+
+
+# In[39]:
 
 
 df['ingredients_filtered'] = df['ingredients_filtered'].apply(lambda x: ''.join(x))
@@ -599,17 +623,19 @@ df['cleaned_titles'] = df['cleaned_titles'].apply(lambda x: ' '.join(x))
 # FOR THIS MODEL, THE INPUT IS USER_ID AND OUTPUT IS A SERIES OF RECIPE_ID'S
 # 
 
-# In[45]:
+# In[40]:
 
 
 user_recipe_df=df2.merge(df,on='recipe_id')
 
 #user-recipe matrix
+
+user_recipe_df = user_recipe_df[user_recipe_df['rating'] >= 3]
 rating_matrix=user_recipe_df.pivot_table(values='rating',index='user_id',columns='recipe_id').fillna(0)
 rating_matrix
 
 
-# In[48]:
+# In[41]:
 
 
 num_factors=10
@@ -619,17 +645,36 @@ nmf = NMF(n_components=num_factors, random_state=42)
 user_factors=nmf.fit_transform(rating_matrix)
 recipe_factors=nmf.components_
 
+user_id_to_index = {user_id: idx for idx, user_id in enumerate(rating_matrix.index)}
 
+# Function to recommend recipes based on user ID
 def recommend_recipes(user_id, top_n=10):
-    user_factor = user_factors[user_id]
+    if user_id not in user_id_to_index:
+        print(f"User ID {user_id} not found.")
+        return []
+    
+    user_index = user_id_to_index[user_id]
+    user_factor = user_factors[user_index]
     predicted_ratings = user_factor.dot(recipe_factors)
-    top_recipe_indices = predicted_ratings.argsort()[-top_n:]
-    recipe_ids = df['recipe_id'].iloc[top_recipe_indices] 
-    return recipe_ids
+    top_recipe_indices = predicted_ratings.argsort()[-top_n:][::-1]  # Get top_n indices, sorted in descending order
+    
+    # Map indices back to recipe IDs
+    top_recipe_ids = rating_matrix.columns[top_recipe_indices]
+    return top_recipe_ids
 
 #recommendations for user with ID 10
-recommended_recipes=recommend_recipes(100)
-print(recommended_recipes)
+recommended_recipes_CF=recommend_recipes(935)
+
+print(recommended_recipes_CF)
+
+
+# In[47]:
+
+
+pickle.dump(recommend_recipes, open('CF_model.pkl','wb'))
+CF_recommend_recipes = pickle.load(open("CF_model.pkl", "rb"))
+user = 935
+CF_recommend_recipes(user)
 
 
 # In[ ]:
