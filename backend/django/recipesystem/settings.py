@@ -14,11 +14,14 @@ from pathlib import Path
 from datetime import timedelta
 import os
 from dotenv import load_dotenv
+import sys
 
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+ML_DIR = BASE_DIR.parent
+sys.path.append(str(ML_DIR))
 
 
 # Quick-start development settings - unsuitable for production
@@ -46,6 +49,7 @@ INSTALLED_APPS = [
     'authentication',
     'recipe',
     'corsheaders',
+    'recommend',
 ]
 
 CORS_ALLOWED_ORIGINS = [

@@ -22,5 +22,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('authentication/' , include('authentication.urls')),
     path('recipe/' , include('recipe.urls')),
+    path('recommend/' , include('recommend.urls')),
     path('' , views.index , name='index')
 ]
