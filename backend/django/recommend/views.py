@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.db.models import Avg
 import pickle
 import os
 from recipe.models import Recipe, Category
@@ -50,6 +51,14 @@ class UserPrediction(APIView):
 
         # Make prediction
         prediction = UserPrediction.model(int(data))
+        print(prediction)
+        if len(prediction)==0:
+            avg_review = Recipe.objects.aggregate(Avg("total_reviews"))
+            print(avg_review)
+            avg_total_reviews = avg_review['total_reviews__avg']
+            print(avg_total_reviews)
+            prediction = list(Recipe.objects.filter(total_reviews__gte=avg_total_reviews).values_list('recipeid', flat=True).order_by('-rating')[:10])
+            print(prediction)
         queryset = Recipe.objects.filter(recipeid__in=prediction)
         serializer = RecipeSerializer(queryset, many=True)
         data = serializer.data

@@ -47,11 +47,11 @@ class AllRecipesLimited(APIView):
         return Response(data)
 
 class PopularRecipes(generics.ListAPIView):
-    queryset = Recipe.objects.order_by("-total_reviews")[:10]
     serializer_class = RecipeSerializer
 
     def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
+        start_date = timezone.now() - timedelta(days=30)
+        queryset = Recipe.objects.filter(created_at__gte=start_date).order_by("-total_reviews")[:10]
         serializer = RecipeSerializer(queryset, many=True)
         # serializer = self.get_serializer(queryset, many=True)
         data = serializer.data
