@@ -339,6 +339,7 @@ const AddNewRecipe = () => {
                     }
                     required
                     placeholder="Enter ingredients separated by commas"
+                    style={{ width: "600px" }}
                   />
                 </div>
                 {/*cooking time section*/}

@@ -11,6 +11,43 @@
   padding-left: 70px;
   padding-top: 40px;
 }
+/*recommended recipes*/
+.recommendedrecipe {
+  height: 70vh;
+  gap: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc; /* Light gray border */
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.recommendedrecipe h1 {
+  color: black;
+  font-size: 36px;
+  font-family: serif;
+  margin-bottom: 20px;
+}
+
+.recommended-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.recommended-heading,
+.justforyou-heading {
+  background-color: #ffd0af;
+  color: #333;
+  padding: 10px 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.slider-container {
+  width: 80%; /* Adjust width as needed */
+  margin-left: 70px;
+  margin-right: 70px;
+}
 /*new recipe*/
 .newrecipe {
   height: 70vh;

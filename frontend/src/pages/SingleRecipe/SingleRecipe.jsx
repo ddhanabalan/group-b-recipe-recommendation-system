@@ -75,7 +75,7 @@ const SingleRecipe = () => {
       <RecipeDisplay recipe={recipe} />
       <RatingAndReviewBox recipeId={recipe.recipeid} />
       <Reviews reviews={reviews} />
-      <RecommendedRecipes />
+      <RecommendedRecipes recipeId={recipe.recipeid} />
       <Footer />
     </div>
   );
