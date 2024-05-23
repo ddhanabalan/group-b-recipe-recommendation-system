@@ -2,14 +2,14 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from .models import Recipe, Category, RecipeCategories, Favorite, Reviews, History
 from .serializers import RecipeSerializer, FavoriteSerializer, ReviewsSerializer, TitleSerializer
-from .serializers import RecipeWithCategoriesSerializer, CategorySerializer, HistorySerializer
+from .serializers import RecipeWithCategoriesSerializer, CategorySerializer, HistorySerializer, ImageSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 import random
 import string
 from django.utils import timezone
 from datetime import timedelta
-from dateutil.relativedelta import relativedelta
+from rest_framework.parsers import MultiPartParser, FormParser
 
 class AllRecipes(generics.ListAPIView):
     queryset = Recipe.objects.all()
@@ -379,3 +379,14 @@ class NewRecipesLast30DaysDetails(APIView):
             recipe_data['categories'] = list(category_names)
         
         return Response(data)
+    
+class ImageUploadView(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request, *args, **kwargs):
+        serializer = ImageSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

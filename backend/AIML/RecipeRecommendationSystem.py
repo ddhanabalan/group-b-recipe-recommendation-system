@@ -22,8 +22,8 @@ import pickle
 # In[2]:
 
 
-df=pd.read_pickle("./AIML/all_recipes.pkl")
-df2=pd.read_pickle("./AIML/all_users.pkl")
+df=pd.read_pickle("../AIML/all_recipes.pkl")
+df2=pd.read_pickle("../AIML/all_users.pkl")
 df.head()
 
 

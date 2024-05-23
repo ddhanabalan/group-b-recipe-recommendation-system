@@ -59,3 +59,10 @@ class History(models.Model):
 
     class Meta:
         db_table = 'user_history'
+
+class Image(models.Model):
+    image = models.ImageField(upload_to='images/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def get_image_url(self):
+        return self.image.url

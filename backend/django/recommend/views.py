@@ -18,8 +18,8 @@ class CustomUnpickler(pickle.Unpickler):
 
 class RecipePrediction(APIView):
     # Load the model
-    model_path = os.path.join(settings.BASE_DIR, 'AIML', 'KNN_model.pkl')
-    # model_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'AIML', 'KNN_model.pkl')
+    # model_path = os.path.join(settings.BASE_DIR, 'AIML', 'KNN_model.pkl')
+    model_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'AIML', 'KNN_model.pkl')
     with open(model_path, 'rb') as f:
         model = CustomUnpickler(f).load()
     def post(self, request, *args, **kwargs):
@@ -43,8 +43,8 @@ class RecipePrediction(APIView):
     
 class UserPrediction(APIView):
     # Load the model
-    model_path = os.path.join(settings.BASE_DIR, 'AIML', 'CF_model.pkl')
-    # model_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'AIML', 'CF_model.pkl')
+    # model_path = os.path.join(settings.BASE_DIR, 'AIML', 'CF_model.pkl')
+    model_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'AIML', 'CF_model.pkl')
     with open(model_path, 'rb') as f:
         model = CustomUnpickler(f).load()
     def post(self, request, *args, **kwargs):
