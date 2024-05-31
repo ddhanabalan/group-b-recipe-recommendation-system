@@ -61,8 +61,9 @@ class History(models.Model):
         db_table = 'user_history'
 
 class Image(models.Model):
-    image = models.ImageField(upload_to='images/')
+    image = models.ImageField(upload_to='')
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
-    def get_image_url(self):
-        return self.image.url
+    def image_url(self):
+        # return "http://127.0.0.1:8000"+self.image.url/
+        return "http://localhost:8000"+self.image.url

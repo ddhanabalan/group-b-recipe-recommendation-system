@@ -70,6 +70,6 @@ class HistorySerializer(serializers.ModelSerializer):
 class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
-        fields = ['id', 'image', 'uploaded_at', 'get_image_url']
-        read_only_fields = ['get_image_url']
+        fields = ['id', 'image', 'uploaded_at', 'image_url']
+        read_only_fields = ['image_url']
         
