@@ -2,14 +2,22 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from .models import Recipe, Category, RecipeCategories, Favorite, Reviews, History
 from .serializers import RecipeSerializer, FavoriteSerializer, ReviewsSerializer, TitleSerializer
-from .serializers import RecipeWithCategoriesSerializer, CategorySerializer, HistorySerializer
+from .serializers import RecipeWithCategoriesSerializer, CategorySerializer, HistorySerializer, ImageSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 import random
 import string
 from django.utils import timezone
 from datetime import timedelta
-from dateutil.relativedelta import relativedelta
+from rest_framework.parsers import MultiPartParser, FormParser
+
+def AddCategories(data):
+    for recipe_data in data:
+        recipe_id = recipe_data['recipeid']
+        categories = RecipeCategories.objects.filter(recipeid=recipe_id).values_list('category_id', flat=True)
+        category_names = Category.objects.filter(id__in=categories).values_list('name', flat=True)
+        recipe_data['categories'] = list(category_names)
+    return data
 
 class AllRecipes(generics.ListAPIView):
     queryset = Recipe.objects.all()
@@ -21,11 +29,7 @@ class AllRecipes(generics.ListAPIView):
         # serializer = self.get_serializer(queryset, many=True)
         data = serializer.data
         # Fetching categories for each recipe and adding them to the response
-        for recipe_data in data:
-            recipe_id = recipe_data['recipeid']
-            categories = RecipeCategories.objects.filter(recipeid=recipe_id).values_list('category_id', flat=True)
-            category_names = Category.objects.filter(id__in=categories).values_list('name', flat=True)
-            recipe_data['categories'] = list(category_names)
+        data = AddCategories(data)
         return Response(data)
 
 class AllRecipesLimited(APIView):
@@ -38,29 +42,22 @@ class AllRecipesLimited(APIView):
         serializer = RecipeSerializer(queryset, many=True)
         data = serializer.data
         # Fetching categories for each recipe and adding them to the response
-        for recipe_data in data:
-            recipe_id = recipe_data['recipeid']
-            categories = RecipeCategories.objects.filter(recipeid=recipe_id).values_list('category_id', flat=True)
-            category_names = Category.objects.filter(id__in=categories).values_list('name', flat=True)
-            recipe_data['categories'] = list(category_names)
+        data = AddCategories(data)
         
         return Response(data)
 
 class PopularRecipes(generics.ListAPIView):
+    start_date = timezone.now() - timedelta(days=30)
+    queryset = Recipe.objects.filter(created_at__gte=start_date).order_by("-total_reviews")[:10]
     serializer_class = RecipeSerializer
 
     def list(self, request, *args, **kwargs):
-        start_date = timezone.now() - timedelta(days=30)
-        queryset = Recipe.objects.filter(created_at__gte=start_date).order_by("-total_reviews")[:10]
+        queryset = self.get_queryset()
         serializer = RecipeSerializer(queryset, many=True)
         # serializer = self.get_serializer(queryset, many=True)
         data = serializer.data
         # Fetching categories for each recipe and adding them to the response
-        for recipe_data in data:
-            recipe_id = recipe_data['recipeid']
-            categories = RecipeCategories.objects.filter(recipeid=recipe_id).values_list('category_id', flat=True)
-            category_names = Category.objects.filter(id__in=categories).values_list('name', flat=True)
-            recipe_data['categories'] = list(category_names)
+        data = AddCategories(data)
         return Response(data)
     
 class NewRecipes(generics.ListAPIView):
@@ -73,11 +70,7 @@ class NewRecipes(generics.ListAPIView):
         # serializer = self.get_serializer(queryset, many=True)
         data = serializer.data
         # Fetching categories for each recipe and adding them to the response
-        for recipe_data in data:
-            recipe_id = recipe_data['recipeid']
-            categories = RecipeCategories.objects.filter(recipeid=recipe_id).values_list('category_id', flat=True)
-            category_names = Category.objects.filter(id__in=categories).values_list('name', flat=True)
-            recipe_data['categories'] = list(category_names)
+        data = AddCategories(data)
         return Response(data)
 
 class AddFavorite(APIView):
@@ -124,11 +117,7 @@ class AllFavourites(APIView):
         serializer = RecipeSerializer(recipes, many=True)
 
         data = serializer.data
-        for recipe_data in data:
-            recipe_id = recipe_data['recipeid']
-            categories = RecipeCategories.objects.filter(recipeid=recipe_id).values_list('category_id', flat=True)
-            category_names = Category.objects.filter(id__in=categories).values_list('name', flat=True)
-            recipe_data['categories'] = list(category_names)
+        data = AddCategories(data)
 
         return Response(data)
     
@@ -319,11 +308,7 @@ class UserRecipes(APIView):
         serializer = RecipeSerializer(queryset, many=True)
         data = serializer.data
         # Fetching categories for each recipe and adding them to the response
-        for recipe_data in data:
-            recipe_id = recipe_data['recipeid']
-            categories = RecipeCategories.objects.filter(recipeid=recipe_id).values_list('category_id', flat=True)
-            category_names = Category.objects.filter(id__in=categories).values_list('name', flat=True)
-            recipe_data['categories'] = list(category_names)
+        data = AddCategories(data)
         return Response(data)
 
 class UserHistory(APIView):
@@ -372,10 +357,17 @@ class NewRecipesLast30DaysDetails(APIView):
         serializer = RecipeSerializer(queryset, many=True)
         data = serializer.data
         # Fetching categories for each recipe and adding them to the response
-        for recipe_data in data:
-            recipe_id = recipe_data['recipeid']
-            categories = RecipeCategories.objects.filter(recipeid=recipe_id).values_list('category_id', flat=True)
-            category_names = Category.objects.filter(id__in=categories).values_list('name', flat=True)
-            recipe_data['categories'] = list(category_names)
+        data = AddCategories(data)
         
         return Response(data)
+    
+class ImageUploadView(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request, *args, **kwargs):
+        serializer = ImageSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data['image_url'], status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
