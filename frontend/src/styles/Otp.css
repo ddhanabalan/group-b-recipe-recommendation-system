@@ -1,4 +1,4 @@
-.forgotpassword {
+.otp-section {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -6,31 +6,25 @@
   margin: 0;
 }
 
-.card {
-  margin: auto;
-  height: auto;
-}
-
-h1 {
-  color: black;
-  margin-bottom: 20px;
-  font-size: 25px;
-}
-
-form {
-  text-align: left;
-}
-
-table {
+.card-otp {
+  background: white;
+  border-radius: 15px;
+  padding: 20px;
+  max-width: 400px;
   width: 100%;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-td {
-  padding: 10px;
+.otp-head {
+  margin-bottom: 20px;
+  font-family: serif;
+  font-size: 30px;
+  margin-bottom: 10px;
 }
 
 input {
-  width: calc(100% - 20px);
+  width: 100%;
   padding: 8px;
   margin: 5px 0;
   box-sizing: border-box;

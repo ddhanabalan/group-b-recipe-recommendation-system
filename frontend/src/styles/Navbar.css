@@ -104,17 +104,16 @@ nav ul li.selected a {
 .search-history {
   list-style-type: none;
   position: absolute;
-  top: calc(100% + 4px); /* Adjust this value as needed */
+  top: calc(100% + 4px);
   left: 0;
-  background-color: #ffffff; /* Grey background color */
+  background-color: #ffffff;
   border: 1px solid #ccc;
   border-radius: 4px;
-  z-index: 1001; /* Ensure the dropdown is above the search bar */
-
-  overflow-y: auto; /* Enable vertical scrolling if needed */
+  z-index: 1001;
+  overflow-y: auto;
   color: black;
-  width: 300px;
-  font-size: 12px;
+  width: 450px;
+  max-height: 600px;
 }
 .search-item-history {
   background-color: rgb(205, 205, 205);

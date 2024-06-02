@@ -11,6 +11,9 @@ COPY ./requirements.txt /app/
 # # RUN pipenv install --system --deploy
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Download NLTK 'punkt' , 'wordnet' and 'stopwords' data
+RUN python -m nltk.downloader punkt wordnet stopwords
+
 COPY . /app
 
 EXPOSE 8000

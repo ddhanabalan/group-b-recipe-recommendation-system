@@ -1,9 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import "../../styles/SideBar.css";
+import "../../styles/AdminSideBar.css";
 const AdminSideBar = () => {
   return (
-    <div className="sidebar">
+    <div className="admin-sidebar">
       <ul>
         <li>
           <Link to="/dashboard">Dashboard</Link>

@@ -14,11 +14,17 @@ from pathlib import Path
 from datetime import timedelta
 import os
 from dotenv import load_dotenv
+import sys
 
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+ML_DIR = BASE_DIR.parent
+sys.path.append(str(ML_DIR))
+MEDIA_URL = '/media/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR,'django', 'media')
 
 
 # Quick-start development settings - unsuitable for production
@@ -46,7 +52,10 @@ INSTALLED_APPS = [
     'authentication',
     'recipe',
     'corsheaders',
+    'recommend',
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOWED_ORIGINS = [
     ("http://localhost:3000"),

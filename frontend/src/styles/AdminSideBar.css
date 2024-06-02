@@ -1,0 +1,38 @@
+.admin-sidebar {
+  width: 280px;
+  background-color: #ffebdc;
+  color: black;
+  position: relative;
+}
+
+.admin-sidebar ul {
+  list-style-type: none;
+  padding: 0;
+
+  height: 100vh;
+}
+
+.admin-sidebar ul li {
+  padding-top: 15px;
+  padding-left: 40px;
+  padding-bottom: 15px;
+}
+
+.admin-sidebar ul li a {
+  color: black;
+  text-decoration: none;
+  font-size: x-large;
+  font-weight: 300;
+}
+.admin-sidebar::after {
+  content: "";
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 5px;
+  height: 100%;
+  box-shadow: -10px 0px 10px rgba(0, 0, 0, 0.1);
+}
+.admin-sidebar ul li:hover {
+  background-color: #ffd3b1;
+}

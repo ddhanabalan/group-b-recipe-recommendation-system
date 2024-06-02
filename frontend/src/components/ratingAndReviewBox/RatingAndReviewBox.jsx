@@ -2,8 +2,15 @@ import React, { useState } from "react";
 import { MdOutlineStar } from "react-icons/md";
 import "../../styles/RatingAndReviewBox.css";
 import { FaRegCircleUser } from "react-icons/fa6";
-import { getUserId } from "../../utils/auth";
+import {
+  getUserId,
+  getUserName,
+  getAuthToken,
+  clearAuthData,
+} from "../../utils/auth";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 const colors = {
   orange: "rgb(255, 174, 0)",
   grey: "#a9a9a9",
@@ -15,6 +22,7 @@ const RatingAndReviewBox = (props) => {
   const [currentValue, setCurrentValue] = useState(0);
   const [hoverValue, setHoverValue] = useState(undefined);
   const [reviewText, setReviewText] = useState("");
+
   const handleClick = (value) => {
     setCurrentValue(value);
   };
@@ -28,26 +36,50 @@ const RatingAndReviewBox = (props) => {
   };
 
   const handlePostReview = async () => {
+    const history = useNavigate;
+
     try {
       const userId = getUserId();
+      const userName = getUserName();
+      const authToken = getAuthToken();
+
+      if (!userId || !userName || !reviewText || !currentValue) {
+        console.error("Missing required fields");
+        return;
+      }
+
       const reviewData = {
         userid: userId,
+        username: userName,
         recipeid: recipeId,
         review: reviewText,
+        rating: currentValue,
       };
-      console.log("Data sending to API:", reviewData);
+
       const response = await axios.post(
         "http://localhost:8000/recipe/addreview/",
-        reviewData, // Ensure review data is correct
+        reviewData,
         {
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
           },
         }
       );
-      console.log("Review posted successfully:", response.data);
+
+      setCurrentValue(0);
+      setReviewText("");
     } catch (error) {
       console.error("Error posting review:", error.message);
+      if (error.response) {
+        if (error.response.status === 401) {
+          clearAuthData();
+          window.location.href = "/login";
+        } else {
+          console.error("Server responded with status:", error.response.status);
+          console.error("Response data:", error.response.data);
+        }
+      }
     }
   };
 
@@ -62,7 +94,7 @@ const RatingAndReviewBox = (props) => {
         />
       </div>
       <div className="ratingContainer-bottom">
-        {/*} <div className="ratingContainer-star">
+        <div className="ratingContainer-star">
           Your Rating :
           {stars.map((_, index) => {
             return (
@@ -79,12 +111,12 @@ const RatingAndReviewBox = (props) => {
                     : colors.grey
                 }
                 onClick={() => handleClick(index + 1)}
-                onMouseOver={() => handleClick(index + 1)}
+                onMouseOver={() => handleMouseOver(index + 1)}
                 onMouseLeave={handleMouseLeave}
               />
             );
           })}
-        </div>*/}
+        </div>
         <button
           style={{
             borderRadius: 15,

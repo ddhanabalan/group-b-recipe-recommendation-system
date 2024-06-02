@@ -2,19 +2,22 @@ import React, { useContext, useEffect, useState } from "react";
 import Items from "../Items/Items";
 import { RecipeContext } from "../../context/recipeContext";
 import "../../styles/SavedItems.css";
-import { getUserId } from "../../utils/auth";
-import Swal from "sweetalert2"; // Import SweetAlert
+import { clearAuthData, getAuthToken, getUserId } from "../../utils/auth";
+import Swal from "sweetalert2";
 
 const SavedItems = () => {
   const { unsaveRecipe } = useContext(RecipeContext);
   const [savedRecipes, setSavedRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
 
   useEffect(() => {
     const fetchSavedRecipes = async () => {
       try {
         const userId = getUserId();
+
         const response = await fetch("http://localhost:8000/recipe/saved/", {
           method: "POST",
           headers: {
@@ -29,9 +32,7 @@ const SavedItems = () => {
 
         const data = await response.json();
 
-        // Check if the response indicates "Recipe already favorited"
         if (data.error && data.error === "Recipe already favorited") {
-          // Use SweetAlert to show an alert
           Swal.fire({
             icon: "info",
             title: "Already Favorited",
@@ -46,7 +47,6 @@ const SavedItems = () => {
         setSavedRecipes(data || []);
         setLoading(false);
       } catch (error) {
-        // Check if the error is related to the "Recipe already favorited" case
         if (error.message !== "Failed to fetch saved recipes") {
           setError(error.message);
         }
@@ -56,9 +56,54 @@ const SavedItems = () => {
     fetchSavedRecipes();
   }, []);
 
-  const handleRemoveRecipe = (recipeId) => {
-    unsaveRecipe(recipeId);
+  const handleRemoveRecipe = async (recipeId) => {
+    try {
+      const userId = getUserId();
+      const authToken = getAuthToken();
+      const response = await fetch(
+        "http://localhost:8000/recipe/deletefavourite/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify({ userid: userId, recipeid: recipeId }),
+        }
+      );
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          clearAuthData();
+          window.location.href = "/login";
+          return;
+        }
+        throw new Error("Failed to remove recipe");
+      }
+
+      setSavedRecipes((prevRecipes) =>
+        prevRecipes.filter((recipe) => recipe.recipeid !== recipeId)
+      );
+
+      Swal.fire({
+        title: "Removed",
+        text: "Recipe has been removed from your favorites.",
+        confirmButtonText: "OK",
+      });
+    } catch (error) {
+      Swal.fire({
+        title: "Error",
+        text: error.message,
+        confirmButtonText: "OK",
+      });
+    }
   };
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = savedRecipes.slice(indexOfFirstItem, indexOfLastItem);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -73,9 +118,9 @@ const SavedItems = () => {
       <hr />
       <div>
         <div className="saveditems-format">
-          {savedRecipes && savedRecipes.length > 0 ? (
+          {currentItems && currentItems.length > 0 ? (
             <div className="saveditems-format">
-              {savedRecipes.map((item, i) => (
+              {currentItems.map((item, i) => (
                 <div className="saved-recipe-card" key={i}>
                   <Items
                     recipeid={item.recipeid}
@@ -85,7 +130,7 @@ const SavedItems = () => {
                     calories={item.calories}
                     rating={item.rating}
                   />
-                  <button onClick={() => handleRemoveRecipe(item.id)}>
+                  <button onClick={() => handleRemoveRecipe(item.recipeid)}>
                     Remove
                   </button>
                 </div>
@@ -95,6 +140,22 @@ const SavedItems = () => {
             <p>No saved recipes found.</p>
           )}
         </div>
+        <nav>
+          <ul className="pagination">
+            {Array.from({
+              length: Math.ceil(savedRecipes.length / itemsPerPage),
+            }).map((_, index) => (
+              <li key={index} className="page-item">
+                <button
+                  onClick={() => paginate(index + 1)}
+                  className="page-link"
+                >
+                  {index + 1}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </nav>
       </div>
     </div>
   );

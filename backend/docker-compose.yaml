@@ -31,7 +31,8 @@ services:
     command: sh -c "python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"
     restart: always
     volumes:
-      - .:/app/django
+      - ./django:/app
+      - ./AIML:/app/AIML
     ports:
       - "8000:8000"
     depends_on:

@@ -1,7 +1,103 @@
 .dashboard-area {
   display: flex;
-  flex-direction: row;
 }
+
 .userslist-content {
-  border: 2px solid black;
+  flex-grow: 1;
+  padding: 20px;
+}
+
+.feedback-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.search-input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 300px;
+  font-size: 16px;
+}
+
+.sort-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  background-color: #e19660;
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.sort-button:hover {
+  background-color: #dc6c1c;
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.users-table th,
+.users-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.users-table th {
+  background-color: #f2f2f2;
+}
+
+.pagination-buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.remove-button {
+  background-color: red;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.remove-button:hover {
+  background-color: darkred;
+}
+.highlighted-row {
+  background-color: #ffcccc;
+}
+.pagination-input-container {
+  margin-bottom: 20px;
+}
+
+.pagination-input-form {
+  display: flex;
+}
+
+.pagination-input-field {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-right: 10px;
+  font-size: 16px;
+}
+
+.pagination-input-button {
+  padding: 8px 16px;
+  background-color: #e19660;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.pagination-input-button:hover {
+  background-color: #c17645;
 }

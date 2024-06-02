@@ -14,16 +14,15 @@
 .profile-icon {
   margin-right: 30px;
 }
-.head {
-  padding-top: 15px;
-}
+
 .user-content-section {
   flex: 1;
   padding: 20px;
 }
 .user-content-section h2 {
-  font-size: 35px;
-
+  font-family: serif;
+  font-size: 33px;
+  margin-bottom: 10px;
   margin-bottom: 20px;
 }
 .user-details {
@@ -33,31 +32,44 @@
 .detail-item {
   margin-bottom: 10px;
   display: flex;
+  font-size: 18px;
 }
 
 .detail-item label {
   font-weight: bold;
   margin-right: 10px;
+  font-size: 18px;
 }
 
 .button-group button {
   margin-right: 10px;
 }
 
-.edit-button {
+.okbtn {
   background-color: #e16d19;
   color: #fff;
   border: none;
-  padding: 8px 12px;
+  padding: 6px 12px;
   border-radius: 5px;
   cursor: pointer;
+  width: 100px;
+  font-size: 16px;
 }
-
-.password-button {
-  background-color: #e16d19;
+.username_field {
+  width: 300px;
+  padding: 8px;
+  margin: 5px 0;
+  box-sizing: border-box;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-right: 10px;
+}
+.changepasswordbtn {
+  background: #e1792f;
   color: #fff;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 5px;
   cursor: pointer;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  font-size: medium;
 }

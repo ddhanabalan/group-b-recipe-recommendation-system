@@ -3,14 +3,9 @@ import "../../styles/Navbar.css";
 import logo_dark from "../../assets/logo.svg";
 import { Search } from "@mui/icons-material";
 import { RecipeContext } from "../../context/recipeContext";
-import {
-  isAuthenticated,
-  getAuthToken,
-  clearAuthToken,
-  clearUserId,
-} from "../../utils/auth";
+import { isAuthenticated, getAuthToken, clearAuthData } from "../../utils/auth";
 import { FaUser } from "react-icons/fa";
-
+import axios from "axios";
 function Navbar() {
   const { allRecipes } = useContext(RecipeContext);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -22,7 +17,6 @@ function Navbar() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    console.log("Stored Token:", storedToken);
     const storedSearchHistory = sessionStorage.getItem("searchHistory");
     if (storedSearchHistory) {
       setSearchHistory(JSON.parse(storedSearchHistory));
@@ -109,11 +103,28 @@ function Navbar() {
     }
   };*/
   }
-  const handleLogout = () => {
-    clearAuthToken();
-    clearUserId();
-
-    window.location.href = "/login";
+  const handleLogout = async () => {
+    try {
+      const authToken = getAuthToken();
+      await axios.post(
+        "http://localhost:8000/authentication/logout/",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+      clearAuthData();
+      window.location.href = "/login";
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        clearAuthData();
+        window.location.href = "/login";
+      } else {
+        console.error("Error logging out:", error);
+      }
+    }
   };
   const toggleDropdown = () => {
     setOpen(!open);
@@ -208,7 +219,21 @@ function Navbar() {
             </li>
             {authToken ? (
               <li>
-                <span className="user-heading" onClick={toggleDropdown}>
+                <span
+                  className="user-heading"
+                  style={{
+                    cursor: "pointer",
+                  }}
+                  onClick={toggleDropdown}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = "#e49963";
+                    e.target.style.textDecoration = "underline";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = "black";
+                    e.target.style.textDecoration = "none";
+                  }}
+                >
                   User
                 </span>
                 {open && (
@@ -217,11 +242,18 @@ function Navbar() {
                       <a href="/user/savedrecipes">Dashboard</a>
                     </li>
                     <li>
-                      <a href="/passwordreset">Change Password</a>
+                      <a href="/changepassword">Change Password</a>
                     </li>
                     <li>
                       <button
-                        style={{ border: "none", background: "none" }}
+                        style={{
+                          border: "none",
+                          background: "none",
+                          color: "black",
+                          fontSize: "12px",
+                          paddingLeft: 0,
+                          cursor: "pointer",
+                        }}
                         onClick={handleLogout}
                       >
                         Logout
@@ -238,8 +270,17 @@ function Navbar() {
                     border: "2px dashed #e49963",
                     padding: " 8px 30px",
                     color: "black",
+                    cursor: "pointer",
                   }}
                   onClick={() => (window.location.href = "/login")}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = "#e49963";
+                    e.target.style.textDecoration = "underline";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = "black";
+                    e.target.style.textDecoration = "none";
+                  }}
                 >
                   Login
                 </span>

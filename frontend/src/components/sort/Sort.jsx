@@ -12,13 +12,6 @@ const Sort = () => {
   return (
     <div style={{ fontFamily: "serif", fontSize: 20, fontWeight: 300 }}>
       <form className="custom-form" action="#">
-        <label
-          htmlFor="sort"
-          style={{ fontFamily: "serif", fontSize: 15, padding: 10 }}
-          className="form-label"
-        >
-          Sort By:
-        </label>
         <select
           name="sort"
           id="sort"
@@ -27,11 +20,12 @@ const Sort = () => {
           value={sortOption}
           onChange={handleSortChange}
         >
-          <option value="lowestCalorie">Calorie(low)</option>
-          <option value="highestRating">Rating(high)</option>
+          <option value="default">Sort by</option>
+          <option value="lowestCalorie">Calorie (low)</option>
+          <option value="highestRating">Rating (high)</option>
           <option value="alphabeticalAsc">(a-z)</option>
           <option value="alphabeticalDesc">(z-a)</option>
-          <option value="leasttime">Time(low)</option>
+          <option value="leasttime">Time (low)</option>
         </select>
       </form>
     </div>
