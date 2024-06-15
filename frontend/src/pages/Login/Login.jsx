@@ -4,6 +4,8 @@ import logo_dark from "../../assets/logo.svg";
 import login_image from "../../assets/loginpic.jpg";
 import "../../styles/Login.css";
 import Validation from "./Validation";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import {
   setAuthToken,
   setUserId,
@@ -56,6 +58,20 @@ function Login() {
       if (response.data.user.role === "admin") {
         history("/dashboard");
       } else {
+        toast.success("Logged in successfully.", {
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          closeButton: false,
+          style: {
+            height: "50px",
+            border: "2px solid #ccc",
+            borderRadius: "5px",
+            padding: "10px",
+          },
+        });
         history("/home");
       }
     } catch (error) {
