@@ -29,9 +29,13 @@ const Recipe = () => {
       filter.maxCalories === null || recipe.calories <= filter.maxCalories;
     const seasonFilter = !filter.season || recipe.season === filter.season;
     const timeOfDayFilter =
-      !filter.timeOfDay || recipe.daytimeofcooking === filter.timeOfDay;
+      !filter.timeOfDay ||
+      recipe.daytimeofcooking
+        .toLowerCase()
+        .includes(filter.timeOfDay.toLowerCase());
     const vegNonVegFilter =
-      !filter.vegNonVeg || recipe.veg_nonveg === filter.vegNonVeg;
+      !filter.vegNonVeg ||
+      recipe.veg_nonveg.toLowerCase() === filter.vegNonVeg.toLowerCase();
 
     return (
       (recipe.title.toLowerCase().includes(searchQueryLowerCase) ||

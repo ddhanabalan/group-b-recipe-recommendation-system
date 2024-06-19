@@ -15,6 +15,7 @@ import {
   getAuthToken,
 } from "../../utils/auth";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const UserProfile = () => {
   const history = useNavigate();
@@ -52,25 +53,41 @@ const UserProfile = () => {
       );
       setUserName(editedData.name);
       setIsEditing(false);
-      alert("Username updated successfully!");
+      toast.success("username updated successfully.", {
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        closeButton: false,
+        style: {
+          height: "50px",
+          border: "2px solid #ccc",
+          borderRadius: "5px",
+          padding: "10px",
+        },
+      });
     } catch (error) {
       if (error.response && error.response.status === 401) {
         console.error("Unauthorized error:", error);
         history("/login");
       } else {
         console.error("Error updating username:", error);
-        alert("Failed to update username. Please try again later.");
+        toast.error("Failed to update username. Please try again later.");
       }
     }
   };
+
   React.useEffect(() => {
     if (!isAuthenticated() || getUserRole() !== "user") {
       history("/login");
     }
   }, [history]);
+
   const handleChangePassword = () => {
     history("/changepassword");
   };
+
   return (
     <div>
       <Navbar />

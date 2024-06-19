@@ -10,7 +10,6 @@ import "../../styles/User.css";
 const UserSavedRecipes = () => {
   const history = useNavigate();
 
-  // Check authentication and user role
   if (!isAuthenticated() || getUserRole() !== "user") {
     history("/login");
     return null;

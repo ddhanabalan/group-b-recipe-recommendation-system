@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../../styles/PasswordReset.css";
+import "../../styles/PasswordReset.css"; // Make sure to adjust this import if needed
 import { useNavigate } from "react-router";
 
 const PasswordReset = () => {
@@ -53,7 +53,7 @@ const PasswordReset = () => {
       history("/login");
     } catch (error) {
       console.error("Error updating password:", error);
-      alert("Failed to update password.");
+      setError("Failed to update password.");
     }
   };
 
@@ -63,109 +63,115 @@ const PasswordReset = () => {
         <h1 className="reset-head" align="center">
           Password Reset
         </h1>
-        <form id="form1" name="form1" onSubmit={handleSubmit}>
-          <table width="285" rules="none" cellPadding="10px" id="reset-table">
-            <tbody>
-              <tr>
-                <td
-                  style={{
-                    fontSize: "20px",
-                    fontFamily: "Playfair Display, serif",
-                  }}
-                >
-                  New Password:
-                </td>
-                <td
-                  style={{
-                    fontSize: "20px",
-                    fontFamily: "Playfair Display, serif",
-                  }}
-                >
-                  <input
-                    type="password"
-                    name="txtnewpwd"
-                    id="txtnewpwd"
-                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{6,20}"
-                    title="Must contain at least one number, one uppercase and one special character, one lowercase letter, and be 6 to 20 characters long"
-                    value={newPassword}
-                    onChange={handleChange}
-                  />
-                  <i
-                    id="togglePassword"
-                    className="fas fa-eye"
+        <div className="form-container">
+          <form id="form1" name="form1" onSubmit={handleSubmit}>
+            <table width="285" rules="none" cellPadding="10px" id="reset-table">
+              <tbody>
+                <tr>
+                  <td
                     style={{
-                      color: "orange",
-                      left: "133px",
-                      top: "-32px",
-                      position: "relative",
+                      fontSize: "20px",
+                      fontFamily: "Playfair Display, serif",
                     }}
-                  ></i>
-                </td>
-              </tr>
-              <tr>
-                <td
-                  style={{
-                    fontSize: "20px",
-                    fontFamily: "Playfair Display, serif",
-                  }}
-                >
-                  Confirm New Password:
-                </td>
-                <td
-                  style={{
-                    fontSize: "20px",
-                    fontFamily: "Playfair Display, serif",
-                  }}
-                >
-                  <input
-                    type="password"
-                    name="txtconpwd"
-                    id="txtconpwd"
-                    value={confirmNewPassword}
-                    onChange={handleChange}
-                  />
-                  <i
-                    id="togglePassword2"
-                    className="fas fa-eye"
+                  >
+                    New Password:
+                  </td>
+                  <td
                     style={{
-                      color: "orange",
-                      left: "133px",
-                      top: "-32px",
-                      position: "relative",
+                      fontSize: "20px",
+                      fontFamily: "Playfair Display, serif",
                     }}
-                  ></i>
-                </td>
-              </tr>
-              <tr>
-                <td
-                  style={{
-                    fontSize: "20px",
-                    fontFamily: "Playfair Display, serif",
-                  }}
-                  colSpan="2"
-                  align="center"
-                >
-                  <input
-                    type="submit"
-                    name="btnsubmit"
-                    id="btnsubmit"
-                    value="Update"
+                  >
+                    <input
+                      type="password"
+                      name="txtnewpwd"
+                      id="txtnewpwd"
+                      pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{6,20}"
+                      title="Must contain at least one number, one uppercase and one special character, one lowercase letter, and be 6 to 20 characters long"
+                      value={newPassword}
+                      onChange={handleChange}
+                    />
+                    <i
+                      id="togglePassword"
+                      className="fas fa-eye"
+                      style={{
+                        color: "orange",
+                        left: "133px",
+                        top: "-32px",
+                        position: "relative",
+                      }}
+                    ></i>
+                  </td>
+                </tr>
+                <tr>
+                  <td
                     style={{
-                      background: " #e1792f",
-                      color: "#fff",
-                      cursor: "pointer",
-                      padding: "10px",
-                      border: "none",
-                      borderRadius: "5px",
-                      width: "100%",
+                      fontSize: "20px",
+                      fontFamily: "Playfair Display, serif",
                     }}
-                  />
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </form>
-        {error && <p style={{ color: "red" }}>{error}</p>}
+                  >
+                    Confirm New Password:
+                  </td>
+                  <td
+                    style={{
+                      fontSize: "20px",
+                      fontFamily: "Playfair Display, serif",
+                    }}
+                  >
+                    <input
+                      type="password"
+                      name="txtconpwd"
+                      id="txtconpwd"
+                      value={confirmNewPassword}
+                      onChange={handleChange}
+                    />
+                    <i
+                      id="togglePassword2"
+                      className="fas fa-eye"
+                      style={{
+                        color: "orange",
+                        left: "133px",
+                        top: "-32px",
+                        position: "relative",
+                      }}
+                    ></i>
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    style={{
+                      fontSize: "20px",
+                      fontFamily: "Playfair Display, serif",
+                    }}
+                    colSpan="2"
+                    align="center"
+                  >
+                    <input
+                      type="submit"
+                      name="btnsubmit"
+                      id="btnsubmit"
+                      value="Update"
+                      style={{
+                        background: "#e1792f",
+                        color: "#fff",
+                        cursor: "pointer",
+                        padding: "10px",
+                        border: "none",
+                        borderRadius: "5px",
+                        width: "100%",
+                      }}
+                    />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </form>
+          {error && (
+            <p className="error-message" align="center">
+              {error}
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

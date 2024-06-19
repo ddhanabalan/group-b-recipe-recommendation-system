@@ -8,6 +8,8 @@ const AddedItems = () => {
   const [addedRecipes, setAddedRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
 
   useEffect(() => {
     const fetchAddedRecipes = async () => {
@@ -40,6 +42,12 @@ const AddedItems = () => {
     fetchAddedRecipes();
   }, []);
 
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = addedRecipes.slice(indexOfFirstItem, indexOfLastItem);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -53,9 +61,9 @@ const AddedItems = () => {
       <hr />
       <div>
         <div className="saveditems-format">
-          {addedRecipes && addedRecipes.length > 0 ? (
+          {currentItems && currentItems.length > 0 ? (
             <div className="saveditems-format">
-              {addedRecipes.map((item, i) => (
+              {currentItems.map((item, i) => (
                 <div className="saved-recipe-card" key={i}>
                   <Items
                     recipeid={item.recipeid}
@@ -73,6 +81,29 @@ const AddedItems = () => {
           )}
         </div>
       </div>
+      {addedRecipes.length > itemsPerPage && (
+        <nav>
+          <ul className="pagination">
+            {Array.from({
+              length: Math.ceil(addedRecipes.length / itemsPerPage),
+            }).map((_, index) => (
+              <li
+                key={index}
+                className={`page-item ${
+                  currentPage === index + 1 ? "active" : ""
+                }`}
+              >
+                <button
+                  onClick={() => paginate(index + 1)}
+                  className="page-link"
+                >
+                  {index + 1}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )}
     </div>
   );
 };

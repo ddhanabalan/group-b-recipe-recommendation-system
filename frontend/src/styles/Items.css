@@ -6,7 +6,11 @@
 }
 .img {
   width: 350px;
-  object-fit: contain;
+  height: 213px;
+  object-fit: cover;
+}
+.details-container {
+  height: 122px;
 }
 *.item h3 {
   margin: 6px 0px;

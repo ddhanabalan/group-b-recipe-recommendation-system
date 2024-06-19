@@ -10,7 +10,7 @@ import {
 } from "../../utils/auth";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import Swal from "sweetalert2";
+
 const colors = {
   orange: "rgb(255, 174, 0)",
   grey: "#a9a9a9",
@@ -23,28 +23,16 @@ const RatingAndReviewBox = (props) => {
   const [hoverValue, setHoverValue] = useState(undefined);
   const [reviewText, setReviewText] = useState("");
 
-  const handleClick = (value) => {
-    setCurrentValue(value);
-  };
-
-  const handleMouseOver = (value) => {
-    setHoverValue(value);
-  };
-
-  const handleMouseLeave = () => {
-    setHoverValue(null);
-  };
-
   const handlePostReview = async () => {
-    const history = useNavigate;
-
     try {
       const userId = getUserId();
       const userName = getUserName();
       const authToken = getAuthToken();
 
       if (!userId || !userName || !reviewText || !currentValue) {
-        console.error("Missing required fields");
+        alert(
+          "Please fill in all fields: rating and review text are required."
+        );
         return;
       }
 
@@ -67,8 +55,12 @@ const RatingAndReviewBox = (props) => {
         }
       );
 
+      // Clear form fields after successful submission
       setCurrentValue(0);
       setReviewText("");
+
+      // Show success alert
+      alert("Review submitted successfully!");
     } catch (error) {
       console.error("Error posting review:", error.message);
       if (error.response) {
@@ -78,9 +70,24 @@ const RatingAndReviewBox = (props) => {
         } else {
           console.error("Server responded with status:", error.response.status);
           console.error("Response data:", error.response.data);
+          alert("Failed to submit review. Please try again later.");
         }
+      } else {
+        alert("Failed to submit review. Please try again later.");
       }
     }
+  };
+
+  const handleClick = (value) => {
+    setCurrentValue(value);
+  };
+
+  const handleMouseOver = (value) => {
+    setHoverValue(value);
+  };
+
+  const handleMouseLeave = () => {
+    setHoverValue(null);
   };
 
   return (

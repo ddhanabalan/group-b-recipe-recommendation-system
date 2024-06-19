@@ -11,6 +11,7 @@ const RecipeContextProvider = ({ children }) => {
     "Main Dish",
     "Sauces and Condiments",
     "Desserts",
+    "Beverages",
     "European",
     "Soups, Stews and Chili",
     "Seafood",
@@ -64,8 +65,13 @@ const RecipeContextProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [distinctSeasons, setDistinctSeasons] = useState([]);
-  const [distinctDayOfTimeCooking, setDistinctDayOfTimeCooking] = useState([]);
-  const [distinctVegNonVeg, setDistinctVegNonVeg] = useState([]);
+  const [distinctDayOfTimeCooking] = useState([
+    "Breakfast",
+    "Dinner",
+    "Lunch",
+    "Brunch",
+  ]);
+  const [distinctVegNonVeg] = useState(["Non-veg", "Veg"]);
 
   useEffect(() => {
     if (!dataLoaded) {
@@ -94,18 +100,16 @@ const RecipeContextProvider = ({ children }) => {
   useEffect(() => {
     if (!loading && allRecipes) {
       const seasonsSet = new Set();
-      const dayOfTimeCookingSet = new Set();
-      const vegNonVegSet = new Set();
 
       allRecipes.forEach((recipe) => {
-        seasonsSet.add(recipe.season);
-        dayOfTimeCookingSet.add(recipe.daytimeofcooking);
-        vegNonVegSet.add(recipe.veg_nonveg);
+        if (recipe.season) {
+          recipe.season
+            .split("/")
+            .forEach((season) => seasonsSet.add(season.trim()));
+        }
       });
 
       setDistinctSeasons(Array.from(seasonsSet));
-      setDistinctDayOfTimeCooking(Array.from(dayOfTimeCookingSet));
-      setDistinctVegNonVeg(Array.from(vegNonVegSet));
     }
   }, [allRecipes, loading]);
 

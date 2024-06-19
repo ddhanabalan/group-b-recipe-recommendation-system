@@ -3,7 +3,7 @@ import logo_dark from "../../assets/logo.svg";
 import Sign_image from "../../assets/signuppic.jpg";
 import "../../styles/Signup.css";
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; // Import useHistory for redirection
+import { useNavigate } from "react-router-dom";
 
 function Signup() {
   const [formData, setFormData] = useState({
@@ -13,7 +13,10 @@ function Signup() {
   });
 
   const [passwordError, setPasswordError] = useState("");
-  const history = useNavigate(); // Create history object for redirection
+  const [usernameError, setUsernameError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [generalError, setGeneralError] = useState("");
+  const history = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -30,6 +33,10 @@ function Signup() {
 
   const handleSignup = async (e) => {
     e.preventDefault();
+    setPasswordError("");
+    setUsernameError("");
+    setEmailError("");
+    setGeneralError("");
 
     if (!validatePassword(formData.password)) {
       setPasswordError(
@@ -39,31 +46,35 @@ function Signup() {
     }
 
     try {
-      const response = await fetch(
+      const response = await axios.post(
         "http://localhost:8000/authentication/signup/",
         {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            username: formData.username,
-            email: formData.email,
-            password: formData.password,
-          }),
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
         }
       );
 
-      if (response.ok) {
+      if (response.status === 201) {
         const email = formData.email;
         localStorage.setItem("signupEmail", email);
         history(`/otp/${email}`);
-      } else {
-        const errorData = await response.json();
-        console.error("Signup failed:", errorData);
       }
     } catch (error) {
-      console.error("Error during signup:", error);
+      if (error.response && error.response.data) {
+        const errorData = error.response.data;
+        if (errorData.username) {
+          setUsernameError(errorData.username.join(" "));
+        }
+        if (errorData.email) {
+          setEmailError(errorData.email.join(" "));
+        }
+        if (!errorData.username && !errorData.email) {
+          setGeneralError("Signup failed. Please try again.");
+        }
+      } else {
+        setGeneralError("Error during signup. Please try again.");
+      }
     }
   };
 
@@ -104,18 +115,17 @@ function Signup() {
             value={formData.password}
             onChange={handleInputChange}
           />
-          {passwordError && (
-            <p className="error-message">
-              Password must be at least 6 characters long and contain <br />
-              digits, special characters, capital letters, and small letters.
-            </p>
-          )}
+          {passwordError && <p className="error-message">{passwordError}</p>}
+          {usernameError && <p className="error-message">{usernameError}</p>}
+          {emailError && <p className="error-message">{emailError}</p>}
+          {generalError && <p className="error-message">{generalError}</p>}
           <div className="form-button">
             <button type="submit" className="signup-button">
               SIGN UP
             </button>
           </div>
         </form>
+
         <p className="login-link">
           Already have an account ? <a href="/login">Login</a>
         </p>

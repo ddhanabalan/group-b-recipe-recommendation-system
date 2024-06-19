@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import "../../styles/Otp.css";
+import WelcomeCard from "../Otp/Welcome-card";
 
 const Otp = () => {
   const location = useLocation();
@@ -10,6 +11,7 @@ const Otp = () => {
   });
 
   const [verificationError, setVerificationError] = useState("");
+  const [showWelcomeCard, setShowWelcomeCard] = useState(false);
 
   useEffect(() => {
     const pathnameSegments = location.pathname.split("/");
@@ -31,11 +33,6 @@ const Otp = () => {
   const handleOTPSubmit = async (e) => {
     e.preventDefault();
     try {
-      console.log("Request body sent to server:", {
-        email: formData.email,
-        vericode: formData.otp,
-      });
-
       const response = await fetch(
         "http://localhost:8000/authentication/verify-email/",
         {
@@ -51,11 +48,7 @@ const Otp = () => {
       );
 
       if (response.ok) {
-        const data = await response.json();
-        console.log("Response from server:", data);
-        alert("Email verified successfully.");
-
-        window.location.href = "/login";
+        setShowWelcomeCard(true);
       } else {
         const data = await response.json();
         setVerificationError(data.message || "Failed to verify email.");
@@ -64,6 +57,11 @@ const Otp = () => {
       console.error("Error verifying email:", error.message);
       setVerificationError("Failed to verify email.");
     }
+  };
+
+  const handleCloseWelcomeCard = () => {
+    setShowWelcomeCard(false);
+    window.location.href = "/login";
   };
 
   return (
@@ -124,6 +122,7 @@ const Otp = () => {
           </table>
         </form>
       </div>
+      {showWelcomeCard && <WelcomeCard onClose={handleCloseWelcomeCard} />}
     </div>
   );
 };
