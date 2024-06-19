@@ -23,8 +23,23 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 ML_DIR = BASE_DIR.parent
 sys.path.append(str(ML_DIR))
 MEDIA_URL = '/media/'
-# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_ROOT = os.path.join(BASE_DIR,'django', 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+CELERY_BROKER_URL = 'redis://redis:6379/0'
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    'update-recommendation-model-every-day': {
+        'task': 'recipe.tasks.update_recommendation_model_task',
+        'schedule': crontab(hour=0, minute=0),  # Schedule it to run daily at midnight
+    },
+}
 
 
 # Quick-start development settings - unsuitable for production
