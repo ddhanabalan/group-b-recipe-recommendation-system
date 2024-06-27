@@ -30,36 +30,20 @@ df.head()
 # In[3]:
 
 
-df2.head()
-
-
-# In[4]:
-
-
-null_records = df[df.isnull().any(axis=1)]
-print(null_records)
-
-
-# We Find one record which has a Null Attribute that can be filled manually with relevant data. 
-
-# In[5]:
-
-
 df.at[776, 'Veg/NonVeg'] = 'Non-Veg'
 
 
 # Rest of the Null Attributes are beyond repair. so we drop them from the dataset for better model functionality.
 
-# In[6]:
+# In[4]:
 
 
 df = df.dropna()
 df.drop_duplicates(inplace=True)
 df = df.reset_index(drop=True)
-df.info()
 
 
-# In[7]:
+# In[5]:
 
 
 df2.dropna()
@@ -67,31 +51,48 @@ df2.drop_duplicates(inplace=True)
 df2=df2.reset_index(drop=True)
 
 def processing(value):
-    return int(value)
+    try:
+        return int(value)
+    except:
+        return 0
 
 df2['rating']=df2['rating'].apply(processing)
 df2['recipe_id']=df2['recipe_id'].apply(processing)
 df2['user_id']=df2['user_id'].apply(processing)
 
-df2['date'] = pd.to_datetime(df2['date'], format='%Y-%m-%d')
+try:
+    df2['date'] = pd.to_datetime(df2['date'], format='%m/%d/%Y', errors='raise')
+except ValueError:
+    # Handle mixed date formats
+    df2['date'] = pd.to_datetime(df2['date'], format='mixed', dayfirst=False, errors='coerce')
 
 
 # **CONVERTING THE FEATURES TO RELEVANT DATATYPE - REVIEWS, CALORIES, CATEGORY, INGREDIENTS**
 
-# In[8]:
+# In[6]:
 
 
 def replace_k(value):
-    if 'k' in value:
-        value=str(value).split('k')
-        value=value[0]
-        value=float(value)*1000
-    return value
+    try:
+        if 'k' in value:
+            value=str(value).split('k')
+            value=value[0]
+            value=float(value)*1000
+        return value
+    except:
+        return value
 
 df['reviews']=df['reviews'].apply(replace_k)
 
 def cat_2(value):
-    return eval(value)
+    try:
+        return eval(value)
+    except:
+        if isinstance(value, str):
+            # Split the string on '|' to get individual categories
+            categories = value.split('|')
+            return categories
+        return value
 
 df['category']=df['category'].apply(cat_2)
 df['ingredients']=df['ingredients'].apply(cat_2)
@@ -99,18 +100,17 @@ df['ingredients']=df['ingredients'].apply(cat_2)
 df['reviews']=df['reviews'].apply(processing)
 
 def calories(value):
-    if value.isdigit():
-        return int(value)
-    else:
-        return 1
+    if type(value)!=int:
+        if value.isdigit():
+            return int(value)
+        else:
+            return 1
 df['calories']=df['calories'].apply(calories)
 
 df = df.rename(columns={'ratings': 'avg_rating', 'reviews':'no_reviews', 'Season':'season','DaytimeOfCooking':'meal_type','Veg/NonVeg':'diet_type'})
 
-df.head()
 
-
-# In[9]:
+# In[7]:
 
 
 df['season'] = df['season'].apply(lambda x: x.split('/'))
@@ -118,17 +118,16 @@ df['season'] = df['season'].apply(lambda x: ['Summer', 'Spring', 'Fall', 'Winter
 df['meal_type'] = df['meal_type'].apply(lambda x: x.split('/'))
 
 
-# In[10]:
+# In[8]:
 
 
 def count_ingredients(ingredients):
     return len(ingredients)
 
 df['no_ingredients'] = df['ingredients'].apply(count_ingredients)
-df.head()
 
 
-# In[11]:
+# In[9]:
 
 
 pattern = re.compile(r'\s*\([^)]*\)')
@@ -138,7 +137,7 @@ cleaned_records = [re.sub(pattern, '', record) for record in records]
 df['diet_type'] = cleaned_records
 
 
-# In[12]:
+# In[10]:
 
 
 def clean_text(text):
@@ -148,10 +147,9 @@ def clean_text(text):
     return tokens[0]
 
 df['diet_type'] = df['diet_type'].apply(clean_text)
-df.head()
 
 
-# In[13]:
+# In[11]:
 
 
 # Define a threshold for identifying significant outliers (e.g., 3 standard deviations above the mean)
@@ -161,19 +159,6 @@ threshold = 3 * df['total_mins'].std()
 outliers_df = df[df['total_mins'] > threshold]
 
 # Print the records with significant outlier cooking times
-print(outliers_df)
-
-
-# In[14]:
-
-
-df.describe()
-
-
-# In[15]:
-
-
-df.describe(include="object").T
 
 
 # **OUTLIERS REMOVAL USING IQR METHOD**
@@ -185,7 +170,7 @@ df.describe(include="object").T
 #     Extremely high or low calories.
 #     Unusually large or small numbers of ingredients.
 
-# In[16]:
+# In[12]:
 
 
 def iqr_method(outlier):
@@ -195,7 +180,8 @@ def iqr_method(outlier):
     iqr=q3-q1
     upper_limit = q3 + (1.5*iqr)
     lower_limit = q1 - (1.5*iqr)
-    
+    df[outlier] = df[outlier].astype(float)
+
     df.loc[(df[outlier]>upper_limit),outlier]=upper_limit
     df.loc[(df[outlier]<lower_limit),outlier]=lower_limit
 iqr_method('calories')
@@ -203,7 +189,7 @@ iqr_method('no_ingredients')
 iqr_method('total_mins')
 
 
-# In[17]:
+# In[13]:
 
 
 df_exploded = df.explode('season')
@@ -222,7 +208,7 @@ df_exploded2 = df.explode('meal_type')
 # 
 # punctuations and other decorators were also removed for simplicity and accurate prediction of model.
 
-# In[18]:
+# In[14]:
 
 
 def clean_text(text):
@@ -234,7 +220,7 @@ def clean_text(text):
 df['cleaned_titles'] = df['title'].apply(clean_text)
 
 
-# In[19]:
+# In[15]:
 
 
 lemmatizer = WordNetLemmatizer()
@@ -255,7 +241,7 @@ data = lemmatize_feature(df, 'cleaned_titles')
 # removal of any special characters, conversion to lower cases and lemmatization of words for better computation
 # after lemmatization, the stop words were removed.
 
-# In[20]:
+# In[16]:
 
 
 def lemmatize_category_list(category_list):
@@ -269,7 +255,7 @@ def lemmatize_category_list(category_list):
 df['category_lemmatized'] = df['category'].apply(lemmatize_category_list)
 
 
-# In[21]:
+# In[17]:
 
 
 def preprocess_ingredients(ingredients):
@@ -324,16 +310,14 @@ df['ingredients_filtered'] = join_lists(df['ingredients_filtered'])
 df['category_lemmatized'] = join_lists(df['category_lemmatized'])
 df['category_lemmatized']=df['category_lemmatized'].apply(lambda x: ', '.join(x))
 
-df.head()
 
-
-# In[22]:
+# In[18]:
 
 
 df=df.drop(['title','category','ingredients'],axis=1)
 
 
-# In[23]:
+# In[19]:
 
 
 for i in df['ingredients_filtered']:
@@ -349,12 +333,6 @@ df['ingredients_filtered']=df['ingredients_filtered'].apply(to_string)
 ingredients_filtered=df[['recipe_id','ingredients_filtered']]
 
 
-# In[24]:
-
-
-df.head()
-
-
 # **RECOMMENDATION BASED ON INGREDIENT SIMILARITY**
 # 
 # I DID THIS BY TAKING THE VECTOR FORMAT OF THE INGREDIENTS, CATEGORY AND TITLE COLUMN OF EACH RECIPE AND THEN FURTHER PLOTTING THE SIMILARITY BETWEEN EACH RECIPE USING COSINE SIMILARITY.
@@ -363,7 +341,7 @@ df.head()
 # 
 # THIS MODEL SUGGESTS SIMILAR RECIPES WHEN ONE RECIPE IS VIEWED. THIS COULD GIVE OPTIONS FOR THE USER TO PICK.
 
-# In[25]:
+# In[20]:
 
 
 vectorizer=TfidfVectorizer()
@@ -375,10 +353,8 @@ recipe_text_features = vectorizer.fit_transform(df['combined_text'])
 
 similarity=cosine_similarity(recipe_text_features, recipe_text_features)
 
-similarity
 
-
-# In[26]:
+# In[21]:
 
 
 knn = NearestNeighbors(n_neighbors=10, algorithm='auto', metric='cosine')
@@ -387,7 +363,7 @@ knn.fit(recipe_text_features)
 def recommend_recipe(recipe_id):
     
     if recipe_id not in df['recipe_id'].values:
-        print("Recipe ID not found.")
+        # print("Recipe ID not found.")
         return []
     
     recipe_index = df.index[df['recipe_id'] == recipe_id].tolist()[0]
@@ -402,20 +378,15 @@ def recommend_recipe(recipe_id):
     
     return recommendations
 
-#example
-recommendations_list = recommend_recipe(220596)
-print("Recommendations list:", recommendations_list)
+# In[22]:
 
 
-# In[27]:
+pickle.dump(recommend_recipe, open('./AIML/KNN_model.pkl','wb'))
+'''loaded_recommend_recipes = pickle.load(open("KNN_model.pkl", "rb"))
+print(loaded_recommend_recipes(222337))'''
 
 
-pickle.dump(recommend_recipe, open('KNN_model.pkl','wb'))
-loaded_recommend_recipes = pickle.load(open("KNN_model.pkl", "rb"))
-print(loaded_recommend_recipes(222337))
-
-
-# In[28]:
+# In[23]:
 
 
 df['ingredients_filtered'] = df['ingredients_filtered'].apply(lambda x: ''.join(x))
@@ -426,58 +397,69 @@ df['cleaned_titles'] = df['cleaned_titles'].apply(lambda x: ' '.join(x))
 # 
 # MATRIX FACTORIZATION IS COMMONLY USED FOR DETECTING A PATTERN BETWEEN DIFFERENT USERS AND THEIR INTEREST. SINCE WE HAVE DATASET OF USER RATING FOR DIFFERENT RECIPES, WE COULD PLOT USER VS. RECIPE MATRIX. THIS COULD SUGGEST RECIPES FOR A USER THAT WAS ACCEPTED BY A SIMILAR USER.
 # 
+# the parameter on which the user-recipe plotting is done is through the CLICKS, SAVES, and RATED recipes.
+# we take an interaction parameter which is a combination of these 3 features, with an added weight.
+# at the initial stage of the website, data on clicks and saves is lacking, hence more weight to rating is given.
+# 
+# 
 # FOR THIS MODEL, THE INPUT IS USER_ID AND OUTPUT IS A SERIES OF RECIPE_ID'S
 # 
 
-# In[29]:
+# In[24]:
 
 
-user_recipe_df=df2.merge(df,on='recipe_id')
+clicks = pd.read_pickle('./AIML/user_click.pkl')
+saved_recipes = pd.read_pickle('./AIML/user_save.pkl')
+rated_recipes = df2[['recipe_id','user_id','rating']]
 
-#user-recipe matrix
+# Taking only those recipes that were given a rating of 3 or above. Any rating less than 3 signifies dislike.
+rated_recipes = rated_recipes[rated_recipes['rating']>=3]
 
-user_recipe_df = user_recipe_df[user_recipe_df['rating'] >= 3]
-rating_matrix=user_recipe_df.pivot_table(values='rating',index='user_id',columns='recipe_id').fillna(0)
-rating_matrix
+# Initially the user activity would be null, so less weightage would be given to clicked and saved recipes.
+weight_click = 1
+weight_saved = 2
+weight_rating = 5
 
+interactions = pd.merge(clicks, saved_recipes, on=['user_id', 'recipe_id'], how='outer')
+interactions = pd.merge(interactions, rated_recipes, on=['user_id', 'recipe_id'], how='outer')
 
-# In[30]:
+# Fill missing values with 0
+pd.set_option('future.no_silent_downcasting', True)
+interactions = interactions.fillna(0).infer_objects(copy=False)
+
+# Apply weights and create the unified interaction score
+interactions['interaction'] = (weight_click * interactions['click'] + weight_saved * interactions['saved'] + weight_rating * interactions['rating'])
+
+user_item_matrix = interactions.pivot_table(values='interaction', index='user_id', columns='recipe_id').fillna(0)
+
+# In[25]:
 
 
 num_factors=10
 
 #perform NMF Non-Negative Matrix Factorization
 nmf = NMF(n_components=num_factors, random_state=42)
-user_factors=nmf.fit_transform(rating_matrix)
+user_factors=nmf.fit_transform(user_item_matrix)
 recipe_factors=nmf.components_
 
-user_id_to_index = {user_id: idx for idx, user_id in enumerate(rating_matrix.index)}
+user_id_to_index = {user_id: idx for idx, user_id in enumerate(user_item_matrix.index)}
 
 # Function to recommend recipes based on user ID
 def recommend_recipes(user_id, top_n=10):
     if user_id not in user_id_to_index:
-        print(f"User ID {user_id} not found.")
         return []
-    
+
     user_index = user_id_to_index[user_id]
     user_factor = user_factors[user_index]
     predicted_ratings = user_factor.dot(recipe_factors)
     top_recipe_indices = predicted_ratings.argsort()[-top_n:][::-1]  # Get top n indices, sorted in descending order
     
     # Map indices back to recipe IDs
-    top_recipe_ids = rating_matrix.columns[top_recipe_indices]
+    top_recipe_ids = user_item_matrix.columns[top_recipe_indices]
     return top_recipe_ids
 
-#recommendations for user with ID
-recommended_recipes_CF=recommend_recipes(16)
+# In[26]:
 
-print(recommended_recipes_CF)
-
-
-# In[31]:
-
-
-pickle.dump(recommend_recipes, open('CF_model.pkl','wb'))
-CF_recommend_recipes = pickle.load(open("CF_model.pkl", "rb"))
-CF_recommend_recipes(16)
+pickle.dump(recommend_recipes, open('./AIML/CF_model_renewed.pkl','wb'))
+# CF_recommend_recipes = pickle.load(open("CF_model_renewed.pkl", "rb"))
 

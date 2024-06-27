@@ -35,6 +35,7 @@ class RecipeCategories(models.Model):
         db_table = 'recipe_categories'
 
 class Favorite(models.Model):
+    id = models.AutoField(primary_key=True)
     userid = models.ForeignKey(User, on_delete=models.CASCADE, db_column='userid')
     recipeid = models.ForeignKey(Recipe, on_delete=models.CASCADE, db_column='recipeid')
 
@@ -54,8 +55,10 @@ class Reviews(models.Model):
         db_table = 'reviews'
         
 class History(models.Model):
+    id = models.AutoField(primary_key=True)
     userid = models.ForeignKey(User, on_delete=models.CASCADE, db_column='userid')
     recipeid = models.ForeignKey(Recipe, on_delete=models.CASCADE, db_column='recipeid')
+    total_count = models.IntegerField(default=1)
 
     class Meta:
         db_table = 'user_history'

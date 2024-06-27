@@ -24,6 +24,7 @@ import FeedbackList from "./pages/admin/FeedbackList";
 import ChangePassword from "./pages/changePassword/ChangePassword";
 import NewUsersList from "./pages/admin/NewUsersList";
 import NewRecipesList from "./pages/admin/NewRecipesList";
+import PersonalizedRecommendationPage from "./pages/personalizedRecommendation/PersonalizedRecommendations";
 function App() {
   return (
     <div>
@@ -32,6 +33,10 @@ function App() {
           <Route index element={<Home />} />
           <Route path="/home" element={<Home />} />
           <Route path="/recipe" element={<Recipe />} />
+          <Route
+            path="/recommendation"
+            element={<PersonalizedRecommendationPage />}
+          />
           <Route path="/about" element={<About />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
@@ -54,7 +59,7 @@ function App() {
             element={<PasswordReset />}
           />
 
-          <Route path="/otp/:email" element={<Otp />} />
+          <Route path="/otp/:username" element={<Otp />} />
           <Route path="/changepassword" element={<ChangePassword />} />
         </Routes>
       </Router>

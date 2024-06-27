@@ -7,6 +7,7 @@ import {
   getUserName,
   getAuthToken,
   clearAuthData,
+  isAuthenticated,
 } from "../../utils/auth";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -25,6 +26,11 @@ const RatingAndReviewBox = (props) => {
 
   const handlePostReview = async () => {
     try {
+      if (!isAuthenticated()) {
+        window.location.href = "/login";
+        return;
+      }
+
       const userId = getUserId();
       const userName = getUserName();
       const authToken = getAuthToken();

@@ -1,6 +1,95 @@
+# version: '4.29'
+
+# services:
+#   redis:
+#     image: "redis:alpine"
+#     ports:
+#       - "6379:6379"
+#     networks:
+#       - app_network
+
+#   mysql_server:
+#     build:
+#       context: ./mysqldb
+#       dockerfile: Dockerfile
+#     restart: always
+#     env_file:
+#       - .env
+#     environment:
+#       - MYSQL_ROOT_PASSWORD=${ROOT_PASSWORD}
+#       - MYSQL_DATABASE=${DATABASE} 
+#       - MYSQL_USER=${USER}
+#       - MYSQL_PASSWORD=${PASSWORD}
+#     # ports:
+#     #   - "3306:3306"
+#     healthcheck:
+#       test: ["CMD", "mysql", "-h", "localhost", "-u", "root", "root_password", "-e", "SELECT 1"]
+#       timeout: 10s
+#       retries: 10
+#     networks:
+#       - app_network
+#         # ipv4_address: 172.20.0.2
+
+#   recipesystem:
+#     build:
+#       context: ./django
+#       dockerfile: Dockerfile
+#     # command: python manage.py runserver 0.0.0.0:8000
+#     command: sh -c "python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"
+#     restart: always
+#     volumes:
+#       - ./django:/app
+#       - ./AIML:/app/AIML
+#     ports:
+#       - "8000:8000"
+#     depends_on:
+#       mysql_server:
+#         condition: service_healthy
+#     networks:
+#       - app_network
+
+#   celery-worker:
+#     build: ./django
+#     command: celery -A recipesystem worker --loglevel=info
+#     volumes:
+#       - ./django:/app
+#       - ./AIML:/app/AIML
+#     depends_on:
+#       - recipesystem
+#       - redis
+#     networks:
+#       - app_network
+
+#   celery-beat:
+#     build: ./django
+#     command: celery -A recipesystem beat --loglevel=info
+#     volumes:
+#       - ./django:/app
+#       - ./AIML:/app/AIML
+#     depends_on:
+#       - recipesystem
+#       - redis
+#     networks:
+#       - app_network
+
+# networks:
+#   app_network:
+#     driver: bridge
+#     ipam:
+#       config:
+#         - subnet: 172.20.0.0/16
+
 version: '4.29'
 
 services:
+  # redis:
+  #   image: "redis:alpine"
+  #   networks:
+  #     - app_network
+  #   command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+  #   volumes:
+  #     - ./redis.conf:/usr/local/etc/redis/redis.conf
+
   mysql_server:
     build:
       context: ./mysqldb
@@ -10,24 +99,20 @@ services:
       - .env
     environment:
       - MYSQL_ROOT_PASSWORD=${ROOT_PASSWORD}
-      - MYSQL_DATABASE=${DATABASE} 
+      - MYSQL_DATABASE=${DATABASE}
       - MYSQL_USER=${USER}
       - MYSQL_PASSWORD=${PASSWORD}
-    # ports:
-    #   - "3306:3306"
     healthcheck:
-      test: ["CMD", "mysql", "-h", "localhost", "-u", "root", "root_password", "-e", "SELECT 1"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
       retries: 10
     networks:
       - app_network
-        # ipv4_address: 172.20.0.2
 
   recipesystem:
     build:
       context: ./django
       dockerfile: Dockerfile
-    # command: python manage.py runserver 0.0.0.0:8000
     command: sh -c "python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"
     restart: always
     volumes:
@@ -36,10 +121,57 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      mysql_server:
-        condition: service_healthy
+      - mysql_server
+      # - redis
     networks:
       - app_network
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       memory: 3500M
+    environment:
+      - NLTK_DATA=/usr/share/nltk_data
+
+  # celery-worker:
+  #   build: ./django
+  #   restart: always
+  #   command: celery -A recipesystem worker --loglevel=info
+  #   user: celeryuser  # Run as non-root user
+  #   volumes:
+  #     - ./django:/app
+  #     - ./AIML:/app/AIML
+  #   depends_on:
+  #     - recipesystem
+  #     - redis
+  #   environment:
+  #     - NLTK_DATA=/usr/share/nltk_data
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         memory: 100M 
+  #   networks:
+  #     - app_network
+
+  # celery-beat:
+  #   build: ./django
+  #   restart: always
+  #   command: celery -A recipesystem beat --loglevel=info
+  #   user: celeryuser  # Run as non-root user
+  #   volumes:
+  #     - ./django:/app
+  #     - ./AIML:/app/AIML
+  #   depends_on:
+  #     - recipesystem
+  #     - redis
+  #   environment:
+  #     - NLTK_DATA=/usr/share/nltk_data
+  #     - CELERYBEAT_SCHEDULE_FILENAME=/app/celerybeat-schedule
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         memory: 100M 
+  #   networks:
+  #     - app_network
 
 networks:
   app_network:

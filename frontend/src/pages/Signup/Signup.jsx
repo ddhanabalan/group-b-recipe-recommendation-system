@@ -56,18 +56,26 @@ function Signup() {
       );
 
       if (response.status === 201) {
-        const email = formData.email;
-        localStorage.setItem("signupEmail", email);
-        history(`/otp/${email}`);
+        const username = formData.username;
+        localStorage.setItem("signupUsername", username);
+        history(`/otp/${username}`);
       }
     } catch (error) {
       if (error.response && error.response.data) {
         const errorData = error.response.data;
         if (errorData.username) {
-          setUsernameError(errorData.username.join(" "));
+          setUsernameError(
+            Array.isArray(errorData.username)
+              ? errorData.username.join(" ")
+              : errorData.username
+          );
         }
         if (errorData.email) {
-          setEmailError(errorData.email.join(" "));
+          setEmailError(
+            Array.isArray(errorData.email)
+              ? errorData.email.join(" ")
+              : errorData.email
+          );
         }
         if (!errorData.username && !errorData.email) {
           setGeneralError("Signup failed. Please try again.");

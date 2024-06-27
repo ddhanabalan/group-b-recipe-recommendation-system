@@ -66,7 +66,6 @@ const RecipeContextProvider = ({ children }) => {
   const [dataLoaded, setDataLoaded] = useState(false);
   const [distinctSeasons, setDistinctSeasons] = useState([]);
   const [distinctDayOfTimeCooking] = useState([
-    "All",
     "Breakfast",
     "Dinner",
     "Lunch",

@@ -61,6 +61,10 @@ class UserSignup(APIView):
         
         if not User.objects.filter(username=username).exists():
             userid = generate_unique_userid()
+            
+            # Delete all existing temporary records with the same username
+            Temp.objects.filter(username=username).delete()
+
             serializer = TempSerializer(data={**request.data, 'userid': userid})
             # serializer = UserSerializer(data=request.data)
             if serializer.is_valid():
@@ -89,12 +93,12 @@ def send_verification_email(email, verification_code):
 class VerifyEmail(APIView):
     
     def post(self, request):
-        email = request.data.get('email')
+        username = request.data.get('username')
         vericode = request.data.get('vericode')
         
         # Check if the verification code matches the one in the temp table
         try:
-            temp = Temp.objects.get(email=email, vericode=vericode)
+            temp = Temp.objects.get(username=username, vericode=vericode)
         except Temp.DoesNotExist:
             return Response({'error': 'Invalid verification code'}, status=status.HTTP_400_BAD_REQUEST)
         

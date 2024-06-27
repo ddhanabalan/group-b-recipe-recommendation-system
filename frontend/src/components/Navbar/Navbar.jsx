@@ -3,18 +3,35 @@ import "../../styles/Navbar.css";
 import logo_dark from "../../assets/logo.svg";
 import { Search } from "@mui/icons-material";
 import { RecipeContext } from "../../context/recipeContext";
-import { isAuthenticated, getAuthToken, clearAuthData } from "../../utils/auth";
-import { FaUser } from "react-icons/fa";
+import {
+  isAuthenticated,
+  getAuthToken,
+  clearAuthData,
+  getUserName,
+} from "../../utils/auth";
 import axios from "axios";
+
+function debounce(func, delay) {
+  let timeoutId;
+  return function (...args) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      func.apply(this, args);
+    }, delay);
+  };
+}
+
 function Navbar() {
   const { allRecipes } = useContext(RecipeContext);
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredRecipes, setFilteredRecipes] = useState([]);
   const [searchHistory, setSearchHistory] = useState([]);
+  const [lastSelectedRecipe, setLastSelectedRecipe] = useState(null);
   const searchRef = useRef(null);
   const storedToken = getAuthToken();
   const [open, setOpen] = useState(false);
+  const username = getUserName();
 
   useEffect(() => {
     const storedSearchHistory = sessionStorage.getItem("searchHistory");
@@ -22,25 +39,28 @@ function Navbar() {
       setSearchHistory(JSON.parse(storedSearchHistory));
     }
 
+    document.addEventListener("click", handleClickOutside);
+
     return () => {
-      sessionStorage.removeItem("searchHistory"); // Clear search history when unmounting
+      document.removeEventListener("click", handleClickOutside);
+      sessionStorage.removeItem("searchHistory");
     };
   }, []);
 
   const handleClickOutside = (event) => {
     if (searchRef.current && !searchRef.current.contains(event.target)) {
-      setShowDropdown(false); // Close search list if clicked outside search bar
+      setShowDropdown(false);
     }
   };
 
   const handleSearchClick = (event) => {
-    event.stopPropagation(); // Prevent click propagation to document
+    event.stopPropagation();
     setShowDropdown(true);
   };
 
-  const handleSearch = (e) => {
-    const term = e.target.value.trim();
-    setSearchTerm(term);
+  const handleSearch = debounce((term) => {
+    console.log("User searched for:", term);
+
     if (term) {
       setShowDropdown(true);
       const filteredRecipes = allRecipes.filter((recipe) =>
@@ -51,10 +71,17 @@ function Navbar() {
       setShowDropdown(false);
       setFilteredRecipes([]);
     }
+  }, 300);
+
+  const handleInputChange = (e) => {
+    const term = e.target.value.trim();
+    setSearchTerm(term);
+    handleSearch(term);
   };
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && searchTerm.trim().length > 0) {
+      //console.log("User searched for:", searchTerm);
       setSearchTerm("");
     }
   };
@@ -64,45 +91,22 @@ function Navbar() {
       window.location.href = "/login";
       return;
     }
+    //needed for api
+    console.log("Selected recipe:", recipeTitle);
 
-    // Redirect to the single recipe page
     window.location.href = `/singlerecipe/${recipeid}`;
 
-    // Update search history in sessionStorage
     const updatedHistory = [
-      ...searchHistory,
+      ...searchHistory.filter((item) => item.id !== recipeid),
       { id: recipeid, title: recipeTitle },
     ];
     setSearchHistory(updatedHistory);
     sessionStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
+
+    setLastSelectedRecipe(recipeTitle);
+    setShowDropdown(false);
   };
-  {
-    /*const handleLogout = async () => {
-    try {
-      // Call your logout API endpoint here
-      const response = await fetch(
-        "http://localhost:8000/authentication/logout/",
-        {
-          method: "POST", // Assuming your logout endpoint uses POST method
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
 
-      if (!response.ok) {
-        throw new Error("Failed to logout");
-      }
-
-      clearAuthToken();
-      clearUserId();
-
-      window.location.href = "/login";
-    } catch (error) {
-      console.error("Error logging out:", error);
-    }
-  };*/
-  }
   const handleLogout = async () => {
     try {
       const authToken = getAuthToken();
@@ -126,11 +130,12 @@ function Navbar() {
       }
     }
   };
+
   const toggleDropdown = () => {
     setOpen(!open);
   };
 
-  const authToken = isAuthenticated(); // Determine if the user is authenticated
+  const authToken = isAuthenticated();
 
   return (
     <div className="navbar">
@@ -141,7 +146,7 @@ function Navbar() {
             placeholder="Search a recipe.."
             className="search-bar"
             onClick={handleSearchClick}
-            onChange={handleSearch}
+            onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             value={searchTerm}
           />
@@ -186,7 +191,7 @@ function Navbar() {
               <div>
                 {filteredRecipes.map((recipe) => (
                   <li
-                    key={recipe.reciepid}
+                    key={recipe.recipeid}
                     className="search-item"
                     onClick={() =>
                       handleRecipeClick(recipe.recipeid, recipe.title)
@@ -234,7 +239,7 @@ function Navbar() {
                     e.target.style.textDecoration = "none";
                   }}
                 >
-                  User
+                  <b> {username ? username.toUpperCase() : "User"}</b>
                 </span>
                 {open && (
                   <ul className="dropdown-menu">
@@ -286,38 +291,6 @@ function Navbar() {
                 </span>
               </li>
             )}
-
-            {/*{authToken ? (
-              <li className="dropdown-container">
-                <div
-                  className="user-icon"
-                  onClick={toggleDropdown}
-                  onMouseEnter={() => setShowDropdown(true)}
-                  onMouseLeave={() => setShowDropdown(false)}
-                >
-                  <span className="user-heading">User</span>
-                  {showDropdown && (
-                    <ul className="dropdown">
-                      <li>
-                        <a href="/user/savedrecipes">Dashboard</a>
-                      </li>
-                      <li>
-                        <button onClick={handleLogout}>Logout</button>
-                      </li>
-                    </ul>
-                  )}
-                </div>
-              </li>
-            ) : (
-              <li>
-                <span
-                  className="user-heading"
-                  onClick={() => (window.location.href = "/login")}
-                >
-                  login
-                </span>
-              </li>
-            )}*/}
           </ul>
         </nav>
       </div>

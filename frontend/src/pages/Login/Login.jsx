@@ -3,7 +3,6 @@ import axiosInstance from "../../utils/api";
 import logo_dark from "../../assets/logo.svg";
 import login_image from "../../assets/loginpic.jpg";
 import "../../styles/Login.css";
-import Validation from "./Validation";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {
@@ -13,7 +12,7 @@ import {
   setUserName,
   setUserRole,
 } from "../../utils/auth";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   const [values, setValues] = useState({
@@ -21,7 +20,7 @@ function Login() {
     password: "",
   });
   const [errors, setErrors] = useState({});
-  const history = useNavigate();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -55,7 +54,7 @@ function Login() {
       const token = response.data.token;
       setAuthToken(token);
 
-      if (response.data.user.role === "admin") {
+      if (userRole === "admin") {
         toast.success("Logged in successfully.", {
           autoClose: 3000,
           hideProgressBar: true,
@@ -70,7 +69,7 @@ function Login() {
             padding: "10px",
           },
         });
-        history("/dashboard");
+        navigate("/dashboard");
       } else {
         toast.success("Logged in successfully.", {
           autoClose: 3000,
@@ -86,7 +85,7 @@ function Login() {
             padding: "10px",
           },
         });
-        history("/home");
+        navigate("/recommendation"); // Redirect to recommendation page
       }
     } catch (error) {
       console.error("Login error:", error);

@@ -9,6 +9,7 @@ import RecommendedRecipes from "../../components/recommendedRecipes/RecommendedR
 import Reviews from "../../components/reviews/Reviews";
 import RatingAndReviewBox from "../../components/ratingAndReviewBox/RatingAndReviewBox";
 import { isAuthenticated } from "../../utils/auth";
+import VideoDisplay from "../../components/videoDisplay/VideoDisplay";
 const SingleRecipe = () => {
   const { allRecipes, loading, error } = useContext(RecipeContext);
   const { RecipeId } = useParams();
@@ -42,10 +43,10 @@ const SingleRecipe = () => {
 
     fetchReviews();
   }, [RecipeId]);
-  if (!isAuthenticated()) {
+  /*if (!isAuthenticated()) {
     window.location.href = "/login";
     return;
-  }
+  }*/
   if (loading || reviewsLoading) {
     return <div>Loading...</div>;
   }
@@ -73,6 +74,7 @@ const SingleRecipe = () => {
       <Navbar />
       <Breadcrums recipe={recipe} />
       <RecipeDisplay recipe={recipe} />
+      <VideoDisplay />
       <RatingAndReviewBox recipeId={recipe.recipeid} />
       <Reviews reviews={reviews} />
       <RecommendedRecipes recipeId={recipe.recipeid} />

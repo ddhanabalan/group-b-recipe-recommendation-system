@@ -16,6 +16,7 @@ import {
 } from "../../utils/auth";
 import axios from "axios";
 import { toast } from "react-toastify";
+import UserHistory from "../../components/userHistory/UserHistory";
 
 const UserProfile = () => {
   const history = useNavigate();
@@ -139,6 +140,9 @@ const UserProfile = () => {
                 Change Password
               </button>
             </div>
+          </div>
+          <div className="user-history">
+            <UserHistory />
           </div>
         </div>
       </div>

@@ -6,7 +6,12 @@ import RecipeDisplay from "../../components/recipeDisplay/RecipeDisplay";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import axios from "axios";
 import { RecipeContext } from "../../context/recipeContext";
-import { clearAuthData, getAuthToken, getUserId } from "../../utils/auth";
+import {
+  clearAuthData,
+  getAuthToken,
+  getUserId,
+  isAuthenticated,
+} from "../../utils/auth";
 import "../../styles/AddNewRecipe.css";
 
 const AddNewRecipe = () => {
@@ -25,7 +30,7 @@ const AddNewRecipe = () => {
     calories: 0,
     veg_nonveg: "",
     daytimeofcooking: "",
-    season: "",
+    season: [],
   });
 
   const [validationErrors, setValidationErrors] = useState({});
@@ -52,20 +57,10 @@ const AddNewRecipe = () => {
         [name]: newValue,
       }));
     } else {
-      setFormData((prevData) => {
-        const newData = {
-          ...prevData,
-          [name]: value,
-        };
-
-        if (name === "hours" || name === "minutes") {
-          const hours = name === "hours" ? value : newData.hours;
-          const minutes = name === "minutes" ? value : newData.minutes;
-          newData.total_mins = calculateTotalMins(hours, minutes);
-        }
-
-        return newData;
-      });
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
     }
   };
 
@@ -75,12 +70,12 @@ const AddNewRecipe = () => {
     return parsedHours * 60 + parsedMinutes;
   };
 
-  const handlePhotoChange = async (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
     setUploadingImage(true);
 
     const formData = new FormData();
-    formData.append("image", file);
+    formData.append("file", file);
 
     try {
       const response = await axios.post(
@@ -92,7 +87,8 @@ const AddNewRecipe = () => {
           },
         }
       );
-      const imageUrl = response.data;
+
+      const imageUrl = response.data.url; // Assuming the response contains the URL
       setFormData((prevData) => ({
         ...prevData,
         img: imageUrl,
@@ -100,7 +96,7 @@ const AddNewRecipe = () => {
       setPhotoPreview(imageUrl);
       setUploadingImage(false);
     } catch (error) {
-      //console.error("Error uploading image:", error);
+      console.error("Error uploading file:", error);
       setUploadingImage(false);
     }
   };
@@ -122,11 +118,16 @@ const AddNewRecipe = () => {
   };
 
   const handleSubmit = async (e) => {
+    if (!isAuthenticated()) {
+      window.location.href = "/login";
+      return;
+    }
+
     e.preventDefault();
     const errors = {};
 
     if (!formData.title) errors.title = "Title is required.";
-    if (!formData.img) errors.img = "Image is required.";
+    if (!formData.img) errors.img = "Image or video is required.";
     if (!formData.ingredients.length)
       errors.ingredients = "Ingredients are required.";
     if (!formData.veg_nonveg)
@@ -135,7 +136,7 @@ const AddNewRecipe = () => {
       errors.daytimeofcooking = "Please select the time of cooking.";
     if (!formData.season.length)
       errors.season = "Please select at least one season.";
-    if (!formData.calories.length) errors.calories = "Calories are required";
+    if (!formData.calories) errors.calories = "Calories are required";
 
     if (Object.keys(errors).length) {
       setValidationErrors(errors);
@@ -151,7 +152,7 @@ const AddNewRecipe = () => {
 
     const hours = parseInt(formData.hours) || 0;
     const minutes = parseInt(formData.minutes) || 0;
-    const total_mins = hours * 60 + minutes;
+    const total_mins = calculateTotalMins(hours, minutes);
 
     const authToken = getAuthToken();
     const userid = getUserId();
@@ -163,8 +164,6 @@ const AddNewRecipe = () => {
       season: seasonsString,
       ingredients: JSON.stringify(formData.ingredients),
     };
-
-    //console.log("Data sending to addrecipe API:", dataToSend);
 
     try {
       const response = await axios.post(
@@ -183,9 +182,6 @@ const AddNewRecipe = () => {
         return;
       }
 
-      // const responseData = response.data;
-      // console.log("Recipe saved:", responseData);
-
       Swal.fire({
         title: "Saved!",
         text: "Your recipe has been saved.",
@@ -201,13 +197,13 @@ const AddNewRecipe = () => {
         calories: 0,
         veg_nonveg: "",
         daytimeofcooking: "",
-        season: "",
+        season: [],
       });
       setPhotoPreview("");
       setShowPreview(false);
       setValidationErrors({});
     } catch (error) {
-      //console.error("Error saving recipe:", error);
+      console.error("Error saving recipe:", error);
 
       if (
         error.response &&
@@ -355,36 +351,14 @@ const AddNewRecipe = () => {
                     <span className="error">{validationErrors.season}</span>
                   )}
                 </div>
-                {/*} <div className="season-section">
-                  <label htmlFor="season">Season:</label>
-                  <select
-                    id="season"
-                    name="season"
-                    value={formData.season}
-                    onChange={handleChange}
-                    required
-                  >
-                    <option value="">Select Season</option>
-                    {distinctSeasons.map((season) => (
-                      <option key={season} value={season}>
-                        {season}
-                      </option>
-                    ))}
-                  </select>
-                  {validationErrors.season && (
-                    <span className="error" style={{ color: "#f44336" }}>
-                      {validationErrors.season}
-                    </span>
-                  )}
-                </div>*/}
                 {/* Image Upload */}
                 <div className="form-group">
-                  <label htmlFor="img">Recipe Image:</label>
+                  <label htmlFor="img">Recipe Image or Video:</label>
                   <input
                     type="file"
                     id="img"
                     name="img"
-                    onChange={handlePhotoChange}
+                    onChange={handleFileChange}
                     required
                   />{" "}
                   {validationErrors.img && (
