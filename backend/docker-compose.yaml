@@ -82,13 +82,26 @@
 version: '4.29'
 
 services:
+
   # redis:
-  #   image: "redis:alpine"
+  #   image: redis:latest
+  #   container_name: redis
+  #   ports:
+  #     - "6379:6379"
   #   networks:
   #     - app_network
-  #   command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
-  #   volumes:
-  #     - ./redis.conf:/usr/local/etc/redis/redis.conf
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: '0.50'
+  #         memory: '512M'
+  #       reservations:
+  #         memory: '256M'
 
   mysql_server:
     build:
@@ -113,7 +126,8 @@ services:
     build:
       context: ./django
       dockerfile: Dockerfile
-    command: sh -c "python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"
+    command: sh -c "python manage.py makemigrations && python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"
+    tty: true
     restart: always
     volumes:
       - ./django:/app
@@ -125,57 +139,74 @@ services:
       # - redis
     networks:
       - app_network
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       memory: 3500M
     environment:
       - NLTK_DATA=/usr/share/nltk_data
-
-  # celery-worker:
-  #   build: ./django
+    deploy:
+      resources:
+        limits:
+          cpus: '3.50'
+          memory: '3G'
+        reservations:
+          memory: '512M'
+      
+  # celery_worker:
   #   restart: always
-  #   command: celery -A recipesystem worker --loglevel=info
-  #   user: celeryuser  # Run as non-root user
+  #   build: ./django
+  #   user: celeryuser 
+  #   command: celery -A recipesystem worker -l info -P gevent
   #   volumes:
   #     - ./django:/app
   #     - ./AIML:/app/AIML
+  #   environment:
+  #     - CELERY_BROKER_URL=redis://redis:6379/0
+  #     - CELERY_RESULT_BACKEND=redis://redis:6379/0
+  #     - DB_HOST=mysql_server
   #   depends_on:
   #     - recipesystem
   #     - redis
-  #   environment:
-  #     - NLTK_DATA=/usr/share/nltk_data
-  #   deploy:
-  #     resources:
-  #       reservations:
-  #         memory: 100M 
   #   networks:
   #     - app_network
+  #   ports:
+  #     - "5555:5555"
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: '2.50'
+  #         memory: '2G'
+  #       reservations:
+  #         memory: '512M'
 
-  # celery-beat:
-  #   build: ./django
+  # celery_beat:
   #   restart: always
-  #   command: celery -A recipesystem beat --loglevel=info
-  #   user: celeryuser  # Run as non-root user
+  #   build: ./django
+  #   user: celeryuser 
+  #   command: celery -A recipesystem beat -l info
+  #   # command: celery -A recipesystem beat -l debug --pidfile=
   #   volumes:
   #     - ./django:/app
   #     - ./AIML:/app/AIML
+  #   environment:
+  #     - CELERY_BROKER_URL=redis://redis:6379/0
+  #     - CELERY_RESULT_BACKEND=redis://redis:6379/0
+  #     - DB_HOST=mysql_server
   #   depends_on:
   #     - recipesystem
   #     - redis
-  #   environment:
-  #     - NLTK_DATA=/usr/share/nltk_data
-  #     - CELERYBEAT_SCHEDULE_FILENAME=/app/celerybeat-schedule
-  #   deploy:
-  #     resources:
-  #       reservations:
-  #         memory: 100M 
   #   networks:
   #     - app_network
+  #   ports:
+  #     - "8888:8888"
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: '2.50'
+  #         memory: '2G'
+  #       reservations:
+  #         memory: '256M'
 
 networks:
   app_network:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.20.0.0/16
+        - subnet: 172.25.0.0/16

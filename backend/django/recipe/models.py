@@ -15,6 +15,8 @@ class Recipe(models.Model):
     title = models.CharField(max_length=255)
     ingredients = models.TextField()
     img = models.URLField()
+    video = models.URLField(default='')
+    thumbnail = models.URLField(default='')
     calories = models.IntegerField()
     rating = models.FloatField(default=0)
     total_reviews = models.IntegerField(default=0)
@@ -59,6 +61,7 @@ class History(models.Model):
     userid = models.ForeignKey(User, on_delete=models.CASCADE, db_column='userid')
     recipeid = models.ForeignKey(Recipe, on_delete=models.CASCADE, db_column='recipeid')
     total_count = models.IntegerField(default=1)
+    added_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'user_history'
@@ -70,3 +73,11 @@ class Image(models.Model):
     def image_url(self):
         # return "http://127.0.0.1:8000"+self.image.url/
         return "http://localhost:8000"+self.image.url
+    
+class Video(models.Model):
+    video = models.FileField(upload_to='')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def video_url(self):
+        # return "http://127.0.0.1:8000"+self.image.url/
+        return "http://localhost:8000"+self.video.url
