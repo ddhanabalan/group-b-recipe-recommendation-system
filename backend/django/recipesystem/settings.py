@@ -25,22 +25,6 @@ sys.path.append(str(ML_DIR))
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-CELERY_BROKER_URL = 'redis://redis:6379/0'
-CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'UTC'
-
-from celery.schedules import crontab
-
-CELERY_BEAT_SCHEDULE = {
-    'update-recommendation-model-every-day': {
-        'task': 'recipe.tasks.update_recommendation_model_task',
-        'schedule': crontab(hour=0, minute=0),  # Schedule it to run daily at midnight
-    },
-}
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -68,7 +52,28 @@ INSTALLED_APPS = [
     'recipe',
     'corsheaders',
     'recommend',
+    'django_celery_beat',
 ]
+
+CELERY_BROKER_URL = 'redis://redis:6379/0'
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+# CELERY_BROKER_URL = 'redis://localhost:6379/0'
+# CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    'update-recommendation-model-every-day': {
+        'task': 'recipe.tasks.update_recommendation_model_task',
+        'schedule': crontab(minute='*/5'),
+        # 'schedule': crontab(hour=0, minute=0),  # Schedule it to run daily at midnight
+    },
+}
 
 CORS_ALLOW_ALL_ORIGINS = True
 
@@ -208,3 +213,5 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+DEBUG = True

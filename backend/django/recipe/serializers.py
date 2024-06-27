@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Recipe, Category, RecipeCategories, Favorite, Reviews, History, Image
+from .models import Recipe, Category, RecipeCategories, Favorite, Reviews, History, Image, Video
 #from authentication.models import User
 from datetime import date
 
@@ -18,7 +18,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = ['recipeid', 'userid', 'title', 'ingredients', 'img', 'calories', 'rating', 'total_reviews', 'season', 'daytimeofcooking', 'veg_nonveg', 'total_mins', 'created_at']#, 'categories']
+        fields = ['recipeid', 'userid', 'title', 'ingredients', 'img', 'video', 'thumbnail', 'calories', 'rating', 'total_reviews', 'season', 'daytimeofcooking', 'veg_nonveg', 'total_mins', 'created_at']
 
 class TitleSerializer(serializers.ModelSerializer):
     # categories = serializers.SerializerMethodField()
@@ -53,7 +53,7 @@ class RecipeWithCategoriesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = ['recipeid', 'title', 'userid', 'ingredients', 'img', 'calories', 'season', 'daytimeofcooking', 'veg_nonveg', 'total_mins', 'categories']
+        fields = ['recipeid', 'title', 'userid', 'ingredients', 'img', 'video', 'thumbnail', 'calories', 'season', 'daytimeofcooking', 'veg_nonveg', 'total_mins', 'categories']
 
 class HistorySerializer(serializers.ModelSerializer):
 
@@ -72,4 +72,16 @@ class ImageSerializer(serializers.ModelSerializer):
         model = Image
         fields = ['id', 'image', 'uploaded_at', 'image_url']
         read_only_fields = ['image_url']
+
+class VideoSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Video
+        fields = ['id', 'video', 'uploaded_at', 'video_url']
+        read_only_fields = ['video_url']
+    
+class FetchHistorySerializer(serializers.ModelSerializer):
         
+    class Meta:
+        model = History
+        fields = ['id','userid', 'recipeid','added_at']

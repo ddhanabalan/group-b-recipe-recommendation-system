@@ -1,8 +1,8 @@
 from rest_framework import generics, status
 from rest_framework.response import Response
 from .models import Recipe, Category, RecipeCategories, Favorite, Reviews, History
-from .serializers import RecipeSerializer, FavoriteSerializer, ReviewsSerializer, TitleSerializer
-from .serializers import RecipeWithCategoriesSerializer, CategorySerializer, HistorySerializer, ImageSerializer
+from .serializers import RecipeSerializer, FavoriteSerializer, ReviewsSerializer, TitleSerializer, FetchHistorySerializer
+from .serializers import RecipeWithCategoriesSerializer, CategorySerializer, HistorySerializer, ImageSerializer, VideoSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 import random
@@ -364,13 +364,66 @@ class NewRecipesLast30DaysDetails(APIView):
         
         return Response(data)
     
-class ImageUploadView(APIView):
+# class ImageUploadView(APIView):
+#     parser_classes = [MultiPartParser, FormParser]
+
+#     def post(self, request, *args, **kwargs):
+#         serializer = ImageSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data['image_url'], status=status.HTTP_201_CREATED)
+#         else:
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class MediaUploadView(APIView):
     parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request, *args, **kwargs):
-        serializer = ImageSerializer(data=request.data)
+        if 'image' in request.data:
+            serializer = ImageSerializer(data=request.data)
+        elif 'video' in request.data:
+            serializer = VideoSerializer(data=request.data)
+        else:
+            return Response({"error": "No media file provided."}, status=status.HTTP_400_BAD_REQUEST)
+
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data['image_url'], status=status.HTTP_201_CREATED)
+            media_url = serializer.data.get('image_url') or serializer.data.get('video_url')
+            return Response(media_url, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class FetchUserHistory(APIView):
+    def post(self, request, *args, **kwargs):
+        user_id = request.data.get('userid')
+        if not user_id:
+            return Response({'error': 'User ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+        queryset = History.objects.filter(userid=user_id).order_by('-added_at')
+        serializer = FetchHistorySerializer(queryset, many=True)
+        data = serializer.data
+
+        return Response(data)
+    
+class DeleteHistory(generics.DestroyAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, *args, **kwargs):
+        history_id = request.data.get('id')
+        try:
+            history = History.objects.get(pk=history_id)
+            history.delete()
+            return Response({"message": "History deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        except History.DoesNotExist:
+            return Response({"message": "History not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+class DeleteAllHistory(generics.DestroyAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, *args, **kwargs):
+        user_id = request.data.get('userid')
+        try:
+            history = History.objects.filter(userid=user_id)
+            history.delete()
+            return Response({"message": "History deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        except History.DoesNotExist:
+            return Response({"message": "History not found"}, status=status.HTTP_404_NOT_FOUND)
