@@ -7,6 +7,7 @@ import {
   getAuthToken,
   getUserId,
   isAuthenticated,
+  refreshAccessToken,
 } from "../../utils/auth";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -27,8 +28,12 @@ const RecipeDisplay = (props) => {
     }
 
     try {
-      const authToken = getAuthToken();
+      let authToken = getAuthToken();
       const userId = getUserId();
+
+      if (!authToken) {
+        authToken = await refreshAccessToken(); // Refresh token if not available or expired
+      }
 
       const response = await axios.post(
         "http://localhost:8000/recipe/saverecipe/",
@@ -39,7 +44,7 @@ const RecipeDisplay = (props) => {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${authToken}`,
+            Authorization: `Bearer ${authToken.access}`,
           },
         }
       );
@@ -57,18 +62,19 @@ const RecipeDisplay = (props) => {
           "An error occurred while saving the recipe:",
           error.message
         );
-      }
 
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.error === "Recipe already favorited"
-      ) {
-        Swal.fire({
-          icon: "info",
-          title: "Recipe Already Favorited",
-          text: "You have already favorited this recipe.",
-        });
+        // Show specific error message if recipe is already favorited
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.error === "Recipe already favorited"
+        ) {
+          Swal.fire({
+            icon: "info",
+            title: "Recipe Already Favorited",
+            text: "You have already favorited this recipe.",
+          });
+        }
       }
     }
   };

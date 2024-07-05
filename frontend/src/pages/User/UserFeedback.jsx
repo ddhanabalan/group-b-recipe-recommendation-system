@@ -5,7 +5,12 @@ import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
 import "../../styles/User.css";
 import "../../styles/UserFeedback.css";
-import { clearAuthData, getAuthToken, getUserId } from "../../utils/auth";
+import {
+  clearAuthData,
+  getAuthToken,
+  getUserId,
+  refreshAccessToken,
+} from "../../utils/auth";
 import { isAuthenticated, getUserRole } from "../../utils/auth";
 import { useNavigate } from "react-router-dom";
 
@@ -35,7 +40,7 @@ const UserFeedback = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const userId = getUserId();
-    const accessToken = getAuthToken();
+    const authToken = getAuthToken();
 
     if (formData.category && formData.message) {
       const dataToSend = {
@@ -51,16 +56,15 @@ const UserFeedback = () => {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
+              Authorization: `Bearer ${authToken.access}`,
             },
             body: JSON.stringify(dataToSend),
           }
         );
 
         if (response.status === 401) {
-          clearAuthData();
-          window.location.href = "/login";
-          return;
+          await refreshAccessToken(); // Refresh the access token
+          return handleSubmit(e); // Retry submitting feedback
         }
 
         const responseData = await response.json();
@@ -99,7 +103,6 @@ const UserFeedback = () => {
       });
     }
   };
-
   return (
     <div>
       <Navbar />

@@ -1,8 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import RecipeCard from "../../components/recipeCard/RecipeCard";
 import "../../styles/UserHistory.css";
-import { getAuthToken, getUserId, isAuthenticated } from "../../utils/auth";
+import {
+  getAuthToken,
+  setAuthToken,
+  clearAuthData,
+  isAuthenticated,
+  getUserId,
+} from "../../utils/auth";
 import { useNavigate } from "react-router-dom";
 
 const UserHistory = () => {
@@ -14,17 +20,25 @@ const UserHistory = () => {
   // Add a flag to check if the component is initialized
   const [initialized, setInitialized] = useState(false);
 
+  useEffect(() => {
+    initialize();
+  }, []);
+
   const initialize = async () => {
-    if (!isAuthenticated()) {
+    try {
+      if (!isAuthenticated()) {
+        await refreshTokensAndFetchRecipes();
+      } else {
+        await fetchRecipes();
+      }
+    } catch (error) {
+      console.error("Initialization error:", error);
       navigate("/login");
-      return; // Return early to avoid further execution
-    } else {
-      await fetchRecipes();
     }
   };
 
   const fetchRecipes = async () => {
-    const token = getAuthToken();
+    const { access: accessToken } = getAuthToken();
     const userId = getUserId();
     try {
       const response = await axios.post(
@@ -32,11 +46,10 @@ const UserHistory = () => {
         { userid: userId },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         }
       );
-      // console.log("Fetched recipes response:", response.data); // Print response
       if (Array.isArray(response.data) && response.data.length > 0) {
         setRecipes(response.data);
       } else {
@@ -44,61 +57,75 @@ const UserHistory = () => {
       }
       setLoading(false);
     } catch (error) {
-      if (error.response && error.response.status === 401) {
-        console.error("Unauthorized error:", error);
-        navigate("/login");
-      } else {
-        // console.error("Error fetching recipes:", error);
-      }
+      handleRequestError(error);
+    }
+  };
+
+  const handleRequestError = async (error) => {
+    if (error.response && error.response.status === 401) {
+      console.error("Unauthorized error:", error);
+      await refreshTokensAndFetchRecipes();
+    } else {
+      console.error("Error fetching recipes:", error);
       setLoading(false);
+    }
+  };
+
+  const refreshTokensAndFetchRecipes = async () => {
+    try {
+      const { refresh: refreshToken } = getAuthToken();
+      const response = await axios.post(
+        "http://localhost:8000/authentication/token/refresh/",
+        { refresh: refreshToken }
+      );
+      const { access, refresh } = response.data;
+      setAuthToken({ access, refresh });
+      await fetchRecipes();
+    } catch (error) {
+      console.error("Token refresh failed:", error);
+      clearAuthData();
+      navigate("/login");
     }
   };
 
   const handleRemoveRecipe = async (historyId) => {
     try {
-      const token = getAuthToken();
+      const { access: accessToken } = getAuthToken();
       const requestData = { id: historyId };
-      //console.log("Deleting Recipe. Request Data:", requestData);
       const response = await axios.delete(
         "http://localhost:8000/recipe/deletehistory/",
         {
           data: requestData,
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         }
       );
       setRecipes(recipes.filter((recipe) => recipe.id !== historyId));
-      /*console.log(
-        `Recipe with history ID ${historyId} removed from history. Response:`,
-        response.data
-      );*/
     } catch (error) {
-      //console.error("Error removing recipe from history:", error);
+      console.error("Error removing recipe from history:", error);
     }
   };
 
   const handleRemoveAll = async () => {
     try {
-      const token = getAuthToken();
+      const { access: accessToken } = getAuthToken();
       const userId = getUserId();
       const requestData = { userid: userId };
-      // console.log("Deleting All Recipes. Request Data:", requestData);
       await axios.delete("http://localhost:8000/recipe/deleteallhistory/", {
         data: requestData,
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
       setRecipes([]);
-      // console.log("All recipes removed successfully.");
     } catch (error) {
-      //console.error("Error removing all recipes:", error);
+      console.error("Error removing all recipes:", error);
     }
   };
 
   const handleLoadMore = async () => {
-    const token = getAuthToken();
+    const { access: accessToken } = getAuthToken();
     const userId = getUserId();
     try {
       const response = await axios.post(
@@ -106,7 +133,7 @@ const UserHistory = () => {
         { userid: userId },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         }
       );
@@ -127,11 +154,6 @@ const UserHistory = () => {
 
   if (loading) {
     return <div>Loading...</div>;
-  }
-
-  if (!isAuthenticated()) {
-    navigate("/login");
-    return null;
   }
 
   return (

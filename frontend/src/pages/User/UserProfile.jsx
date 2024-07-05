@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import UserSideBar from "../../components/userSideBar/UserSideBar";
 import Navbar from "../../components/Navbar/Navbar";
@@ -13,6 +13,8 @@ import {
   getUserEmail,
   setUserName,
   getAuthToken,
+  clearAuthData,
+  setAuthToken,
 } from "../../utils/auth";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -22,11 +24,18 @@ const UserProfile = () => {
   const history = useNavigate();
   const userId = getUserId();
 
-  const [editedData, setEditedData] = React.useState({
+  const [editedData, setEditedData] = useState({
     name: getUserName(),
     email: getUserEmail(),
   });
-  const [isEditing, setIsEditing] = React.useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    // Check if user is authenticated and has user role
+    if (!isAuthenticated() || getUserRole() !== "user") {
+      history("/login");
+    }
+  }, [history]);
 
   const handleToggleEdit = () => {
     setIsEditing(!isEditing);
@@ -39,22 +48,21 @@ const UserProfile = () => {
       [name]: value,
     }));
   };
-
   const handleSubmit = async () => {
     try {
       const token = getAuthToken();
       const response = await axios.put(
-        `http://localhost:8000/authentication/change-username/`,
+        "http://localhost:8000/authentication/change-username/",
         { new_username: editedData.name, userid: userId },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token.access}`,
           },
         }
       );
       setUserName(editedData.name);
       setIsEditing(false);
-      toast.success("username updated successfully.", {
+      toast.success("Username updated successfully.", {
         autoClose: 2000,
         hideProgressBar: true,
         closeOnClick: true,
@@ -71,19 +79,67 @@ const UserProfile = () => {
     } catch (error) {
       if (error.response && error.response.status === 401) {
         console.error("Unauthorized error:", error);
-        history("/login");
+        await handleUnauthorizedError();
+      } else if (
+        error.response &&
+        error.response.data &&
+        error.response.data.new_username
+      ) {
+        // Username already taken error
+        const errorMessage = error.response.data.new_username.join(" ");
+        toast.error(`Failed to update username: ${errorMessage}`, {
+          autoClose: 4000, // Auto close the toast after 4 seconds
+          hideProgressBar: false, // Show the progress bar
+          closeOnClick: true, // Close the toast when clicked
+          pauseOnHover: true, // Pause closing the toast on hover
+          draggable: true, // Allow dragging the toast
+          closeButton: true, // Show a close button on the toast
+          style: {
+            background: "#f44336", // Background color of the toast
+            color: "#ffffff", // Text color
+            border: "1px solid #ffffff", // Border style
+            borderRadius: "5px", // Border radius
+            padding: "16px", // Padding around the toast content
+          },
+        });
       } else {
         console.error("Error updating username:", error);
-        toast.error("Failed to update username. Please try again later.");
+
+        toast.error(`Failed to update username. Please try again later.`, {
+          autoClose: 4000, // Auto close the toast after 4 seconds
+          hideProgressBar: false, // Show the progress bar
+          closeOnClick: true, // Close the toast when clicked
+          pauseOnHover: true, // Pause closing the toast on hover
+          draggable: true, // Allow dragging the toast
+          closeButton: true, // Show a close button on the toast
+          style: {
+            background: "#f44336", // Background color of the toast
+            color: "#ffffff", // Text color
+            border: "1px solid #ffffff", // Border style
+            borderRadius: "5px", // Border radius
+            padding: "10px", // Padding around the toast content
+          },
+        });
       }
     }
   };
 
-  React.useEffect(() => {
-    if (!isAuthenticated() || getUserRole() !== "user") {
+  const handleUnauthorizedError = async () => {
+    try {
+      const { refresh: refreshToken } = getAuthToken();
+      const response = await axios.post(
+        "http://localhost:8000/authentication/token/refresh/",
+        { refresh: refreshToken }
+      );
+      const { access, refresh } = response.data;
+      setAuthToken({ access, refresh });
+      await handleSubmit(); // Retry submitting after token refresh
+    } catch (error) {
+      console.error("Token refresh failed:", error);
+      clearAuthData(); // Clear auth data on token refresh failure
       history("/login");
     }
-  }, [history]);
+  };
 
   const handleChangePassword = () => {
     history("/changepassword");

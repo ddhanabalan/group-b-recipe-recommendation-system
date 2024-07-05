@@ -6,7 +6,12 @@ import RecipeDisplay from "../../components/recipeDisplay/RecipeDisplay";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import axios from "axios";
 import { RecipeContext } from "../../context/recipeContext";
-import { clearAuthData, getAuthToken, getUserId } from "../../utils/auth";
+import {
+  getAuthToken,
+  getUserId,
+  clearAuthData,
+  refreshAccessToken,
+} from "../../utils/auth";
 import "../../styles/AddNewRecipe.css";
 
 const AddNewRecipe = () => {
@@ -26,8 +31,8 @@ const AddNewRecipe = () => {
     calories: 0,
     veg_nonveg: "",
     daytimeofcooking: "",
-    season: "",
-    thumbnail: "", // Added for thumbnail URL
+    season: [],
+    thumbnail: "",
   });
 
   const [validationErrors, setValidationErrors] = useState({
@@ -51,11 +56,10 @@ const AddNewRecipe = () => {
     const { name, value, type, checked } = e.target;
 
     if (type === "checkbox") {
-      const isChecked = checked;
       const currentValue = formData[name];
       let newValue;
 
-      if (isChecked) {
+      if (checked) {
         newValue = [...currentValue, value];
       } else {
         newValue = currentValue.filter((item) => item !== value);
@@ -107,7 +111,7 @@ const AddNewRecipe = () => {
         }
       );
       const mediaUrl = response.data;
-      console.log(`${type} upload response:`, response.data);
+      //  console.log(`${type} upload response:`, response.data);
       if (type === "image") {
         setPhotoPreview(mediaUrl);
         setFormData((prevData) => ({
@@ -127,12 +131,12 @@ const AddNewRecipe = () => {
         const videoElement = document.createElement("video");
         videoElement.src = URL.createObjectURL(file);
         videoElement.addEventListener("loadeddata", () => {
-          videoElement.currentTime = 5; // Set time to 5 seconds (or any other time)
+          videoElement.currentTime = 5;
         });
         videoElement.addEventListener("seeked", async () => {
           const canvas = document.createElement("canvas");
-          canvas.width = 320; // Set desired width
-          canvas.height = 180; // Set desired height
+          canvas.width = 320;
+          canvas.height = 180;
           const ctx = canvas.getContext("2d");
           ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
           const thumbnailDataUrl = canvas.toDataURL("image/png");
@@ -156,7 +160,7 @@ const AddNewRecipe = () => {
               }
             );
             const thumbnailUrl = thumbnailResponse.data;
-            console.log(`Thumbnail upload response:`, thumbnailResponse.data);
+            // console.log(`Thumbnail upload response:`, thumbnailResponse.data);
 
             // Update formData with thumbnail URL
             setFormData((prevData) => ({
@@ -231,7 +235,7 @@ const AddNewRecipe = () => {
       return;
     }
 
-    const authToken = getAuthToken();
+    const { access: authToken } = getAuthToken();
     const userid = getUserId();
     const seasonsString = formData.season.join("/");
 
@@ -239,7 +243,7 @@ const AddNewRecipe = () => {
       title: formData.title,
       img: formData.img,
       ingredients: JSON.stringify(formData.ingredients),
-      total_mins: formData.total_mins, // Only send total_mins
+      total_mins: formData.total_mins,
       categories: formData.categories,
       calories: formData.calories,
       veg_nonveg: formData.veg_nonveg,
@@ -248,7 +252,6 @@ const AddNewRecipe = () => {
       userid: userid,
     };
 
-    // Add video and thumbnail to dataToSend only if they exist
     if (formData.video) {
       dataToSend.video = formData.video;
     }
@@ -272,37 +275,56 @@ const AddNewRecipe = () => {
 
       Swal.fire({
         title: "Saved!",
-        text: "Your recipe has been saved.",
+        text: "Your recipe has been saved successfully.",
         confirmButtonText: "OK",
       }).then(() => {
         window.location.href = "/user/addedrecipes";
       });
     } catch (error) {
-      console.error("Error saving recipe:", error);
-
       if (error.response && error.response.status === 401) {
-        clearAuthData();
-        window.location.href = "/login";
-      } else if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
-        Swal.fire({
-          title: "Error",
-          text: error.response.data.message,
-          confirmButtonText: "OK",
-        });
+        try {
+          const newAuthToken = await refreshAccessToken();
+          const retryResponse = await axios.post(
+            "http://localhost:8000/recipe/addrecipe/",
+            dataToSend,
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${newAuthToken}`,
+              },
+            }
+          );
+
+          //console.log("Recipe saved:", retryResponse.data);
+
+          Swal.fire({
+            title: "Saved!",
+            text: "Your recipe has been saved successfully.",
+            confirmButtonText: "OK",
+          }).then(() => {
+            window.location.href = "/user/addedrecipes";
+          });
+        } catch (refreshError) {
+          console.error("Error refreshing token:", refreshError);
+          Swal.fire({
+            title: "Unauthorized",
+            text: "Your session has expired. Please log in again.",
+            confirmButtonText: "OK",
+          }).then(() => {
+            clearAuthData();
+            window.location.href = "/user/login";
+          });
+        }
       } else {
+        console.error("Error saving recipe:", error);
         Swal.fire({
           title: "Error",
-          text: "An error occurred while saving the recipe.",
+          text: "There was an error saving your recipe. Please try again later.",
           confirmButtonText: "OK",
         });
       }
     }
   };
-
   const handleShowPreview = () => {
     console.log("Form Data:", formData);
     setShowPreview(true);
@@ -311,6 +333,7 @@ const AddNewRecipe = () => {
   const handleEdit = () => {
     setShowPreview(false);
   };
+
   return (
     <div>
       <Navbar />

@@ -8,6 +8,7 @@ import {
   getAuthToken,
   clearAuthData,
   isAuthenticated,
+  refreshAccessToken,
 } from "../../utils/auth";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -24,22 +25,28 @@ const RatingAndReviewBox = (props) => {
   const [hoverValue, setHoverValue] = useState(undefined);
   const [reviewText, setReviewText] = useState("");
 
+  const navigate = useNavigate();
+
   const handlePostReview = async () => {
     try {
       if (!isAuthenticated()) {
-        window.location.href = "/login";
+        navigate("/login");
         return;
       }
 
       const userId = getUserId();
       const userName = getUserName();
-      const authToken = getAuthToken();
+      let authToken = getAuthToken();
 
       if (!userId || !userName || !reviewText || !currentValue) {
         alert(
           "Please fill in all fields: rating and review text are required."
         );
         return;
+      }
+
+      if (!authToken) {
+        authToken = await refreshAccessToken();
       }
 
       const reviewData = {
@@ -56,7 +63,7 @@ const RatingAndReviewBox = (props) => {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${authToken}`,
+            Authorization: `Bearer ${authToken.access}`,
           },
         }
       );
@@ -72,7 +79,7 @@ const RatingAndReviewBox = (props) => {
       if (error.response) {
         if (error.response.status === 401) {
           clearAuthData();
-          window.location.href = "/login";
+          navigate("/login");
         } else {
           console.error("Server responded with status:", error.response.status);
           console.error("Response data:", error.response.data);

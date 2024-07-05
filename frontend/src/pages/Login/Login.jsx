@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axiosInstance from "../../utils/api";
+import axiosInstance from "../../utils/axiosInstance"; // Adjust the import path based on your project structure
 import logo_dark from "../../assets/logo.svg";
 import login_image from "../../assets/loginpic.jpg";
 import "../../styles/Login.css";
@@ -34,58 +34,38 @@ function Login() {
     e.preventDefault();
 
     try {
-      const response = await axiosInstance.post(
-        "http://localhost:8000/authentication/login/",
-        {
-          username: values.name,
-          password: values.password,
-        }
-      );
-      console.log("Login response:", response);
+      const response = await axiosInstance.post("/authentication/login/", {
+        username: values.name,
+        password: values.password,
+      });
 
-      const userId = response.data.user.userid;
-      const userName = response.data.user.username;
-      const userEmail = response.data.user.email;
-      const userRole = response.data.user.role;
-      setUserId(userId);
-      setUserName(userName);
-      setUserEmail(userEmail);
-      setUserRole(userRole);
+      const { userid, username, email, role } = response.data.user;
+      const { access, refresh } = response.data;
 
-      const token = response.data.token;
-      setAuthToken(token);
+      setUserId(userid);
+      setUserName(username);
+      setUserEmail(email);
+      setUserRole(role);
+      setAuthToken({ access, refresh });
 
-      if (userRole === "admin") {
-        toast.success("Logged in successfully.", {
-          autoClose: 3000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: true,
-          closeButton: false,
-          style: {
-            height: "50px",
-            border: "2px solid #ccc",
-            borderRadius: "5px",
-            padding: "10px",
-          },
-        });
+      toast.success("Logged in successfully.", {
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        closeButton: false,
+        style: {
+          height: "50px",
+          border: "2px solid #ccc",
+          borderRadius: "5px",
+          padding: "10px",
+        },
+      });
+
+      if (role === "admin") {
         navigate("/dashboard");
       } else {
-        toast.success("Logged in successfully.", {
-          autoClose: 3000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: true,
-          closeButton: false,
-          style: {
-            height: "50px",
-            border: "2px solid #ccc",
-            borderRadius: "5px",
-            padding: "10px",
-          },
-        });
         navigate("/recommendation"); // Redirect to recommendation page
       }
     } catch (error) {

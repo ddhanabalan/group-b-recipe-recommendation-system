@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import "../../styles/ChangePassword.css";
 import { useNavigate } from "react-router";
 import axios from "axios";
-import { getAuthToken, clearAuthData } from "../../utils/auth";
+import {
+  getAuthToken,
+  clearAuthData,
+  refreshAccessToken,
+} from "../../utils/auth";
 import Swal from "sweetalert2";
 
 const ChangePassword = () => {
@@ -42,7 +46,7 @@ const ChangePassword = () => {
         },
         {
           headers: {
-            Authorization: `Bearer ${authToken}`,
+            Authorization: `Bearer ${authToken.access}`,
           },
         }
       );
@@ -54,14 +58,27 @@ const ChangePassword = () => {
         history("/user/profile");
       });
     } catch (error) {
-      if (error.response && error.response.status === 401) {
-        clearAuthData();
-        history("/login");
+      console.error("Error changing password:", error);
+      if (error.response) {
+        if (error.response.status === 401) {
+          try {
+            await refreshAccessToken(); // Refresh the access token
+            handleSubmit(e); // Retry changing password after token refresh
+          } catch (refreshError) {
+            console.error("Failed to refresh token:", refreshError);
+            clearAuthData();
+            history("/login");
+          }
+        } else {
+          Swal.fire({
+            title: "Error",
+            text: `Failed to change password (${error.response.status})`,
+          });
+        }
       } else {
-        console.error("Error changing password:", error);
         Swal.fire({
           title: "Error",
-          text: "Failed to change password.",
+          text: "Failed to change password. Please try again later.",
         });
       }
     }
