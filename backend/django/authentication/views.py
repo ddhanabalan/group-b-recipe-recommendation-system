@@ -16,7 +16,8 @@ from django.conf import settings
 from django.utils.html import strip_tags
 import re
 from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
+from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
 from django.utils import timezone
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
@@ -125,16 +126,16 @@ class UserLogin(APIView):
             if user is not None and check_password(password, user.password):
                 user.is_active = True
                 user.save()
-                # refresh = RefreshToken.for_user(user)
-                # serializer = UserSerializer(user)
-                # return Response({
-                #     'refresh': str(refresh),
-                #     'access': str(refresh.access_token),
-                #     'user': serializer.data
-                # }, status=status.HTTP_200_OK)
-                token = AccessToken.for_user(user)
+                refresh = RefreshToken.for_user(user)
                 serializer = UserSerializer(user)
-                return Response({'token': str(token), 'user': serializer.data}, status=status.HTTP_200_OK)
+                return Response({
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token),
+                    'user': serializer.data
+                }, status=status.HTTP_200_OK)
+                # token = AccessToken.for_user(user)
+                # serializer = UserSerializer(user)
+                # return Response({'token': str(token), 'user': serializer.data}, status=status.HTTP_200_OK)
             else:
                 return Response({"error": "Invalid username or password"}, status=status.HTTP_401_UNAUTHORIZED)
         except User.DoesNotExist:
@@ -148,6 +149,11 @@ class Logout(APIView):
             user = request.user
             user.is_active = False
             user.save()
+
+            tokens = OutstandingToken.objects.filter(user=user)
+            for token in tokens:
+                _, _ = BlacklistedToken.objects.get_or_create(token=token)
+
             return Response({"message": "Successfully logged out."}, status=status.HTTP_200_OK)
         except Exception as error:
             return Response({"error": str(error)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
