@@ -79,9 +79,17 @@ class VideoSerializer(serializers.ModelSerializer):
         model = Video
         fields = ['id', 'video', 'uploaded_at', 'video_url']
         read_only_fields = ['video_url']
-    
+
 class FetchHistorySerializer(serializers.ModelSerializer):
-        
+    title = serializers.SerializerMethodField()
+    img = serializers.SerializerMethodField()
+
     class Meta:
         model = History
-        fields = ['id','userid', 'recipeid','added_at']
+        fields = ['id', 'userid', 'recipeid', 'added_at', 'title', 'img']
+
+    def get_title(self, obj):
+        return obj.recipeid.title if obj.recipeid else None
+
+    def get_img(self, obj):
+        return obj.recipeid.img if obj.recipeid else None
