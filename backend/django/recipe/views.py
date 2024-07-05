@@ -398,10 +398,10 @@ class FetchUserHistory(APIView):
         user_id = request.data.get('userid')
         if not user_id:
             return Response({'error': 'User ID is required'}, status=status.HTTP_400_BAD_REQUEST)
-        queryset = History.objects.filter(userid=user_id).order_by('-added_at')
+        queryset = History.objects.filter(userid=user_id).select_related('recipeid').order_by('-added_at')
         serializer = FetchHistorySerializer(queryset, many=True)
         data = serializer.data
-
+        
         return Response(data)
     
 class DeleteHistory(generics.DestroyAPIView):
