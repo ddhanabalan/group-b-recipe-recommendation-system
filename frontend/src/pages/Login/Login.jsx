@@ -41,6 +41,7 @@ function Login() {
           password: values.password,
         }
       );
+      console.log("Login response:", response);
 
       const userId = response.data.user.userid;
       const userName = response.data.user.username;

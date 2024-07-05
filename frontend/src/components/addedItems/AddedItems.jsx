@@ -1,17 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import Items from "../Items/Items";
 import "../../styles/SavedItems.css";
 import Swal from "sweetalert2";
 import { getUserId } from "../../utils/auth";
+import { FaEdit } from "react-icons/fa";
+import { useNavigate } from "react-router";
 
 const AddedItems = () => {
   const [addedRecipes, setAddedRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [editRecipeId, setEditRecipeId] = useState(null);
-  const [editRecipeData, setEditRecipeData] = useState({});
   const itemsPerPage = 20;
+  const history = useNavigate();
 
   useEffect(() => {
     const fetchAddedRecipes = async () => {
@@ -50,46 +51,8 @@ const AddedItems = () => {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  const handleEdit = (item) => {
-    setEditRecipeId(item.recipeid);
-    setEditRecipeData({
-      title: item.title,
-      img: item.img,
-      total_mins: item.total_mins,
-      calories: item.calories,
-      rating: item.rating,
-    });
-  };
-
-  const handleSaveEdit = async () => {
-    try {
-      const response = await fetch(
-        `http://localhost:8000/recipe/${editRecipeId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(editRecipeData),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to save edits");
-      }
-
-      // Update addedRecipes state or fetch updated data
-      // Example:
-      // const updatedData = await response.json();
-      // setAddedRecipes(updatedData);
-
-      // Reset edit state
-      setEditRecipeId(null);
-      setEditRecipeData({});
-    } catch (error) {
-      console.error("Error saving edit:", error);
-      // Handle error saving edit
-    }
+  const handleEdit = (recipeId) => {
+    history(`/edit-recipe/${recipeId}`);
   };
 
   if (loading) {
@@ -109,35 +72,20 @@ const AddedItems = () => {
             <div className="saveditems-format">
               {currentItems.map((item, i) => (
                 <div className="saved-recipe-card" key={i}>
-                  {editRecipeId === item.recipeid ? (
-                    <div>
-                      <input
-                        type="text"
-                        value={editRecipeData.title || ""}
-                        onChange={(e) =>
-                          setEditRecipeData({
-                            ...editRecipeData,
-                            title: e.target.value,
-                          })
-                        }
-                      />
-                      {/* Add more fields for editing */}
-                      <button onClick={handleSaveEdit}>Save</button>
-                      <button onClick={() => setEditRecipeId(null)}>
-                        Cancel
-                      </button>
-                    </div>
-                  ) : (
-                    <Items
-                      recipeid={item.recipeid}
-                      title={item.title}
-                      img={item.img}
-                      total_mins={item.total_mins}
-                      calories={item.calories}
-                      rating={item.rating}
-                      onEdit={() => handleEdit(item)}
-                    />
-                  )}
+                  <Items
+                    recipeid={item.recipeid}
+                    title={item.title}
+                    img={item.img}
+                    total_mins={item.total_mins}
+                    calories={item.calories}
+                    rating={item.rating}
+                  />
+                  <button
+                    className="edit-button"
+                    onClick={() => handleEdit(item.recipeid)}
+                  >
+                    <FaEdit />
+                  </button>
                 </div>
               ))}
             </div>

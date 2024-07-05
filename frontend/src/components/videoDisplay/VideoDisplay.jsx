@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import "../../styles/VideoDisplay.css";
 import { FaThumbsUp, FaThumbsDown, FaTimes } from "react-icons/fa"; // Importing thumb icons from react-icons
-import recipeVideoThumbnail from "../../assets/thumpnail.jpg";
 
-const VideoDisplay = () => {
+const VideoDisplay = ({ recipe }) => {
   const [userMadeRecipe, setUserMadeRecipe] = useState(null);
   const [showVideoPopup, setShowVideoPopup] = useState(false);
 
@@ -16,19 +15,41 @@ const VideoDisplay = () => {
     setShowVideoPopup(!showVideoPopup);
   };
 
+  // Check if both video URL and thumbnail exist
+  const isVideoAvailable = recipe.video && recipe.thumbnail;
+
   return (
     <div className="video-container">
-      {/* Video thumbnail and heading */}
       <div className="horizontal-line"></div>
 
-      <div className="video-thumbnail" onClick={toggleVideoPopup}>
-        <div className="video-img">
-          <img src={recipeVideoThumbnail} alt="Recipe Video Thumbnail" />
-        </div>
+      {/* Conditionally render video section */}
+      {isVideoAvailable ? (
+        <>
+          <div className="video-thumbnail" onClick={toggleVideoPopup}>
+            <div className="video-img">
+              <img src={recipe.thumbnail} alt="Recipe Video Thumbnail" />
+            </div>
+            <div className="video-heading">
+              <h1>Master Your Recipes with Videos</h1>
+            </div>
+          </div>
+
+          {/* Video popup */}
+          {showVideoPopup && (
+            <div className="video-popup">
+              <FaTimes className="close-icon" onClick={toggleVideoPopup} />
+              <video controls width="560" height="315">
+                <source src={recipe.video} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          )}
+        </>
+      ) : (
         <div className="video-heading">
-          <h1>Master Your Recipes with Videos</h1>
+          <h1 style={{ fontSize: "16px" }}>No Video Available</h1>
         </div>
-      </div>
+      )}
 
       <div className="horizontal-line"></div>
 
@@ -48,24 +69,6 @@ const VideoDisplay = () => {
           <FaThumbsDown className="thumb-icon" />
         </button>
       </div>
-
-      <div className="horizontal-line"></div>
-
-      {/* Video popup */}
-      {showVideoPopup && (
-        <div className="video-popup">
-          <FaTimes className="close-icon" onClick={toggleVideoPopup} />
-          <iframe
-            title="Recipe Video"
-            width="560"
-            height="315"
-            src="https://www.youtube.com/embed/VIDEO_ID_HERE"
-            frameBorder="0"
-            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          ></iframe>
-        </div>
-      )}
     </div>
   );
 };

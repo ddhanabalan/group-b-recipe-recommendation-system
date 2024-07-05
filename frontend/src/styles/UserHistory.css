@@ -9,29 +9,23 @@
 }
 
 .remove-all-button {
-  background-color: #ff6347;
+  background-color: #e1792f;
   color: white;
   border: none;
   padding: 10px 20px;
   cursor: pointer;
   border-radius: 5px;
-  margin: 10px;
+  margin-bottom: 10px;
 }
 
 .load-more-button {
-  display: block;
   background-color: #e1792f;
   color: white;
-
+  border: none;
   padding: 10px 20px;
-
-  margin: 20px auto;
-}
-
-.history-heading {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 20px;
 }
 
 .empty-message {
@@ -40,19 +34,21 @@
   color: #999;
 }
 
-.load-more-button,
-.remove-all-button {
-  display: block;
-
-  padding: 10px 20px;
-  background-color: #e1792f;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+.recipe-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
 }
 
-.load-more-button:hover,
-.remove-all-button:hover {
-  background-color: #0056b3;
+.recipe-card {
+  width: 150px;
+  margin: 5px;
+  background-color: #f0f0f0;
+
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.recipe-list {
+  display: flex;
+  flex-wrap: wrap;
 }

@@ -74,7 +74,7 @@ const SingleRecipe = () => {
       <Navbar />
       <Breadcrums recipe={recipe} />
       <RecipeDisplay recipe={recipe} />
-      <VideoDisplay />
+      <VideoDisplay recipe={recipe} />
       <RatingAndReviewBox recipeId={recipe.recipeid} />
       <Reviews reviews={reviews} />
       <RecommendedRecipes recipeId={recipe.recipeid} />

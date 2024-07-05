@@ -25,6 +25,7 @@ import ChangePassword from "./pages/changePassword/ChangePassword";
 import NewUsersList from "./pages/admin/NewUsersList";
 import NewRecipesList from "./pages/admin/NewRecipesList";
 import PersonalizedRecommendationPage from "./pages/personalizedRecommendation/PersonalizedRecommendations";
+import EditRecipePage from "./pages/User/EditRecipePage";
 function App() {
   return (
     <div>
@@ -53,6 +54,7 @@ function App() {
           <Route path="/user/feedbacks" element={<UserFeedback />} />
           <Route path="/user/profile" element={<UserProfile />} />
           <Route path="/addnewrecipe" element={<AddNewRecipe />} />
+          <Route path="/edit-recipe/:recipeId" element={<EditRecipePage />} />
           <Route path="/forgotpassword" element={<ForgotPassword />} />
           <Route
             path="/passwordreset/:userid/:token"
