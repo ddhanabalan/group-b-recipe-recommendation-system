@@ -1,7 +1,7 @@
 from rest_framework import generics, status
 from rest_framework.response import Response
-from .models import Recipe, Category, RecipeCategories, Favorite, Reviews, History
-from .serializers import RecipeSerializer, FavoriteSerializer, ReviewsSerializer, TitleSerializer, FetchHistorySerializer
+from .models import Recipe, Category, RecipeCategories, Favorite, Reviews, History, SearchHistory
+from .serializers import RecipeSerializer, FavoriteSerializer, ReviewsSerializer, TitleSerializer, FetchHistorySerializer, SearchHistorySerializer
 from .serializers import RecipeWithCategoriesSerializer, CategorySerializer, HistorySerializer, ImageSerializer, VideoSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
@@ -329,6 +329,25 @@ class UserHistory(APIView):
             serializer.save(userid=user_id, recipeid=recipe_id)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class UserSearchHistory(APIView):
+    #permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        serializer = SearchHistorySerializer(data=request.data)
+        if serializer.is_valid():
+            searchtext = serializer.validated_data.get('search_text')
+            user_id = serializer.validated_data.get('userid')
+            # Check if the search history already exists
+            if SearchHistory.objects.filter(userid=user_id, search_text=searchtext).exists():
+                history = SearchHistory.objects.get(userid=user_id, search_text=searchtext)
+                history.total_count+=1
+                history.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            # Save the search history
+            serializer.save(userid=user_id, search_text=searchtext)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class RecipesCount(APIView):
 
@@ -427,3 +446,21 @@ class DeleteAllHistory(generics.DestroyAPIView):
             return Response({"message": "History deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
         except History.DoesNotExist:
             return Response({"message": "History not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+class SingleRecipe(APIView):
+    # permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        recipe_id = request.data.get('recipeid')
+        if not recipe_id:
+            return Response({'error': 'Recipe ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            recipe = Recipe.objects.get(recipeid=recipe_id)
+        except:
+            return Response({"message": "Recipe not found"}, status=status.HTTP_404_NOT_FOUND)
+        serializer = RecipeSerializer(recipe)
+        data = serializer.data
+        # Fetching categories for each recipe and adding them to the response
+        data=[data]
+        data = AddCategories(data)
+        return Response(data[0])
