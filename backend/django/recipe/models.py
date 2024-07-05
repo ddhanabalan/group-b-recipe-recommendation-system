@@ -81,3 +81,13 @@ class Video(models.Model):
     def video_url(self):
         # return "http://127.0.0.1:8000"+self.image.url/
         return "http://localhost:8000"+self.video.url
+    
+class SearchHistory(models.Model):
+    id = models.AutoField(primary_key=True)
+    userid = models.ForeignKey(User, on_delete=models.CASCADE, db_column='userid')
+    search_text = models.CharField(max_length=255)
+    total_count = models.IntegerField(default=1)
+    added_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'user_search_history'

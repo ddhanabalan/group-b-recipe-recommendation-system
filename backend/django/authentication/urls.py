@@ -2,10 +2,12 @@ from django.urls import path
 from authentication.views import UserSignup, UserLogin, ForgotPassword, VerifyEmail, Logout, PasswordResetConfirmView, DeleteUser
 from authentication.views import ChangeUsername, FetchUsernameAndEmail, AddFeedback, DeleteFeedback, AllUsersLimited, UsersCount
 from authentication.views import FeedbackCount, AllFeedbacksLimited, NewUsersLast30Days, ChangePassword, NewUsersLast30DaysDetails
+from rest_framework_simplejwt.views import TokenRefreshView
 
 urlpatterns = [
     path('signup/', UserSignup.as_view(), name='signup'),
     path('login/', UserLogin.as_view(), name='login'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('forgot-password/', ForgotPassword.as_view(), name='forgot_password'),
     path('reset/<str:uidb64>/<str:token>/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('verify-email/', VerifyEmail.as_view(), name='verify_email'),

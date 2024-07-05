@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Recipe, Category, RecipeCategories, Favorite, Reviews, History, Image, Video
+from .models import Recipe, Category, RecipeCategories, Favorite, Reviews, History, Image, Video, SearchHistory
 #from authentication.models import User
 from datetime import date
 
@@ -66,6 +66,18 @@ class HistorySerializer(serializers.ModelSerializer):
         Override the create method to handle the saving of the favorite
         """
         return History.objects.create(**validated_data)
+    
+class SearchHistorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = SearchHistory
+        fields = ['userid', 'search_text']
+
+    def create(self, validated_data):
+        """
+        Override the create method to handle the saving of the favorite
+        """
+        return SearchHistory.objects.create(**validated_data)
 
 class ImageSerializer(serializers.ModelSerializer):
     class Meta:
