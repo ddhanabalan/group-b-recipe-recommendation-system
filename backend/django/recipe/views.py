@@ -47,12 +47,13 @@ class AllRecipesLimited(APIView):
         return Response(data)
 
 class PopularRecipes(generics.ListAPIView):
-    start_date = timezone.now() - timedelta(days=30)
-    queryset = Recipe.objects.filter(created_at__gte=start_date).order_by("-total_reviews")[:10]
-    serializer_class = RecipeSerializer
 
     def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
+        start_date = timezone.now() - timedelta(days=30)
+        queryset = Recipe.objects.filter(created_at__gte=start_date).order_by("-total_reviews")[:10]
+        while len(queryset)<5:
+            start_date = start_date - timedelta(days=30)
+            queryset = Recipe.objects.filter(created_at__gte=start_date).order_by("-total_reviews")[:10]
         serializer = RecipeSerializer(queryset, many=True)
         # serializer = self.get_serializer(queryset, many=True)
         data = serializer.data
@@ -464,3 +465,36 @@ class SingleRecipe(APIView):
         data=[data]
         data = AddCategories(data)
         return Response(data[0])
+    
+class EditRecipe(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        recipeid = request.data.get('recipeid')
+        if not recipeid:
+            return Response({"message": "Recipe ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            recipe = Recipe.objects.get(recipeid=recipeid)
+        except Recipe.DoesNotExist:
+            return Response({"message": "Recipe not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Extract categories from request data
+        categories_data = request.data.pop('categories', None)
+
+        serializer = RecipeSerializer(recipe, data=request.data, partial=True)
+        if serializer.is_valid():
+            # Save the updated recipe data
+            serializer.save()
+
+            if categories_data is not None:
+                # Clear existing categories
+                RecipeCategories.objects.filter(recipeid=recipe).delete()
+
+                # Add new categories
+                for category_name in categories_data:
+                    category, created = Category.objects.get_or_create(name=category_name)
+                    RecipeCategories.objects.create(recipeid=recipe, category_id=category.id)
+
+            return Response({"message": "Recipe updated successfully"}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
