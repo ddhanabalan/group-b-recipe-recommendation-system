@@ -3,6 +3,7 @@ import "../../styles/ChangePassword.css";
 import { useNavigate } from "react-router";
 import axios from "axios";
 import { getAuthToken, clearAuthData } from "../../utils/auth";
+import Swal from "sweetalert2";
 
 const ChangePassword = () => {
   const [oldPassword, setOldPassword] = useState("");
@@ -32,7 +33,7 @@ const ChangePassword = () => {
 
     try {
       const authToken = getAuthToken();
-      const response = await axios.put(
+      await axios.put(
         "http://localhost:8000/authentication/change-password/",
         {
           password: oldPassword,
@@ -46,15 +47,22 @@ const ChangePassword = () => {
         }
       );
 
-      alert("Password changed successfully.");
-      history("/user/profile");
+      Swal.fire({
+        title: "Success",
+        text: "Password changed successfully.",
+      }).then(() => {
+        history("/user/profile");
+      });
     } catch (error) {
       if (error.response && error.response.status === 401) {
         clearAuthData();
         history("/login");
       } else {
         console.error("Error changing password:", error);
-        alert("Failed to change password.");
+        Swal.fire({
+          title: "Error",
+          text: "Failed to change password.",
+        });
       }
     }
   };

@@ -162,3 +162,12 @@
 #catcheck {
   width: 100px;
 }
+#season-check {
+  width: 100px;
+}
+.season-part {
+  overflow-y: auto;
+  height: 130px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
