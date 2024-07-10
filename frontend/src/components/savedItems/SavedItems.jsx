@@ -2,7 +2,12 @@ import React, { useContext, useEffect, useState } from "react";
 import Items from "../Items/Items";
 import { RecipeContext } from "../../context/recipeContext";
 import "../../styles/SavedItems.css";
-import { clearAuthData, getAuthToken, getUserId } from "../../utils/auth";
+import {
+  clearAuthData,
+  getAuthToken,
+  getUserId,
+  refreshAccessToken,
+} from "../../utils/auth";
 import Swal from "sweetalert2";
 
 const SavedItems = () => {
@@ -17,6 +22,12 @@ const SavedItems = () => {
     const fetchSavedRecipes = async () => {
       try {
         const userId = getUserId();
+        let authToken = getAuthToken();
+
+        // Refresh token if not available or expired
+        if (!authToken) {
+          authToken = await refreshAccessToken();
+        }
 
         const response = await fetch("http://localhost:8000/recipe/saved/", {
           method: "POST",
@@ -59,14 +70,19 @@ const SavedItems = () => {
   const handleRemoveRecipe = async (recipeId) => {
     try {
       const userId = getUserId();
-      const authToken = getAuthToken();
+      let authToken = getAuthToken();
+
+      if (!authToken) {
+        authToken = await refreshAccessToken();
+      }
+
       const response = await fetch(
         "http://localhost:8000/recipe/deletefavourite/",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${authToken}`,
+            Authorization: `Bearer ${authToken.access}`,
           },
           body: JSON.stringify({ userid: userId, recipeid: recipeId }),
         }

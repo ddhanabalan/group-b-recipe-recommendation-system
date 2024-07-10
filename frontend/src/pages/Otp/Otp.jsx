@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "../../styles/Otp.css";
-import WelcomeCard from "../Otp/Welcome-card";
 
 const Otp = () => {
   const location = useLocation();
-  const [formData, setFormData] = useState({
-    email: "",
-    otp: "",
-  });
-
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({ email: "", otp: "" });
   const [verificationError, setVerificationError] = useState("");
-  const [showWelcomeCard, setShowWelcomeCard] = useState(false);
 
   useEffect(() => {
     const pathnameSegments = location.pathname.split("/");
@@ -24,44 +21,46 @@ const Otp = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value.trim(),
-    });
+    setFormData({ ...formData, [name]: value.trim() });
   };
 
   const handleOTPSubmit = async (e) => {
     e.preventDefault();
     try {
+      const requestData = { username: formData.email, vericode: formData.otp };
+
       const response = await fetch(
         "http://localhost:8000/authentication/verify-email/",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: formData.email,
-            vericode: formData.otp,
-          }),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(requestData),
         }
       );
 
       if (response.ok) {
-        setShowWelcomeCard(true);
+        toast.success("Email verified successfully.", {
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          closeButton: false,
+          style: {
+            height: "50px",
+            border: "2px solid #ccc",
+            borderRadius: "5px",
+            padding: "10px",
+          },
+        });
+        navigate("/login"); // Redirect to login page
       } else {
         const data = await response.json();
-        setVerificationError(data.message || "Failed to verify email.");
+        setVerificationError(data.message || "Failed to verify.");
       }
     } catch (error) {
-      console.error("Error verifying email:", error.message);
-      setVerificationError("Failed to verify email.");
+      setVerificationError("Failed to verify.");
     }
-  };
-
-  const handleCloseWelcomeCard = () => {
-    setShowWelcomeCard(false);
-    window.location.href = "/login";
   };
 
   return (
@@ -122,7 +121,6 @@ const Otp = () => {
           </table>
         </form>
       </div>
-      {showWelcomeCard && <WelcomeCard onClose={handleCloseWelcomeCard} />}
     </div>
   );
 };

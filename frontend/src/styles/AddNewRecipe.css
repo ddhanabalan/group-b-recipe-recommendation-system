@@ -76,7 +76,6 @@
   margin-top: 20px;
 }
 #title {
-  margin-bottom: 20px;
   width: 100%;
   padding: 8px;
   border: 1px solid #ccc;
@@ -102,7 +101,6 @@
 }
 
 #minutes {
-  margin-bottom: 20px;
   width: 100%;
   padding: 8px;
   border: 1px solid #ccc;

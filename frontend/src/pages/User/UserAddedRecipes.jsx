@@ -47,7 +47,7 @@ const UserAddedRecipes = () => {
               </button>
             </div>
           </div>
-          <hr />
+          <hr style={{ width: 0 }} />
           <div className="user-content-item">
             <AddedItems />
           </div>

@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import Items from "../Items/Items";
 import "../../styles/SavedItems.css";
 import Swal from "sweetalert2";
 import { getUserId } from "../../utils/auth";
+import { FaEdit } from "react-icons/fa";
+import { useNavigate } from "react-router";
 
 const AddedItems = () => {
   const [addedRecipes, setAddedRecipes] = useState([]);
@@ -10,6 +12,7 @@ const AddedItems = () => {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
+  const history = useNavigate();
 
   useEffect(() => {
     const fetchAddedRecipes = async () => {
@@ -48,6 +51,10 @@ const AddedItems = () => {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  const handleEdit = (recipeId) => {
+    history(`/edit-recipe/${recipeId}`);
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -73,6 +80,12 @@ const AddedItems = () => {
                     calories={item.calories}
                     rating={item.rating}
                   />
+                  <button
+                    className="edit-button"
+                    onClick={() => handleEdit(item.recipeid)}
+                  >
+                    <FaEdit />
+                  </button>
                 </div>
               ))}
             </div>

@@ -2,7 +2,13 @@ import React, { useContext, useState, useEffect } from "react";
 import "../../styles/RecipeDisplay.css";
 import { RecipeContext } from "../../context/recipeContext";
 import { Link } from "react-router-dom";
-import { clearAuthData, getAuthToken, getUserId } from "../../utils/auth";
+import {
+  clearAuthData,
+  getAuthToken,
+  getUserId,
+  isAuthenticated,
+  refreshAccessToken,
+} from "../../utils/auth";
 import axios from "axios";
 import Swal from "sweetalert2";
 
@@ -14,15 +20,21 @@ const RecipeDisplay = (props) => {
   useEffect(() => {
     setIsSaved(isRecipeSaved(recipe.recipeid));
   }, [isRecipeSaved, recipe.recipeid]);
+
   const handleSaveRecipe = async () => {
+    if (!isAuthenticated()) {
+      window.location.href = "/login";
+      return;
+    }
+
     try {
-      const authToken = getAuthToken();
+      let authToken = getAuthToken();
+      const userId = getUserId();
+
       if (!authToken) {
-        console.error("User not authenticated.");
-        return;
+        authToken = await refreshAccessToken(); // Refresh token if not available or expired
       }
 
-      const userId = getUserId();
       const response = await axios.post(
         "http://localhost:8000/recipe/saverecipe/",
         {
@@ -32,36 +44,37 @@ const RecipeDisplay = (props) => {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${authToken}`,
+            Authorization: `Bearer ${authToken.access}`,
           },
         }
       );
 
       setIsSaved(true);
-      // console.log("Recipe ID saved:", recipe.recipeid);
-      // console.log("Save recipe response:", response.data); // Log the response from the server
+      //console.log("Recipe ID saved:", recipe.recipeid);
+      //console.log("Save recipe response:", response.data);
     } catch (error) {
-      //console.error("Error saving recipe:", error);
+      console.error("Error saving recipe:", error);
       if (error.response && error.response.status === 401) {
         clearAuthData();
         window.location.href = "/login";
       } else {
-        // console.error(
-        //  "An error occurred while saving the recipe:",
-        //  error.message
-        // );
-      }
+        console.error(
+          "An error occurred while saving the recipe:",
+          error.message
+        );
 
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.error === "Recipe already favorited"
-      ) {
-        Swal.fire({
-          icon: "info",
-          title: "Recipe Already Favorited",
-          text: "You have already favorited this recipe.",
-        });
+        // Show specific error message if recipe is already favorited
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.error === "Recipe already favorited"
+        ) {
+          Swal.fire({
+            icon: "info",
+            title: "Recipe Already Favorited",
+            text: "You have already favorited this recipe.",
+          });
+        }
       }
     }
   };
@@ -69,6 +82,7 @@ const RecipeDisplay = (props) => {
   if (!recipe) {
     return <div>Loading...</div>;
   }
+
   let ingredientsArray = [];
   if (typeof recipe.ingredients === "string") {
     ingredientsArray = recipe.ingredients
@@ -103,10 +117,10 @@ const RecipeDisplay = (props) => {
       }
     } catch (error) {
       console.error("Error sharing recipe:", error);
-      // Fallback behavior if sharing fails or Web Share API is not supported
       alert(`Share ${recipe.title} using your preferred method.`);
     }
   };
+
   return (
     <div className="recipedisplay">
       <div className="recipedisplay-left">
@@ -116,15 +130,12 @@ const RecipeDisplay = (props) => {
         <h1>{recipe.title}</h1>
         <div className="recipedisplay-details">
           <span className="mins">
-            {" "}
             <b>{recipe.total_mins}</b> mins
           </span>
           <span className="calorie">
-            {" "}
             <b>{recipe.calories}</b> calorie
           </span>
           <span className="review">
-            {" "}
             <b>{recipe.total_reviews}</b> reviews
           </span>
         </div>

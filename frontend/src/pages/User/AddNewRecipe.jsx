@@ -6,7 +6,12 @@ import RecipeDisplay from "../../components/recipeDisplay/RecipeDisplay";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import axios from "axios";
 import { RecipeContext } from "../../context/recipeContext";
-import { clearAuthData, getAuthToken, getUserId } from "../../utils/auth";
+import {
+  getAuthToken,
+  getUserId,
+  clearAuthData,
+  refreshAccessToken,
+} from "../../utils/auth";
 import "../../styles/AddNewRecipe.css";
 
 const AddNewRecipe = () => {
@@ -19,29 +24,42 @@ const AddNewRecipe = () => {
   const [formData, setFormData] = useState({
     title: "",
     img: "",
+    video: "",
     ingredients: [],
     total_mins: 0,
     categories: [],
     calories: 0,
     veg_nonveg: "",
     daytimeofcooking: "",
-    season: "",
+    season: [],
+    thumbnail: "",
   });
 
-  const [validationErrors, setValidationErrors] = useState({});
+  const [validationErrors, setValidationErrors] = useState({
+    title: "",
+    img: "",
+    ingredients: "",
+    veg_nonveg: "",
+    daytimeofcooking: "",
+    season: "",
+    calories: "",
+    total_mins: "",
+  });
+
   const [photoPreview, setPhotoPreview] = useState("");
+  const [videoPreview, setVideoPreview] = useState("");
   const [showPreview, setShowPreview] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
     if (type === "checkbox") {
-      const isChecked = checked;
       const currentValue = formData[name];
       let newValue;
 
-      if (isChecked) {
+      if (checked) {
         newValue = [...currentValue, value];
       } else {
         newValue = currentValue.filter((item) => item !== value);
@@ -63,7 +81,6 @@ const AddNewRecipe = () => {
           const minutes = name === "minutes" ? value : newData.minutes;
           newData.total_mins = calculateTotalMins(hours, minutes);
         }
-
         return newData;
       });
     }
@@ -75,38 +92,106 @@ const AddNewRecipe = () => {
     return parsedHours * 60 + parsedMinutes;
   };
 
-  const handlePhotoChange = async (e) => {
+  const handleMediaChange = async (e, type) => {
     const file = e.target.files[0];
-    setUploadingImage(true);
+    console.log(`Uploading ${type}:`, file);
+    type === "image" ? setUploadingImage(true) : setUploadingVideo(true);
 
-    const formData = new FormData();
-    formData.append("image", file);
+    const formDataToSend = new FormData();
+    formDataToSend.append(type, file);
 
     try {
       const response = await axios.post(
         "http://localhost:8000/recipe/upload/",
-        formData,
+        formDataToSend,
         {
           headers: {
             "Content-Type": "multipart/form-data",
           },
         }
       );
-      const imageUrl = response.data;
-      setFormData((prevData) => ({
-        ...prevData,
-        img: imageUrl,
-      }));
-      setPhotoPreview(imageUrl);
-      setUploadingImage(false);
+      const mediaUrl = response.data;
+      //  console.log(`${type} upload response:`, response.data);
+      if (type === "image") {
+        setPhotoPreview(mediaUrl);
+        setFormData((prevData) => ({
+          ...prevData,
+          img: mediaUrl,
+        }));
+        setUploadingImage(false);
+      } else if (type === "video") {
+        setVideoPreview(mediaUrl);
+        setFormData((prevData) => ({
+          ...prevData,
+          video: mediaUrl,
+        }));
+        setUploadingVideo(false);
+
+        // Generate thumbnail from video
+        const videoElement = document.createElement("video");
+        videoElement.src = URL.createObjectURL(file);
+        videoElement.addEventListener("loadeddata", () => {
+          videoElement.currentTime = 5;
+        });
+        videoElement.addEventListener("seeked", async () => {
+          const canvas = document.createElement("canvas");
+          canvas.width = 320;
+          canvas.height = 180;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+          const thumbnailDataUrl = canvas.toDataURL("image/png");
+
+          // Upload the thumbnail to the server
+          const thumbnailFile = dataURLToFile(
+            thumbnailDataUrl,
+            "thumbnail.png"
+          );
+          const thumbnailFormData = new FormData();
+          thumbnailFormData.append("image", thumbnailFile);
+
+          try {
+            const thumbnailResponse = await axios.post(
+              "http://localhost:8000/recipe/upload/",
+              thumbnailFormData,
+              {
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                },
+              }
+            );
+            const thumbnailUrl = thumbnailResponse.data;
+            // console.log(`Thumbnail upload response:`, thumbnailResponse.data);
+
+            // Update formData with thumbnail URL
+            setFormData((prevData) => ({
+              ...prevData,
+              thumbnail: thumbnailUrl,
+            }));
+          } catch (error) {
+            console.error("Error uploading thumbnail:", error);
+          }
+        });
+      }
     } catch (error) {
-      //console.error("Error uploading image:", error);
-      setUploadingImage(false);
+      console.error(`Error uploading ${type}:`, error);
+      type === "image" ? setUploadingImage(false) : setUploadingVideo(false);
     }
   };
 
+  const dataURLToFile = (dataurl, filename) => {
+    const arr = dataurl.split(",");
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new File([u8arr], filename, { type: mime });
+  };
+
   const handleCategoryChange = (e) => {
-    const { name, value, checked } = e.target;
+    const { value, checked } = e.target;
 
     if (checked) {
       setFormData((prevData) => ({
@@ -135,7 +220,8 @@ const AddNewRecipe = () => {
       errors.daytimeofcooking = "Please select the time of cooking.";
     if (!formData.season.length)
       errors.season = "Please select at least one season.";
-    if (!formData.calories.length) errors.calories = "Calories are required";
+    if (!formData.calories) errors.calories = "Calories are required.";
+    if (!formData.total_mins) errors.total_mins = "Minutes are required.";
 
     if (Object.keys(errors).length) {
       setValidationErrors(errors);
@@ -149,22 +235,29 @@ const AddNewRecipe = () => {
       return;
     }
 
-    const hours = parseInt(formData.hours) || 0;
-    const minutes = parseInt(formData.minutes) || 0;
-    const total_mins = hours * 60 + minutes;
-
-    const authToken = getAuthToken();
+    const { access: authToken } = getAuthToken();
     const userid = getUserId();
     const seasonsString = formData.season.join("/");
+
     const dataToSend = {
-      ...formData,
-      total_mins,
-      userid,
-      season: seasonsString,
+      title: formData.title,
+      img: formData.img,
       ingredients: JSON.stringify(formData.ingredients),
+      total_mins: formData.total_mins,
+      categories: formData.categories,
+      calories: formData.calories,
+      veg_nonveg: formData.veg_nonveg,
+      daytimeofcooking: formData.daytimeofcooking,
+      season: seasonsString,
+      userid: userid,
     };
 
-    //console.log("Data sending to addrecipe API:", dataToSend);
+    if (formData.video) {
+      dataToSend.video = formData.video;
+    }
+    if (formData.thumbnail) {
+      dataToSend.thumbnail = formData.thumbnail;
+    }
 
     try {
       const response = await axios.post(
@@ -177,59 +270,63 @@ const AddNewRecipe = () => {
           },
         }
       );
-      if (response.status === 401) {
-        clearAuthData();
-        window.location.href = "/login";
-        return;
-      }
 
-      // const responseData = response.data;
-      // console.log("Recipe saved:", responseData);
+      console.log("Recipe saved:", response.data);
 
       Swal.fire({
         title: "Saved!",
-        text: "Your recipe has been saved.",
+        text: "Your recipe has been saved successfully.",
         confirmButtonText: "OK",
+      }).then(() => {
+        window.location.href = "/user/addedrecipes";
       });
-
-      setFormData({
-        title: "",
-        img: "",
-        ingredients: [],
-        total_mins: 0,
-        categories: [],
-        calories: 0,
-        veg_nonveg: "",
-        daytimeofcooking: "",
-        season: "",
-      });
-      setPhotoPreview("");
-      setShowPreview(false);
-      setValidationErrors({});
     } catch (error) {
-      //console.error("Error saving recipe:", error);
+      if (error.response && error.response.status === 401) {
+        try {
+          const newAuthToken = await refreshAccessToken();
+          const retryResponse = await axios.post(
+            "http://localhost:8000/recipe/addrecipe/",
+            dataToSend,
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${newAuthToken}`,
+              },
+            }
+          );
 
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
-        Swal.fire({
-          title: "Error!",
-          text: error.response.data.message,
-          confirmButtonText: "OK",
-        });
+          //console.log("Recipe saved:", retryResponse.data);
+
+          Swal.fire({
+            title: "Saved!",
+            text: "Your recipe has been saved successfully.",
+            confirmButtonText: "OK",
+          }).then(() => {
+            window.location.href = "/user/addedrecipes";
+          });
+        } catch (refreshError) {
+          console.error("Error refreshing token:", refreshError);
+          Swal.fire({
+            title: "Unauthorized",
+            text: "Your session has expired. Please log in again.",
+            confirmButtonText: "OK",
+          }).then(() => {
+            clearAuthData();
+            window.location.href = "/user/login";
+          });
+        }
       } else {
+        console.error("Error saving recipe:", error);
         Swal.fire({
-          title: "Error!",
-          text: "Failed to save the recipe. Please try again later.",
+          title: "Error",
+          text: "There was an error saving your recipe. Please try again later.",
           confirmButtonText: "OK",
         });
       }
     }
   };
-
   const handleShowPreview = () => {
+    console.log("Form Data:", formData);
     setShowPreview(true);
   };
 
@@ -352,54 +449,74 @@ const AddNewRecipe = () => {
                     ))}
                   </div>
                   {validationErrors.season && (
-                    <span className="error">{validationErrors.season}</span>
-                  )}
-                </div>
-                {/*} <div className="season-section">
-                  <label htmlFor="season">Season:</label>
-                  <select
-                    id="season"
-                    name="season"
-                    value={formData.season}
-                    onChange={handleChange}
-                    required
-                  >
-                    <option value="">Select Season</option>
-                    {distinctSeasons.map((season) => (
-                      <option key={season} value={season}>
-                        {season}
-                      </option>
-                    ))}
-                  </select>
-                  {validationErrors.season && (
                     <span className="error" style={{ color: "#f44336" }}>
                       {validationErrors.season}
                     </span>
                   )}
-                </div>*/}
+                </div>
                 {/* Image Upload */}
                 <div className="form-group">
                   <label htmlFor="img">Recipe Image:</label>
                   <input
                     type="file"
+                    accept="image/*"
                     id="img"
                     name="img"
-                    onChange={handlePhotoChange}
-                    required
-                  />{" "}
+                    onChange={(e) => handleMediaChange(e, "image")}
+                  />
                   {validationErrors.img && (
-                    <span className="error" style={{ color: "#f44336" }}>
+                    <div className="error" style={{ color: "#f44336" }}>
                       {validationErrors.img}
-                    </span>
+                    </div>
                   )}
-                  {photoPreview && (
-                    <img
-                      src={photoPreview}
-                      alt="Recipe Preview"
-                      style={{ width: "100px", height: "100px" }}
-                    />
+                  {uploadingImage ? (
+                    <div>Uploading Image...</div>
+                  ) : (
+                    photoPreview && (
+                      <div>
+                        <img
+                          src={photoPreview}
+                          alt="Recipe"
+                          className="preview-image"
+                          style={{ width: "30%" }}
+                        />
+                      </div>
+                    )
                   )}
                 </div>
+
+                <div className="form-group">
+                  <label htmlFor="video">Recipe Video:</label>
+                  <input
+                    type="file"
+                    accept="video/*"
+                    id="video"
+                    name="video"
+                    onChange={(e) => handleMediaChange(e, "video")}
+                  />
+                  {/*  {validationErrors.video && (
+                    <div className="error" style={{ color: "#f44336" }}>
+                      {validationErrors.video}
+                    </div>
+                  )}*/}
+                  {uploadingVideo ? (
+                    <div>Uploading Video...</div>
+                  ) : (
+                    videoPreview && (
+                      <div>
+                        <video
+                          controls
+                          className="preview-video"
+                          style={{ width: "30%" }}
+                        >
+                          <source src={videoPreview} type="video/mp4" />
+                          Your browser does not support the video tag.
+                        </video>
+                      </div>
+                    )
+                  )}
+                </div>
+
                 {/* ingredient section*/}
                 <div className="ingredient-container">
                   <label htmlFor="ingredients">Ingredients:</label>
@@ -470,7 +587,12 @@ const AddNewRecipe = () => {
                       }
                     }}
                     required
-                  />
+                  />{" "}
+                  {validationErrors.minutes && (
+                    <span className="error" style={{ color: "#f44336" }}>
+                      {validationErrors.minutes}
+                    </span>
+                  )}
                 </div>
                 <div></div>
                 {/*category section*/}

@@ -67,9 +67,9 @@
 .changepasswordbtn {
   background: #e1792f;
   color: #fff;
-  cursor: pointer;
-  padding: 10px;
+
+  padding: 10px 20px;
   border: none;
   border-radius: 5px;
-  font-size: medium;
+  cursor: pointer;
 }

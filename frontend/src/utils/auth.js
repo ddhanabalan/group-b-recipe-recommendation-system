@@ -1,37 +1,42 @@
-export const setAuthToken = (token) => {
-  sessionStorage.setItem("token", token);
+import axios from "axios";
+
+export const setAuthToken = (tokens) => {
+  sessionStorage.setItem("accessToken", tokens.access);
+  sessionStorage.setItem("refreshToken", tokens.refresh);
 };
 
 export const getAuthToken = () => {
-  return sessionStorage.getItem("token");
+  return {
+    access: sessionStorage.getItem("accessToken"),
+    refresh: sessionStorage.getItem("refreshToken"),
+  };
 };
 
 export const clearAuthToken = () => {
-  sessionStorage.removeItem("token");
+  sessionStorage.removeItem("accessToken");
+  sessionStorage.removeItem("refreshToken");
 };
 
 export const isAuthenticated = () => {
-  return !!getAuthToken();
+  return !!sessionStorage.getItem("accessToken");
 };
+
 export const setUserId = (userId) => {
   sessionStorage.setItem("userId", userId);
 };
 
-// Retrieve user ID from sessionStorage
 export const getUserId = () => {
   return sessionStorage.getItem("userId");
 };
 
-// Clear user ID from sessionStorage
 export const clearUserId = () => {
   sessionStorage.removeItem("userId");
 };
 
-// Check if user ID exists in sessionStorage
 export const isUserIdSet = () => {
   return !!getUserId();
 };
-//username case
+
 export const setUserName = (userName) => {
   sessionStorage.setItem("userName", userName);
 };
@@ -43,7 +48,7 @@ export const getUserName = () => {
 export const clearUserName = () => {
   sessionStorage.removeItem("userName");
 };
-//useremail case
+
 export const setUserEmail = (userEmail) => {
   sessionStorage.setItem("userEmail", userEmail);
 };
@@ -55,7 +60,7 @@ export const getUserEmail = () => {
 export const clearUserEmail = () => {
   sessionStorage.removeItem("userEmail");
 };
-//role section
+
 export const setUserRole = (userRole) => {
   sessionStorage.setItem("userRole", userRole);
 };
@@ -67,11 +72,28 @@ export const getUserRole = () => {
 export const clearUserRole = () => {
   sessionStorage.removeItem("userRole");
 };
-//clear all
+
 export const clearAuthData = () => {
   clearAuthToken();
   clearUserId();
   clearUserName();
   clearUserEmail();
   clearUserRole();
+};
+export const refreshAccessToken = async () => {
+  const refreshToken = sessionStorage.getItem("refreshToken");
+
+  try {
+    const response = await axios.post(
+      "http://localhost:8000/authentication/token/refresh/",
+      { refresh: refreshToken }
+    );
+
+    const newTokens = response.data;
+    setAuthToken(newTokens); // Store the new tokens
+    return newTokens.access; // Return the new access token
+  } catch (error) {
+    console.error("Error refreshing token:", error);
+    throw error; // Throw error for handling in the calling function
+  }
 };
