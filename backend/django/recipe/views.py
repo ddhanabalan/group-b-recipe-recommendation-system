@@ -467,7 +467,7 @@ class SingleRecipe(APIView):
         return Response(data[0])
     
 class EditRecipe(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         recipeid = request.data.get('recipeid')
@@ -479,10 +479,13 @@ class EditRecipe(APIView):
         except Recipe.DoesNotExist:
             return Response({"message": "Recipe not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        # Extract categories from request data
-        categories_data = request.data.pop('categories', None)
+        # Make a mutable copy of request.data
+        data = request.data.copy()
+        
+        # Extract categories from mutable copy of request data
+        categories_data = data.pop('categories', None)
 
-        serializer = RecipeSerializer(recipe, data=request.data, partial=True)
+        serializer = RecipeSerializer(recipe, data=data, partial=True)
         if serializer.is_valid():
             # Save the updated recipe data
             serializer.save()
@@ -492,9 +495,14 @@ class EditRecipe(APIView):
                 RecipeCategories.objects.filter(recipeid=recipe).delete()
 
                 # Add new categories
-                for category_name in categories_data:
-                    category, created = Category.objects.get_or_create(name=category_name)
-                    RecipeCategories.objects.create(recipeid=recipe, category_id=category.id)
+                # for category_name in categories_data:
+                #     category, created = Category.objects.get_or_create(name=category_name)
+                #     RecipeCategories.objects.create(recipeid=recipe, category_id=category.id)
+                for category in categories_data:
+                    # recipe_id = Recipe.objects.get(recipeid=recipeid)
+                    category_obj = Category.objects.filter(name=category).first()
+                    if category_obj:
+                        RecipeCategories.objects.create(recipeid=recipe, category_id=category_obj.id)
 
             return Response({"message": "Recipe updated successfully"}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

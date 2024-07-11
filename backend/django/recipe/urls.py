@@ -3,7 +3,7 @@ from recipe.views import AllRecipes,PopularRecipes,NewRecipes, AddFavorite, AllF
 from recipe.views import AllReviews, AllReviewsLimited, AllTitles, AddReview, DeleteReview,AddRecipe, AllCategories, UserRecipes
 from recipe.views import RemoveFavourites, UserHistory, RecipesCount, ReviewsCount, DeleteRecipe, AllRecipesLimited, DeleteHistory
 from recipe.views import NewRecipesLast30Days, NewRecipesLast30DaysDetails, MediaUploadView, FetchUserHistory, DeleteAllHistory
-from recipe.views import SingleRecipe, UserSearchHistory
+from recipe.views import SingleRecipe, UserSearchHistory, EditRecipe
 urlpatterns = [
     path('allrecipes/', AllRecipes.as_view(), name='allrecipes'),
     path('allrecipeslimited/', AllRecipesLimited.as_view(), name='allrecipeslimited'),
@@ -34,4 +34,5 @@ urlpatterns = [
     path('deletehistory/', DeleteHistory.as_view(), name='deletehistory'),
     path('addsearchhistory/', UserSearchHistory.as_view(), name='addsearchhistory'),
     path('singlerecipe/', SingleRecipe.as_view(), name='singlerecipe'),
+    path('editrecipe/', EditRecipe.as_view(), name='editrecipe'),
 ]
