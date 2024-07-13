@@ -10,6 +10,7 @@ import string
 from django.utils import timezone
 from datetime import timedelta
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.shortcuts import get_object_or_404
 
 def AddCategories(data):
     for recipe_data in data:
@@ -414,6 +415,8 @@ class MediaUploadView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class FetchUserHistory(APIView):
+    permission_classes = [IsAuthenticated]
+    
     def post(self, request, *args, **kwargs):
         user_id = request.data.get('userid')
         if not user_id:
@@ -467,7 +470,7 @@ class SingleRecipe(APIView):
         return Response(data[0])
     
 class EditRecipe(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         recipeid = request.data.get('recipeid')
@@ -494,15 +497,28 @@ class EditRecipe(APIView):
                 # Clear existing categories
                 RecipeCategories.objects.filter(recipeid=recipe).delete()
 
-                # Add new categories
-                # for category_name in categories_data:
-                #     category, created = Category.objects.get_or_create(name=category_name)
-                #     RecipeCategories.objects.create(recipeid=recipe, category_id=category.id)
                 for category in categories_data:
-                    # recipe_id = Recipe.objects.get(recipeid=recipeid)
                     category_obj = Category.objects.filter(name=category).first()
                     if category_obj:
                         RecipeCategories.objects.create(recipeid=recipe, category_id=category_obj.id)
 
             return Response({"message": "Recipe updated successfully"}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class MadeRecipe(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        recipeid = request.data.get('recipeid')
+        
+        # Ensure userid and recipeid are provided
+        if not recipeid:
+            return Response({'error': 'Recipe Id are required.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        history = get_object_or_404(History, userid=user.userid, recipeid=recipeid)
+        history.status = True
+        history.save()  # Save the updated status
+        
+        return Response({'success': 'Status updated successfully.'}, status=status.HTTP_200_OK)
+

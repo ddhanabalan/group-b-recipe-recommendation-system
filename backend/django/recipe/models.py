@@ -61,6 +61,7 @@ class History(models.Model):
     userid = models.ForeignKey(User, on_delete=models.CASCADE, db_column='userid')
     recipeid = models.ForeignKey(Recipe, on_delete=models.CASCADE, db_column='recipeid')
     total_count = models.IntegerField(default=1)
+    status = models.BooleanField(default=False)
     added_at = models.DateTimeField(auto_now=True)
 
     class Meta:

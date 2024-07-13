@@ -9,7 +9,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["userid","username", "email", "password",'role']
+        fields = ["userid","username", "email", "password",'role', 'preference', 'food_type']
     def create(self, validated_data):
         validated_data['password'] = make_password(validated_data.get('password'))
         return super().create(validated_data)
@@ -74,3 +74,14 @@ class AllUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["userid","username", "email", 'created_at']
+
+class UserPreferenceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['preference', 'food_type']
+    
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        preference = representation.get('preference', '')
+        representation['preference'] = preference.split() if preference else ""
+        return representation
