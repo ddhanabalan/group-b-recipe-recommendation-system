@@ -7,6 +7,7 @@ import os
 from recipe.models import Recipe, Category
 from recipe.serializers import RecipeSerializer, RecipeCategories
 from django.conf import settings
+import random
 
 # Custom Unpickler to ensure recommend_recipe is available
 class CustomUnpickler(pickle.Unpickler):
@@ -62,8 +63,13 @@ class UserPrediction(APIView):
             # print(avg_review)
             avg_total_reviews = avg_review['total_reviews__avg']
             # print(avg_total_reviews)
-            prediction = list(Recipe.objects.filter(total_reviews__gte=avg_total_reviews).values_list('recipeid', flat=True).order_by('-rating')[:10])
+            top_recipes = list(Recipe.objects.filter(total_reviews__gte=avg_total_reviews).values_list('recipeid', flat=True).order_by('-rating')[:50])
             # print(prediction)
+            # Randomly select 10 recipes from the top 50
+            if len(top_recipes) > 10:
+                prediction = random.sample(top_recipes, 10)
+            else:
+                prediction = top_recipes
         queryset = Recipe.objects.filter(recipeid__in=prediction)
         serializer = RecipeSerializer(queryset, many=True)
         data = serializer.data
