@@ -2,6 +2,7 @@ from django.urls import path
 from authentication.views import UserSignup, UserLogin, ForgotPassword, VerifyEmail, Logout, PasswordResetConfirmView, DeleteUser
 from authentication.views import ChangeUsername, FetchUsernameAndEmail, AddFeedback, DeleteFeedback, AllUsersLimited, UsersCount
 from authentication.views import FeedbackCount, AllFeedbacksLimited, NewUsersLast30Days, ChangePassword, NewUsersLast30DaysDetails
+from authentication.views import AddPreference, AddFoodType, FetchUserPreference
 from rest_framework_simplejwt.views import TokenRefreshView
 
 urlpatterns = [
@@ -24,4 +25,7 @@ urlpatterns = [
     path('deleteuser/', DeleteUser.as_view(), name='deleteuser'),
     path('newuserscount/', NewUsersLast30Days.as_view(), name='newuserscount'),
     path('newusersdetails/', NewUsersLast30DaysDetails.as_view(), name='newusersdetails'),
+    path('addpreference/', AddPreference.as_view(), name='addpreference'),
+    path('addfoodtype/', AddFoodType.as_view(), name='addfoodtype'),
+    path('userpreferences/', FetchUserPreference.as_view(), name='fetchuserpreference'),
 ]

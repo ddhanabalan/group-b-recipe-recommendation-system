@@ -23,8 +23,8 @@ class Command(BaseCommand):
             new_data = []
             for favourite in favourites:
                 new_data.append({
-                    'recipe_id': favourite.recipeid,
-                    'user_id': favourite.userid,
+                    'recipe_id': favourite.recipeid.recipeid,
+                    'user_id': favourite.userid.userid,
                     'saved': 1  # All entries in the favourites table are saved, so this is always 1
                 })
             new_data_df = pd.DataFrame(new_data)

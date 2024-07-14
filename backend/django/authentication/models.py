@@ -18,6 +18,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     created_at = models.DateTimeField(auto_now_add=True)
     role = models.CharField(max_length=255,default='user')
     is_active = models.BooleanField(default=False)
+    food_type = models.CharField(max_length=255, default='')
+    preference = models.TextField(default='')
     first_name = ''
     last_name = ''
     is_superuser = False

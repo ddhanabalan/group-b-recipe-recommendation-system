@@ -10,8 +10,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         # Define file paths
-        csv_file_path = os.path.join(settings.BASE_DIR, 'AIML', 'all_clicks.csv')
-        pickle_file_path = os.path.join(settings.BASE_DIR, 'AIML', 'user_clicks.pkl')
+        csv_file_path = os.path.join(settings.BASE_DIR, 'AIML', 'all_click.csv')
+        pickle_file_path = os.path.join(settings.BASE_DIR, 'AIML', 'user_click.pkl')
         # csv_file_path = os.path.join(settings.ML_DIR, 'AIML', 'all_clicks.csv')
         # pickle_file_path = os.path.join(settings.ML_DIR, 'AIML', 'user_click.pkl')
 
@@ -26,8 +26,8 @@ class Command(BaseCommand):
             
             for history in user_history:
                 new_data.append({
-                    'recipe_id': history.recipeid,
-                    'user_id': history.userid,
+                    'recipe_id': history.recipeid.recipeid,
+                    'user_id': history.userid.userid,
                     'click': history.total_count  # Assuming total_count represents clicks
                 })
 

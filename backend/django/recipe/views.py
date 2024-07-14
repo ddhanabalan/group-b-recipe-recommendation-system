@@ -10,6 +10,7 @@ import string
 from django.utils import timezone
 from datetime import timedelta
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.shortcuts import get_object_or_404
 
 def AddCategories(data):
     for recipe_data in data:
@@ -47,12 +48,13 @@ class AllRecipesLimited(APIView):
         return Response(data)
 
 class PopularRecipes(generics.ListAPIView):
-    start_date = timezone.now() - timedelta(days=30)
-    queryset = Recipe.objects.filter(created_at__gte=start_date).order_by("-total_reviews")[:10]
-    serializer_class = RecipeSerializer
 
     def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
+        start_date = timezone.now() - timedelta(days=30)
+        queryset = Recipe.objects.filter(created_at__gte=start_date).order_by("-total_reviews")[:10]
+        while len(queryset)<5:
+            start_date = start_date - timedelta(days=30)
+            queryset = Recipe.objects.filter(created_at__gte=start_date).order_by("-total_reviews")[:10]
         serializer = RecipeSerializer(queryset, many=True)
         # serializer = self.get_serializer(queryset, many=True)
         data = serializer.data
@@ -413,6 +415,8 @@ class MediaUploadView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class FetchUserHistory(APIView):
+    permission_classes = [IsAuthenticated]
+    
     def post(self, request, *args, **kwargs):
         user_id = request.data.get('userid')
         if not user_id:
@@ -464,3 +468,57 @@ class SingleRecipe(APIView):
         data=[data]
         data = AddCategories(data)
         return Response(data[0])
+    
+class EditRecipe(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        recipeid = request.data.get('recipeid')
+        if not recipeid:
+            return Response({"message": "Recipe ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            recipe = Recipe.objects.get(recipeid=recipeid)
+        except Recipe.DoesNotExist:
+            return Response({"message": "Recipe not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Make a mutable copy of request.data
+        data = request.data.copy()
+        
+        # Extract categories from mutable copy of request data
+        categories_data = data.pop('categories', None)
+
+        serializer = RecipeSerializer(recipe, data=data, partial=True)
+        if serializer.is_valid():
+            # Save the updated recipe data
+            serializer.save()
+
+            if categories_data is not None:
+                # Clear existing categories
+                RecipeCategories.objects.filter(recipeid=recipe).delete()
+
+                for category in categories_data:
+                    category_obj = Category.objects.filter(name=category).first()
+                    if category_obj:
+                        RecipeCategories.objects.create(recipeid=recipe, category_id=category_obj.id)
+
+            return Response({"message": "Recipe updated successfully"}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class MadeRecipe(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        recipeid = request.data.get('recipeid')
+        
+        # Ensure userid and recipeid are provided
+        if not recipeid:
+            return Response({'error': 'Recipe Id are required.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        history = get_object_or_404(History, userid=user.userid, recipeid=recipeid)
+        history.status = True
+        history.save()  # Save the updated status
+        
+        return Response({'success': 'Status updated successfully.'}, status=status.HTTP_200_OK)
+
