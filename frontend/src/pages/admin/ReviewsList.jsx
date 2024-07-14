@@ -4,7 +4,11 @@ import { useNavigate } from "react-router-dom";
 import AdminSideBar from "../../components/admin/AdminSideBar";
 import AdminNavbar from "../../components/adminNavbar/AdminNavbar";
 import Footer from "../../components/Footer/Footer";
-import { clearAuthToken, getAuthToken } from "../../utils/auth";
+import {
+  clearAuthToken,
+  getAuthToken,
+  refreshAccessToken,
+} from "../../utils/auth";
 import { isAuthenticated, getUserRole } from "../../utils/auth";
 import "../../styles/ReviewsList.css";
 
@@ -32,6 +36,22 @@ const ReviewsList = () => {
       setReviews(response.data);
     } catch (error) {
       console.error("Error fetching reviews:", error);
+      if (error.response && error.response.status === 401) {
+        await handleTokenRefresh(() => fetchData(pageNumber));
+      }
+    }
+  };
+
+  const handleTokenRefresh = async (retryFunction) => {
+    try {
+      await refreshAccessToken(); // Refresh the access token
+      const authToken = getAuthToken();
+      axios.defaults.headers.common["Authorization"] = `Bearer ${authToken}`;
+      retryFunction();
+    } catch (refreshError) {
+      console.error("Error refreshing access token:", refreshError);
+      clearAuthToken();
+      history("/login");
     }
   };
 
@@ -64,17 +84,15 @@ const ReviewsList = () => {
       await axios.delete("http://localhost:8000/recipe/deletereview", {
         data: { id: id },
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token.access}`,
         },
       });
 
       setReviews(reviews.filter((review) => review.id !== id));
     } catch (error) {
+      console.error("Error deleting review:", error);
       if (error.response && error.response.status === 401) {
-        clearAuthToken();
-        window.location.href = "/login";
-      } else {
-        console.error("Error deleting review:", error);
+        await handleTokenRefresh(() => handleRemoveReview(id));
       }
     }
   };

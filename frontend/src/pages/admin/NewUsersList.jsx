@@ -5,7 +5,11 @@ import moment from "moment";
 import AdminSideBar from "../../components/admin/AdminSideBar";
 import AdminNavbar from "../../components/adminNavbar/AdminNavbar";
 import Footer from "../../components/Footer/Footer";
-import { clearAuthToken, getAuthToken } from "../../utils/auth";
+import {
+  clearAuthToken,
+  getAuthToken,
+  refreshAccessToken,
+} from "../../utils/auth";
 import { isAuthenticated, getUserRole } from "../../utils/auth";
 import "../../styles/UsersList.css";
 
@@ -34,6 +38,9 @@ const NewUsersList = () => {
       setUsers(response.data || []);
     } catch (error) {
       console.error("Error fetching users:", error);
+      if (error.response && error.response.status === 401) {
+        await handleTokenRefresh(() => fetchData(pageNumber));
+      }
     }
   };
 
@@ -45,6 +52,20 @@ const NewUsersList = () => {
       setTotalUsers(response.data || 0);
     } catch (error) {
       console.error("Error fetching total users:", error);
+      if (error.response && error.response.status === 401) {
+        await handleTokenRefresh(fetchTotalUsers);
+      }
+    }
+  };
+
+  const handleTokenRefresh = async (retryFunction) => {
+    try {
+      await refreshAccessToken();
+      retryFunction();
+    } catch (refreshError) {
+      console.error("Error refreshing access token:", refreshError);
+      clearAuthToken();
+      history("/login");
     }
   };
 
@@ -80,7 +101,7 @@ const NewUsersList = () => {
       const authToken = getAuthToken();
       await axios.delete("http://localhost:8000/authentication/deleteuser/", {
         headers: {
-          Authorization: `Bearer ${authToken}`,
+          Authorization: `Bearer ${authToken.access}`,
         },
         data: {
           userid: userid,
@@ -88,11 +109,9 @@ const NewUsersList = () => {
       });
       setUsers(users.filter((user) => user.userid !== userid));
     } catch (error) {
+      console.error("Error removing user:", error);
       if (error.response && error.response.status === 401) {
-        clearAuthToken();
-        history("/login");
-      } else {
-        console.error("Error removing user:", error);
+        await handleTokenRefresh(() => handleRemoveUser(userid));
       }
     }
   };

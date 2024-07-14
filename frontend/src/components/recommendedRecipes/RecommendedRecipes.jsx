@@ -39,9 +39,13 @@ const RecommendedRecipes = ({ recipeId }) => {
     return <div>Error: {error}</div>;
   }
 
+  if (recipeData.length === 0) {
+    return null; // Hide the section if no recipes are available
+  }
+
   return (
     <div className="recommendedrecipes">
-      <h1>Looking For Something else?</h1>
+      <h1>Looking For Something Else?</h1>
       <div className="recommenderecipe_carousel">
         <CarouselComponent className="recomended_carousel" data={recipeData} />
       </div>

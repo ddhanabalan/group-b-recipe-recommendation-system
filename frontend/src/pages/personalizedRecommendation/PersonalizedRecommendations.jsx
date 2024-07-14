@@ -114,7 +114,9 @@ const PersonalizedRecommendationPage = () => {
                 </div>
               </>
             )}
-            <button type="submit">{step === 1 ? "Next" : "Submit"}</button>
+            <button className="recommendationbtn" type="submit">
+              {step === 1 ? "Next" : "Submit"}
+            </button>
           </form>
         </div>
       </div>

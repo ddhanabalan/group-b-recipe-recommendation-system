@@ -6,10 +6,15 @@
   column-gap: 15px;
 }
 .saved-recipe-card button {
-  width: 350px;
+  width: 330px;
   height: 30px;
   font-size: 20px;
-  margin-top: 10px;
-  margin-top: 10px;
+
+  margin-left: 11px;
   background-color: #ffd4b4;
+  border: none;
+}
+.edit-button,
+.removesaves-button {
+  cursor: pointer;
 }

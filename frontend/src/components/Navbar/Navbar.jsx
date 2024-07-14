@@ -287,19 +287,24 @@ function Navbar() {
                 {open && (
                   <ul className="dropdown-menu">
                     <li>
-                      <a href="/user/savedrecipes">Dashboard</a>
+                      <a href="/user/savedrecipes" className="dropdown-link">
+                        Dashboard
+                      </a>
                     </li>
                     <li>
-                      <a href="/changepassword">Change Password</a>
+                      <a href="/changepassword" className="dropdown-link">
+                        Change Password
+                      </a>
                     </li>
                     <li>
                       <button
+                        className="dropdown-link"
                         style={{
                           border: "none",
                           background: "none",
                           color: "black",
                           fontSize: "12px",
-                          paddingLeft: 0,
+                          padding: "10px 20px",
                           cursor: "pointer",
                         }}
                         onClick={handleLogout}

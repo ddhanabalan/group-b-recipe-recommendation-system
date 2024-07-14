@@ -16,7 +16,7 @@ const SavedItems = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 20;
+  const itemsPerPage = 21;
 
   useEffect(() => {
     const fetchSavedRecipes = async () => {
@@ -104,7 +104,6 @@ const SavedItems = () => {
       Swal.fire({
         title: "Removed",
         text: "Recipe has been removed from your favorites.",
-        confirmButtonText: "OK",
       });
     } catch (error) {
       Swal.fire({
@@ -146,7 +145,10 @@ const SavedItems = () => {
                     calories={item.calories}
                     rating={item.rating}
                   />
-                  <button onClick={() => handleRemoveRecipe(item.recipeid)}>
+                  <button
+                    className="removesaves-button"
+                    onClick={() => handleRemoveRecipe(item.recipeid)}
+                  >
                     Remove
                   </button>
                 </div>
