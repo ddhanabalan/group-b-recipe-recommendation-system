@@ -12,7 +12,7 @@ import {
   refreshAccessToken,
   getUserId,
 } from "../../utils/auth";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const EditRecipe = () => {
   const { recipeId } = useParams();
@@ -40,7 +40,7 @@ const EditRecipe = () => {
   const [videoPreview, setVideoPreview] = useState("");
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingVideo, setUploadingVideo] = useState(false);
-
+  const history = useNavigate();
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -58,6 +58,7 @@ const EditRecipe = () => {
         );
 
         const recipeData = response.data;
+        console.log("recipe original data:", recipeData);
         setFormData({
           title: recipeData.title || "",
           img: recipeData.img || "",
@@ -69,7 +70,7 @@ const EditRecipe = () => {
           total_mins: recipeData.total_mins || 0,
           categories: recipeData.categories || [],
           calories: recipeData.calories || 0,
-          veg_nonveg: recipeData.veg_nonveg || "veg",
+          veg_nonveg: recipeData.veg_nonveg || "",
           daytimeofcooking: recipeData.daytimeofcooking || "",
           season: recipeData.season ? recipeData.season.split("/") : [],
         });
@@ -84,7 +85,7 @@ const EditRecipe = () => {
           total_mins: recipeData.total_mins || 0,
           categories: recipeData.categories || [],
           calories: recipeData.calories || 0,
-          veg_nonveg: recipeData.veg_nonveg || "veg",
+          veg_nonveg: recipeData.veg_nonveg || "",
           daytimeofcooking: recipeData.daytimeofcooking || "",
           season: recipeData.season ? recipeData.season.split("/") : [],
         });
@@ -146,7 +147,25 @@ const EditRecipe = () => {
       }));
     }
   };
+  const handleCategoryChange = (e) => {
+    const { value, checked } = e.target;
 
+    setFormData((prevData) => {
+      if (checked) {
+        // Add category to array if checked
+        return {
+          ...prevData,
+          categories: [...prevData.categories, value],
+        };
+      } else {
+        // Remove category from array if unchecked
+        return {
+          ...prevData,
+          categories: prevData.categories.filter((cat) => cat !== value),
+        };
+      }
+    });
+  };
   const handleMediaChange = async (e, type) => {
     const file = e.target.files[0];
     console.log(`Uploading ${type}:`, file);
@@ -263,7 +282,7 @@ const EditRecipe = () => {
 
       const dataToSend = new FormData();
       const changes = {};
-
+      dataToSend.append("recipeid", recipeId);
       if (formData.title !== initialData.title) {
         dataToSend.append("title", formData.title);
         changes.title = formData.title;
@@ -288,8 +307,14 @@ const EditRecipe = () => {
         dataToSend.append("total_mins", formData.total_mins);
         changes.total_mins = formData.total_mins;
       }
-      if (formData.categories !== initialData.categories) {
-        dataToSend.append("categories", formData.categories);
+
+      if (
+        JSON.stringify(formData.categories) !==
+        JSON.stringify(initialData.categories)
+      ) {
+        formData.categories.forEach((category) => {
+          dataToSend.append("categories", category); // Append each category individually
+        });
         changes.categories = formData.categories;
       }
       if (formData.calories !== initialData.calories) {
@@ -327,8 +352,9 @@ const EditRecipe = () => {
       if (response.status === 200) {
         Swal.fire({
           title: "Success!",
-          text: "Recipe updated successfully!",
-          confirmButtonText: "OK",
+          text: "Recipe updated successfully.",
+        }).then(() => {
+          history("/user/addedrecipes");
         });
       } else {
         Swal.fire({
@@ -457,7 +483,7 @@ const EditRecipe = () => {
                       type="checkbox"
                       name="categories"
                       value={category}
-                      onChange={handleChange}
+                      onChange={handleCategoryChange}
                       checked={formData.categories.includes(category)}
                     />
                     <span className="category-name">{category}</span>
@@ -483,15 +509,15 @@ const EditRecipe = () => {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="veg_nonveg">Vegetarian/Non-vegetarian:</label>
+              <label htmlFor="veg_nonveg">Veg/Non-veg:</label>
               <select
                 id="veg_nonveg"
                 name="veg_nonveg"
                 value={formData.veg_nonveg}
                 onChange={handleChange}
               >
-                <option value="veg">Vegetarian</option>
-                <option value="non-veg">Non-vegetarian</option>
+                <option value="veg">Veg</option>
+                <option value="non-veg">Non-veg</option>
               </select>
             </div>
             <div className="form-group">

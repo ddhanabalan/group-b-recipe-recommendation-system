@@ -83,6 +83,7 @@ function AdminNavbar() {
                   padding: "8px 30px",
                   background: "none",
                   marginLeft: "50%",
+                  cursor: "pointer",
                 }}
               >
                 Logout

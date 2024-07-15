@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 import { getUserId } from "../../utils/auth";
 import { FaEdit } from "react-icons/fa";
 import { useNavigate } from "react-router";
+import loadingGif from "../../assets/loading.gif";
 
 const AddedItems = () => {
   const [addedRecipes, setAddedRecipes] = useState([]);
@@ -56,7 +57,11 @@ const AddedItems = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="loader">
+        <img src={loadingGif} alt="Loading..." className="loading-gif" />
+      </div>
+    );
   }
 
   if (error) {

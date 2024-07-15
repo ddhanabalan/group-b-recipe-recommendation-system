@@ -29,7 +29,6 @@ function Login() {
       [name]: value,
     });
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -47,6 +46,23 @@ function Login() {
       setUserEmail(email);
       setUserRole(role);
       setAuthToken({ access, refresh });
+
+      // Fetch user preferences
+      const preferencesResponse = await axiosInstance.get(
+        "/authentication/userpreferences",
+        {
+          headers: {
+            Authorization: `Bearer ${access}`,
+          },
+        }
+      );
+
+      const { preference, food_type } = preferencesResponse.data;
+      // console.log("User Preferences:", { preference, food_type });
+      localStorage.setItem(
+        "userPreferences",
+        JSON.stringify({ preference, food_type })
+      );
 
       toast.success("Logged in successfully.", {
         autoClose: 3000,
@@ -66,7 +82,11 @@ function Login() {
       if (role === "admin") {
         navigate("/dashboard");
       } else {
-        navigate("/recommendation"); // Redirect to recommendation page
+        if (!preference || !food_type) {
+          navigate("/recommendation");
+        } else {
+          navigate("/home");
+        }
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -80,7 +100,6 @@ function Login() {
       }
     }
   };
-
   return (
     <div className="login-container">
       <div className="login-form-container">

@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
+import "../../styles/loading.css";
 import { RecipeContext } from "../../context/recipeContext";
 import { useParams } from "react-router-dom";
 import Footer from "../../components/Footer/Footer";
@@ -8,15 +9,44 @@ import Breadcrums from "../../components/breadcrums/Breadcrums";
 import RecommendedRecipes from "../../components/recommendedRecipes/RecommendedRecipes";
 import Reviews from "../../components/reviews/Reviews";
 import RatingAndReviewBox from "../../components/ratingAndReviewBox/RatingAndReviewBox";
-import { isAuthenticated } from "../../utils/auth";
 import VideoDisplay from "../../components/videoDisplay/VideoDisplay";
+import { isAuthenticated } from "../../utils/auth";
+import loadingGif from "../../assets/loading.gif";
+
 const SingleRecipe = () => {
-  const { allRecipes, loading, error } = useContext(RecipeContext);
   const { RecipeId } = useParams();
+  const [recipe, setRecipe] = useState(null);
   const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [reviewsLoading, setReviewsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [reviewsError, setReviewsError] = useState(null);
+
   useEffect(() => {
+    const fetchRecipe = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:8000/recipe/singlerecipe/",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ recipeid: RecipeId }),
+          }
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch recipe details");
+        }
+        const data = await response.json();
+        setRecipe(data);
+        setLoading(false);
+      } catch (error) {
+        setError(error.message);
+        setLoading(false);
+      }
+    };
+
     const fetchReviews = async () => {
       try {
         const response = await fetch(
@@ -41,28 +71,25 @@ const SingleRecipe = () => {
       }
     };
 
+    fetchRecipe();
     fetchReviews();
   }, [RecipeId]);
-  /*if (!isAuthenticated()) {
-    window.location.href = "/login";
-    return;
-  }*/
+
   if (loading || reviewsLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="loader">
+        <img src={loadingGif} alt="Loading..." className="loading-gif" />
+      </div>
+    );
   }
 
   if (error) {
-    return <div>Error: {error.message}</div>;
+    return <div>Error: {error}</div>;
   }
 
   if (reviewsError) {
     return <div>Error fetching reviews: {reviewsError}</div>;
   }
-
-  const recipe =
-    allRecipes && allRecipes.length > 0
-      ? allRecipes.find((e) => e.recipeid === Number(RecipeId))
-      : [];
 
   if (!recipe) {
     console.log(`Recipe with ID ${RecipeId} not found.`);
