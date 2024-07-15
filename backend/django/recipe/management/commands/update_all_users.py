@@ -11,9 +11,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         # Define file paths
-        csv_file_path = os.path.join(settings.BASE_DIR, 'AIML', 'all_users.csv')
         pickle_file_path = os.path.join(settings.BASE_DIR, 'AIML', 'all_users.pkl')
-        # csv_file_path = os.path.join(settings.ML_DIR, 'AIML','all_users.csv')
         # pickle_file_path = os.path.join(settings.ML_DIR, 'AIML','all_users.pkl')
 
         # Field mapping from reviews table to CSV
@@ -26,9 +24,10 @@ class Command(BaseCommand):
             'username': 'username'
         }
 
-        # Load the existing CSV file
-        if os.path.exists(csv_file_path):
-            df = pd.read_csv(csv_file_path)
+        # Load the existing file
+        if os.path.exists(pickle_file_path):
+            with open(pickle_file_path, 'rb') as file:
+                df = pickle.load(file)
         else:
             df = pd.DataFrame(columns=field_mapping.values())
 
@@ -44,9 +43,6 @@ class Command(BaseCommand):
 
         # Append new data to the existing DataFrame
         updated_df = pd.concat([df, new_data_df]).drop_duplicates().reset_index(drop=True)
-
-        # Save the updated DataFrame to a CSV file
-        updated_df.to_csv(csv_file_path, index=False)
 
         # Also save the updated DataFrame to a pickle file
         with open(pickle_file_path, 'wb') as file:

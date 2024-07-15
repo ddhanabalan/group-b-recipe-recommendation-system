@@ -418,10 +418,11 @@ class FetchUserHistory(APIView):
     permission_classes = [IsAuthenticated]
     
     def post(self, request, *args, **kwargs):
-        user_id = request.data.get('userid')
-        if not user_id:
-            return Response({'error': 'User ID is required'}, status=status.HTTP_400_BAD_REQUEST)
-        queryset = History.objects.filter(userid=user_id).select_related('recipeid').order_by('-added_at')
+        pageNo = request.data.get('pageNo')
+        user=request.user
+        if not pageNo:
+            return Response({'error': 'Page Number is required'}, status=status.HTTP_400_BAD_REQUEST)
+        queryset = History.objects.filter(userid=user.userid).select_related('recipeid').order_by('-added_at')[((pageNo-1)*20):(pageNo*20)]
         serializer = FetchHistorySerializer(queryset, many=True)
         data = serializer.data
         
