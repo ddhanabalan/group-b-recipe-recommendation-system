@@ -35,7 +35,7 @@ class Command(BaseCommand):
             category_names = Category.objects.filter(id__in=categories).values_list('name', flat=True)
 
             new_data.append({
-                'calories': recipe.calories if recipe.calories is not None else -1,
+                'calories': recipe.calories if recipe.calories is not None else 0,
                 'category': list(category_names),
                 'ingredients': recipe.ingredients.split('\n') if recipe.ingredients else [],
                 'ratings': recipe.rating if recipe.rating is not None else -1,

@@ -10,9 +10,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         # Define file paths
-        csv_file_path = os.path.join(settings.BASE_DIR, 'AIML', 'all_click.csv')
         pickle_file_path = os.path.join(settings.BASE_DIR, 'AIML', 'user_click.pkl')
-        # csv_file_path = os.path.join(settings.ML_DIR, 'AIML', 'all_clicks.csv')
         # pickle_file_path = os.path.join(settings.ML_DIR, 'AIML', 'user_click.pkl')
 
         # Fetch new data using Django ORM
@@ -33,13 +31,7 @@ class Command(BaseCommand):
 
             new_data_df = pd.DataFrame(new_data)
 
-        # Save the DataFrame to a CSV file
-        try:
-            new_data_df.to_csv(csv_file_path, index=False)
-        except PermissionError as e:
-            raise PermissionError(f"Cannot write to {csv_file_path}. Check file permissions.") from e
-
-        # Also save the DataFrame to a pickle file in CSV format
+        # Save the DataFrame to a pickle file in CSV format
         try:
             with open(pickle_file_path, 'wb') as file:
                 pickle.dump(new_data_df, file)

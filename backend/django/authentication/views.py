@@ -21,6 +21,7 @@ from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, Ou
 from django.utils import timezone
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
+from recipe.models import Reviews
 
 def generate_unique_userid():
     while True:
@@ -102,6 +103,10 @@ class VerifyEmail(APIView):
             temp = Temp.objects.get(username=username, vericode=vericode)
         except Temp.DoesNotExist:
             return Response({'error': 'Invalid verification code'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if the verification code is older than 5 minutes
+        if timezone.now() - temp.created_at > timedelta(minutes=5):
+            return Response({'error': 'Verification code has expired'}, status=status.HTTP_400_BAD_REQUEST)
         
         # If verification code is valid, save user details to the users table
         user_data = {
@@ -231,6 +236,8 @@ class ChangeUsername(APIView):
             user = User.objects.get(pk=request.data.get('userid'))
             user.username = new_username
             user.save()
+            # Update the username in the Reviews model
+            Reviews.objects.filter(userid=user).update(username=new_username)
             return Response({"message": "Username changed successfully"}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     

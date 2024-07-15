@@ -47,7 +47,7 @@ class PasswordResetSerializer(serializers.Serializer):
 class TempSerializer(serializers.ModelSerializer):
     class Meta:
         model = Temp
-        fields = ['userid','username', 'email', 'password']
+        fields = ['userid','username', 'email', 'password', 'created_at']
 
 class ChangeUsernameSerializer(serializers.Serializer):
     new_username = serializers.CharField(max_length=255)

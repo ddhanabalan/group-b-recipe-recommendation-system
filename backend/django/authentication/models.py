@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.utils.timezone import now
 
 class Temp(models.Model):
     userid = models.IntegerField(primary_key=True,unique=True)
@@ -7,6 +8,8 @@ class Temp(models.Model):
     email = models.EmailField(unique=False)
     password = models.CharField(max_length=255)
     vericode = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
     class Meta:
         db_table = 'temp'
         
