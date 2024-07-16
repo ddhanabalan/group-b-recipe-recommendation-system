@@ -10,9 +10,11 @@ import {
   getAuthToken,
   getUserId,
   refreshAccessToken,
+  setAuthToken,
 } from "../../utils/auth";
 import { isAuthenticated, getUserRole } from "../../utils/auth";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const UserFeedback = () => {
   const [formData, setFormData] = useState({
@@ -41,7 +43,9 @@ const UserFeedback = () => {
     e.preventDefault();
     const userId = getUserId();
     const authToken = getAuthToken();
-
+    if (!authToken) {
+      authToken = await refreshAccessToken();
+    }
     if (formData.category && formData.message) {
       const dataToSend = {
         userid: userId,
@@ -63,8 +67,9 @@ const UserFeedback = () => {
         );
 
         if (response.status === 401) {
-          await refreshAccessToken(); // Refresh the access token
-          return handleSubmit(e); // Retry submitting feedback
+          const error = await response.json();
+          console.error("Unauthorized error:", error);
+          await handleUnauthorizedError();
         }
 
         const responseData = await response.json();
@@ -101,6 +106,22 @@ const UserFeedback = () => {
         text: "Please fill in all fields before submitting.",
         confirmButtonText: "OK",
       });
+    }
+  };
+  const handleUnauthorizedError = async () => {
+    try {
+      const { refresh: refreshToken } = getAuthToken();
+      const response = await axios.post(
+        "http://localhost:8000/authentication/token/refresh/",
+        { refresh: refreshToken }
+      );
+      const { access, refresh } = response.data;
+      setAuthToken({ access, refresh });
+      await handleSubmit(); // Retry submitting after token refresh
+    } catch (error) {
+      console.error("Token refresh failed:", error);
+      clearAuthData(); // Clear auth data on token refresh failure
+      history("/login");
     }
   };
   return (

@@ -64,7 +64,7 @@ function Home() {
         <div className="recommendedrecipe">
           <div className="recommended-container">
             <div className="justforyou-heading">
-              <h2>Recommended - Just for You</h2>
+              <h2>Today's Top Recommendations for You</h2>
             </div>
             <div className="slider-container new-slider">
               <CarouselComponent data={recommendedRecipes} />

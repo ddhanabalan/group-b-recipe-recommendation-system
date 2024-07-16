@@ -15,9 +15,7 @@ const UserHistory = () => {
   const navigate = useNavigate();
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [visibleRecipes, setVisibleRecipes] = useState(6);
-
-  // Add a flag to check if the component is initialized
+  const [currentPage, setCurrentPage] = useState(1);
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
@@ -27,23 +25,24 @@ const UserHistory = () => {
   const initialize = async () => {
     try {
       if (!isAuthenticated()) {
-        await refreshTokensAndFetchRecipes();
+        await refreshTokensAndFetchRecipes(1);
       } else {
-        await fetchRecipes();
+        await fetchRecipes(1);
       }
+      setInitialized(true);
     } catch (error) {
       console.error("Initialization error:", error);
       navigate("/login");
     }
   };
 
-  const fetchRecipes = async () => {
+  const fetchRecipes = async (pageNo) => {
     const { access: accessToken } = getAuthToken();
     const userId = getUserId();
     try {
       const response = await axios.post(
         "http://localhost:8000/recipe/fetchhistory/",
-        { userid: userId },
+        { userid: userId, pageNo },
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -51,9 +50,11 @@ const UserHistory = () => {
         }
       );
       if (Array.isArray(response.data) && response.data.length > 0) {
-        setRecipes(response.data);
+        setRecipes((prevRecipes) =>
+          pageNo === 1 ? response.data : [...prevRecipes, ...response.data]
+        );
       } else {
-        setRecipes([]);
+        if (pageNo === 1) setRecipes([]);
       }
       setLoading(false);
     } catch (error) {
@@ -64,14 +65,14 @@ const UserHistory = () => {
   const handleRequestError = async (error) => {
     if (error.response && error.response.status === 401) {
       console.error("Unauthorized error:", error);
-      await refreshTokensAndFetchRecipes();
+      await refreshTokensAndFetchRecipes(currentPage);
     } else {
       console.error("Error fetching recipes:", error);
       setLoading(false);
     }
   };
 
-  const refreshTokensAndFetchRecipes = async () => {
+  const refreshTokensAndFetchRecipes = async (pageNo) => {
     try {
       const { refresh: refreshToken } = getAuthToken();
       const response = await axios.post(
@@ -80,7 +81,7 @@ const UserHistory = () => {
       );
       const { access, refresh } = response.data;
       setAuthToken({ access, refresh });
-      await fetchRecipes();
+      await fetchRecipes(pageNo);
     } catch (error) {
       console.error("Token refresh failed:", error);
       clearAuthData();
@@ -92,16 +93,15 @@ const UserHistory = () => {
     try {
       const { access: accessToken } = getAuthToken();
       const requestData = { id: historyId };
-      const response = await axios.delete(
-        "http://localhost:8000/recipe/deletehistory/",
-        {
-          data: requestData,
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
+      await axios.delete("http://localhost:8000/recipe/deletehistory/", {
+        data: requestData,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      setRecipes((prevRecipes) =>
+        prevRecipes.filter((recipe) => recipe.id !== historyId)
       );
-      setRecipes(recipes.filter((recipe) => recipe.id !== historyId));
     } catch (error) {
       console.error("Error removing recipe from history:", error);
     }
@@ -125,32 +125,10 @@ const UserHistory = () => {
   };
 
   const handleLoadMore = async () => {
-    const { access: accessToken } = getAuthToken();
-    const userId = getUserId();
-    try {
-      const response = await axios.post(
-        `http://localhost:8000/recipe/fetchhistory/?offset=${visibleRecipes}`,
-        { userid: userId },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-      if (Array.isArray(response.data) && response.data.length > 0) {
-        setRecipes([...recipes, ...response.data]);
-        setVisibleRecipes(visibleRecipes + response.data.length);
-      }
-    } catch (error) {
-      console.error("Error loading more recipes:", error);
-    }
+    const nextPage = currentPage + 1;
+    setCurrentPage(nextPage);
+    await fetchRecipes(nextPage);
   };
-
-  // Check if the component is initialized
-  if (!initialized) {
-    initialize();
-    setInitialized(true); // Mark the component as initialized
-  }
 
   if (loading) {
     return <div>Loading...</div>;
@@ -178,7 +156,7 @@ const UserHistory = () => {
           <div className="empty-message">No recipes in history.</div>
         )}
       </div>
-      {visibleRecipes < recipes.length && (
+      {recipes.length > 0 && (
         <button className="load-more-button" onClick={handleLoadMore}>
           Load More
         </button>

@@ -56,7 +56,7 @@ const Otp = () => {
         navigate("/login"); // Redirect to login page
       } else {
         const data = await response.json();
-        setVerificationError(data.message || "Failed to verify.");
+        setVerificationError(data.error || "Failed to verify.");
       }
     } catch (error) {
       setVerificationError("Failed to verify.");

@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import Items from "../Items/Items";
+import { useNavigate } from "react-router-dom";
 import { RecipeContext } from "../../context/recipeContext";
 import "../../styles/SavedItems.css";
 import {
@@ -7,17 +8,18 @@ import {
   getAuthToken,
   getUserId,
   refreshAccessToken,
+  setAuthToken,
 } from "../../utils/auth";
 import Swal from "sweetalert2";
-
+import axios from "axios";
 const SavedItems = () => {
   const { unsaveRecipe } = useContext(RecipeContext);
   const [savedRecipes, setSavedRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 20;
-
+  const itemsPerPage = 21;
+  const history = useNavigate();
   useEffect(() => {
     const fetchSavedRecipes = async () => {
       try {
@@ -90,8 +92,8 @@ const SavedItems = () => {
 
       if (!response.ok) {
         if (response.status === 401) {
-          clearAuthData();
-          window.location.href = "/login";
+          console.error("Unauthorized error:", error);
+          await handleUnauthorizedError();
           return;
         }
         throw new Error("Failed to remove recipe");
@@ -104,7 +106,6 @@ const SavedItems = () => {
       Swal.fire({
         title: "Removed",
         text: "Recipe has been removed from your favorites.",
-        confirmButtonText: "OK",
       });
     } catch (error) {
       Swal.fire({
@@ -114,7 +115,22 @@ const SavedItems = () => {
       });
     }
   };
-
+  const handleUnauthorizedError = async () => {
+    try {
+      const { refresh: refreshToken } = getAuthToken();
+      const response = await axios.post(
+        "http://localhost:8000/authentication/token/refresh/",
+        { refresh: refreshToken }
+      );
+      const { access, refresh } = response.data;
+      setAuthToken({ access, refresh });
+      await handleRemoveRecipe();
+    } catch (error) {
+      console.error("Token refresh failed:", error);
+      clearAuthData();
+      history("/login");
+    }
+  };
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = savedRecipes.slice(indexOfFirstItem, indexOfLastItem);
@@ -146,7 +162,10 @@ const SavedItems = () => {
                     calories={item.calories}
                     rating={item.rating}
                   />
-                  <button onClick={() => handleRemoveRecipe(item.recipeid)}>
+                  <button
+                    className="removesaves-button"
+                    onClick={() => handleRemoveRecipe(item.recipeid)}
+                  >
                     Remove
                   </button>
                 </div>

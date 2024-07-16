@@ -12,11 +12,11 @@ services:
 
   mysql_server:
     build:
-      context: ./mysqldb
+      context: ./backend/mysqldb
       dockerfile: Dockerfile
     restart: always
     env_file:
-      - .env
+      - .backend/mysqldb/env
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=${MYSQL_DATABASE}
@@ -27,15 +27,15 @@ services:
 
   recipesystem:
     build:
-      context: ./django
+      context: ./backend/django
       dockerfile: Dockerfile
-    command: sh -c "python manage.py makemigrations && python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"
+    # command: sh -c "python manage.py makemigrations && python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"
     # --noreload
-    # command: sh -c "python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"
+    command: sh -c "python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"
     restart: always
     volumes:
-      - ./django:/app
-      - ./AIML:/app/AIML
+      - ./backend/django:/app
+      - ./backend/AIML:/app/AIML
     ports:
       - "8000:8000"
     depends_on:
@@ -47,26 +47,26 @@ services:
       - NLTK_DATA=/usr/share/nltk_data
 
   celery_worker:
-    build: ./django
+    build: ./backend/django
     user: celeryuser
     command: celery -A recipesystem worker -l info -P gevent
     restart: always
     volumes:
-      - ./django:/app
-      - ./AIML:/app/AIML
+      - ./backend/django:/app
+      - ./backend/AIML:/app/AIML
     depends_on:
       - recipesystem
     networks:
       - app_network
 
   celery_beat:
-    build: ./django
+    build: ./backend/django
     user: celeryuser
     command: celery -A recipesystem beat -l info
     restart: always
     volumes:
-      - ./django:/app
-      - ./AIML:/app/AIML
+      - ./backend/django:/app
+      - ./backend/AIML:/app/AIML
     depends_on:
       - recipesystem
     networks:

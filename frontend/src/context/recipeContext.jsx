@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
-
+import loadingGif from "../assets/loading.gif";
+import "../styles/loading.css";
 const RecipeContext = createContext();
 
 const RecipeContextProvider = ({ children }) => {
@@ -128,7 +129,11 @@ const RecipeContextProvider = ({ children }) => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="loader">
+        <img src={loadingGif} alt="Loading..." className="loading-gif" />
+      </div>
+    );
   }
 
   if (error) {

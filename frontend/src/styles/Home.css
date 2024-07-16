@@ -34,13 +34,29 @@
   align-items: center;
 }
 
-.recommended-heading,
 .justforyou-heading {
-  background-color: #ffd0af;
-  color: #333;
-  padding: 10px 20px;
+  text-align: center;
+  margin: 20px 0;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  background-color: #f8f3ee;
+  border-left: 6px solid #e59962;
+  border-right: 6px solid #e59962;
   border-radius: 8px;
-  margin-bottom: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.justforyou-heading h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #000000;
+  margin: 0;
+  padding: 10px 0;
+  font-family: "sans-serif";
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .slider-container {

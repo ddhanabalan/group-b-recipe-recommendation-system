@@ -6,21 +6,44 @@ import AdminSideBar from "../../components/admin/AdminSideBar";
 import AdminNavbar from "../../components/adminNavbar/AdminNavbar";
 import Footer from "../../components/Footer/Footer";
 import "../../styles/RecipesList.css";
-import { getAuthToken, clearAuthToken } from "../../utils/auth";
+import {
+  getAuthToken,
+  clearAuthToken,
+  refreshAccessToken,
+} from "../../utils/auth";
 
 const RecipeModal = ({ recipe, onClose }) => {
+  const [showVideo, setShowVideo] = useState(false);
+  const [showThumbnail, setShowThumbnail] = useState(false);
+
+  const handleVideoClick = () => {
+    setShowVideo(true);
+    setShowThumbnail(false); // Ensure only one media type is displayed
+  };
+
+  const handleThumbnailClick = () => {
+    setShowThumbnail(true);
+    setShowVideo(false); // Ensure only one media type is displayed
+  };
+
+  const handleCloseModal = () => {
+    setShowVideo(false); // Reset video state on modal close
+    setShowThumbnail(false);
+    onClose();
+  };
+
   return (
     <div className="modal-overlay">
       <div className="modal">
         <div className="modal-content">
-          <span className="close" onClick={onClose}>
+          <span className="close" onClick={handleCloseModal}>
             &times;
           </span>
           <h2>{recipe.title}</h2>
           <img
             src={recipe.img}
             alt={recipe.title}
-            style={{ maxWidth: "50%" }}
+            style={{ maxWidth: "30%" }}
           />
           <p>
             <b>Recipe ID:</b> {recipe.recipeid}
@@ -29,7 +52,7 @@ const RecipeModal = ({ recipe, onClose }) => {
             <b>User ID:</b> {recipe.userid}
           </p>
           <p>
-            <b>Created At:</b>
+            <b>Created At:</b>{" "}
             {moment(recipe.created_at).format("MM/DD/YYYY, hh:mm:ss A")}
           </p>
           <p>
@@ -61,6 +84,31 @@ const RecipeModal = ({ recipe, onClose }) => {
           <p>
             <b>Rating:</b> {recipe.rating}
           </p>
+          {recipe.video && (
+            <div className="media-container">
+              <div className="media-button">
+                <button onClick={handleVideoClick}>Play Video</button>
+                {showVideo && (
+                  <div className="video-wrapper">
+                    <video controls>
+                      <source src={recipe.video} type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          {recipe.thumbnail && (
+            <div className="media-container">
+              <div className="media-button">
+                <button onClick={handleThumbnailClick}>View Thumbnail</button>
+                {showThumbnail && (
+                  <img src={recipe.thumbnail} alt="Recipe Thumbnail" />
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -75,12 +123,12 @@ const NewRecipesList = () => {
   const [inputPageNo, setInputPageNo] = useState("");
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [totalRecipes, setTotalRecipes] = useState(0); // State to store total number of recipes
+  const [totalRecipes, setTotalRecipes] = useState(0);
   const history = useNavigate();
 
   useEffect(() => {
     fetchData(pageNo);
-    fetchTotalRecipes(); // Fetch total number of recipes when component mounts
+    fetchTotalRecipes();
   }, [pageNo]);
 
   useEffect(() => {
@@ -100,7 +148,11 @@ const NewRecipesList = () => {
       );
       setRecipes(response.data);
     } catch (error) {
-      console.error("Error fetching recipes:", error);
+      if (error.response && error.response.status === 401) {
+        await handleTokenRefreshAndRetry(fetchData, pageNumber);
+      } else {
+        console.error("Error fetching recipes:", error);
+      }
     }
   };
 
@@ -111,7 +163,11 @@ const NewRecipesList = () => {
       );
       setTotalRecipes(response.data || 0);
     } catch (error) {
-      console.error("Error fetching total recipes:", error);
+      if (error.response && error.response.status === 401) {
+        await handleTokenRefreshAndRetry(fetchTotalRecipes);
+      } else {
+        console.error("Error fetching total recipes:", error);
+      }
     }
   };
 
@@ -160,7 +216,7 @@ const NewRecipesList = () => {
       const authToken = getAuthToken();
       await axios.delete("http://localhost:8000/recipe/deleterecipe/", {
         headers: {
-          Authorization: `Bearer ${authToken}`,
+          Authorization: `Bearer ${authToken.access}`,
         },
         data: {
           recipeid: recipeId,
@@ -169,11 +225,21 @@ const NewRecipesList = () => {
       setRecipes(recipes.filter((recipe) => recipe.recipeid !== recipeId));
     } catch (error) {
       if (error.response && error.response.status === 401) {
-        clearAuthToken();
-        history("/login");
+        await handleTokenRefreshAndRetry(handleRemoveRecipe, recipeId);
       } else {
         console.error("Error removing recipe:", error);
       }
+    }
+  };
+
+  const handleTokenRefreshAndRetry = async (retryFunction, ...args) => {
+    try {
+      await refreshAccessToken();
+      await retryFunction(...args);
+    } catch (error) {
+      console.error("Error refreshing token and retrying operation:", error);
+      clearAuthToken();
+      history("/login");
     }
   };
 

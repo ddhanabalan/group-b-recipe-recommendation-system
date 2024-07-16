@@ -27,10 +27,10 @@ const ForgotPassword = () => {
           email: formData.email,
         }
       );
-      console.log(response.data);
+      //console.log(response.data);
       alert("Password reset email sent successfully.");
     } catch (error) {
-      console.error("Error sending password reset email:", error.response.data);
+      //console.error("Error sending password reset email:", error.response.data);
       setError(
         "Failed to send password reset email. Please check your inputs."
       );

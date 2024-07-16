@@ -84,8 +84,8 @@
   cursor: pointer;
 }
 
-.pagination li button.active {
-  background-color: #007bff;
-  color: #fff;
-  border-color: #007bff;
+.pagination button.active {
+  background-color: #e49963; /* Example color for active page */
+  color: white;
+  border-color: #e68845;
 }

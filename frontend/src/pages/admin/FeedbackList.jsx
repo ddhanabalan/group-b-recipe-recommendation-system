@@ -4,7 +4,11 @@ import axios from "axios";
 import AdminSideBar from "../../components/admin/AdminSideBar";
 import AdminNavbar from "../../components/adminNavbar/AdminNavbar";
 import Footer from "../../components/Footer/Footer";
-import { clearAuthToken, getAuthToken } from "../../utils/auth";
+import {
+  clearAuthToken,
+  getAuthToken,
+  refreshAccessToken,
+} from "../../utils/auth";
 import { isAuthenticated, getUserRole } from "../../utils/auth";
 import "../../styles/FeedbackList.css";
 
@@ -49,6 +53,9 @@ const FeedbackList = () => {
       setFeedbacks(response.data);
     } catch (error) {
       console.error("Error fetching feedbacks:", error);
+      if (error.response && error.response.status === 401) {
+        await handleTokenRefresh(() => fetchData(pageNumber));
+      }
     }
   };
 
@@ -57,10 +64,23 @@ const FeedbackList = () => {
       const response = await axios.get(
         "http://localhost:8000/authentication/feedbackcount/"
       );
-
       setTotalFeedbacks(response.data || 0);
     } catch (error) {
       console.error("Error fetching total feedbacks:", error);
+      if (error.response && error.response.status === 401) {
+        await handleTokenRefresh(fetchTotalFeedbacks);
+      }
+    }
+  };
+
+  const handleTokenRefresh = async (retryFunction) => {
+    try {
+      await refreshAccessToken();
+      retryFunction();
+    } catch (refreshError) {
+      console.error("Error refreshing access token:", refreshError);
+      clearAuthToken();
+      history("/login");
     }
   };
 
@@ -105,13 +125,13 @@ const FeedbackList = () => {
   };
 
   const handleRemoveFeedback = async (id) => {
-    const authToken = getAuthToken();
     try {
+      const authToken = getAuthToken();
       await axios.delete(
         "http://localhost:8000/authentication/deletefeedback/",
         {
           headers: {
-            Authorization: `Bearer ${authToken}`,
+            Authorization: `Bearer ${authToken.access}`,
           },
           data: {
             id: id,
@@ -128,11 +148,9 @@ const FeedbackList = () => {
         JSON.stringify(updatedReadComplaints)
       );
     } catch (error) {
+      console.error("Error removing feedback:", error);
       if (error.response && error.response.status === 401) {
-        clearAuthToken();
-        history("/login");
-      } else {
-        console.error("Error removing feedback:", error);
+        await handleTokenRefresh(() => handleRemoveFeedback(id));
       }
     }
   };
@@ -209,7 +227,6 @@ const FeedbackList = () => {
                   <td>{feedback.category}</td>
                   <td style={{ width: 700 }}>{feedback.feedback}</td>
                   <td>
-                    {" "}
                     {feedback.category === "complaint" &&
                       !readComplaints.includes(feedback.id) && (
                         <button

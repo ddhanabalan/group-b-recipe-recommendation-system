@@ -51,16 +51,15 @@
 }
 
 .user-feedback button {
-  background-color: #e0e0e0;
+  background-color: #ffffff;
   border: none;
-  padding: 10px;
-  margin-right: 10px;
   cursor: pointer;
-  border-radius: 50%;
+  font-size: 33px;
+  margin-top: 8px;
 }
 
 .user-feedback button:hover {
-  background-color: #cccccc;
+  background-color: #ffffff;
 }
 
 .video-popup {

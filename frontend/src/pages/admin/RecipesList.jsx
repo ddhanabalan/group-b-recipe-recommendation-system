@@ -1,26 +1,51 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import AdminSideBar from "../../components/admin/AdminSideBar";
 import AdminNavbar from "../../components/adminNavbar/AdminNavbar";
 import Footer from "../../components/Footer/Footer";
+import {
+  clearAuthToken,
+  getAuthToken,
+  refreshAccessToken,
+  isAuthenticated,
+  getUserRole,
+} from "../../utils/auth";
 import "../../styles/RecipesList.css";
-import { getAuthToken, clearAuthToken } from "../../utils/auth";
 
 const RecipeModal = ({ recipe, onClose }) => {
+  const [showVideo, setShowVideo] = useState(false);
+  const [showThumbnail, setShowThumbnail] = useState(false);
+
+  const handleVideoClick = () => {
+    setShowVideo(true);
+    setShowThumbnail(false); // Ensure only one media type is displayed
+  };
+
+  const handleThumbnailClick = () => {
+    setShowThumbnail(true);
+    setShowVideo(false); // Ensure only one media type is displayed
+  };
+
+  const handleCloseModal = () => {
+    setShowVideo(false); // Reset video state on modal close
+    setShowThumbnail(false);
+    onClose();
+  };
+
   return (
     <div className="modal-overlay">
       <div className="modal">
         <div className="modal-content">
-          <span className="close" onClick={onClose}>
+          <span className="close" onClick={handleCloseModal}>
             &times;
           </span>
           <h2>{recipe.title}</h2>
           <img
             src={recipe.img}
             alt={recipe.title}
-            style={{ maxWidth: "50%" }}
+            style={{ maxWidth: "30%" }}
           />
           <p>
             <b>Recipe ID:</b> {recipe.recipeid}
@@ -29,7 +54,7 @@ const RecipeModal = ({ recipe, onClose }) => {
             <b>User ID:</b> {recipe.userid}
           </p>
           <p>
-            <b>Created At:</b>
+            <b>Created At:</b>{" "}
             {moment(recipe.created_at).format("MM/DD/YYYY, hh:mm:ss A")}
           </p>
           <p>
@@ -61,12 +86,36 @@ const RecipeModal = ({ recipe, onClose }) => {
           <p>
             <b>Rating:</b> {recipe.rating}
           </p>
+          {recipe.video && (
+            <div className="media-container">
+              <div className="media-button">
+                <button onClick={handleVideoClick}>Play Video</button>
+                {showVideo && (
+                  <div className="video-wrapper">
+                    <video controls>
+                      <source src={recipe.video} type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          {recipe.thumbnail && (
+            <div className="media-container">
+              <div className="media-button">
+                <button onClick={handleThumbnailClick}>View Thumbnail</button>
+                {showThumbnail && (
+                  <img src={recipe.thumbnail} alt="Recipe Thumbnail" />
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 };
-
 const RecipesList = () => {
   const [recipes, setRecipes] = useState([]);
   const [filteredRecipes, setFilteredRecipes] = useState([]);
@@ -79,9 +128,13 @@ const RecipesList = () => {
   const history = useNavigate();
 
   useEffect(() => {
+    if (!isAuthenticated() || getUserRole() !== "admin") {
+      history("/login");
+      return;
+    }
     fetchData(pageNo);
     fetchTotalRecipes();
-  }, [pageNo]);
+  }, [pageNo, history]);
 
   useEffect(() => {
     const filtered = recipes.filter(
@@ -101,6 +154,9 @@ const RecipesList = () => {
       setRecipes(response.data);
     } catch (error) {
       console.error("Error fetching recipes:", error);
+      if (error.response && error.response.status === 401) {
+        await handleTokenRefresh(() => fetchData(pageNumber));
+      }
     }
   };
 
@@ -112,6 +168,22 @@ const RecipesList = () => {
       setTotalRecipes(response.data || 0);
     } catch (error) {
       console.error("Error fetching total recipes:", error);
+      if (error.response && error.response.status === 401) {
+        await handleTokenRefresh(fetchTotalRecipes);
+      }
+    }
+  };
+
+  const handleTokenRefresh = async (retryFunction) => {
+    try {
+      await refreshAccessToken();
+      const authToken = getAuthToken();
+      axios.defaults.headers.common["Authorization"] = `Bearer ${authToken}`;
+      retryFunction();
+    } catch (refreshError) {
+      console.error("Error refreshing access token:", refreshError);
+      clearAuthToken();
+      history("/login");
     }
   };
 
@@ -160,7 +232,7 @@ const RecipesList = () => {
       const authToken = getAuthToken();
       await axios.delete("http://localhost:8000/recipe/deleterecipe/", {
         headers: {
-          Authorization: `Bearer ${authToken}`,
+          Authorization: `Bearer ${authToken.access}`,
         },
         data: {
           recipeid: recipeId,
@@ -168,11 +240,9 @@ const RecipesList = () => {
       });
       setRecipes(recipes.filter((recipe) => recipe.recipeid !== recipeId));
     } catch (error) {
+      console.error("Error removing recipe:", error);
       if (error.response && error.response.status === 401) {
-        clearAuthToken();
-        history("/login");
-      } else {
-        console.error("Error removing recipe:", error);
+        await handleTokenRefresh(() => handleRemoveRecipe(recipeId));
       }
     }
   };

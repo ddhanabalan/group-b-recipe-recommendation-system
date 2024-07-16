@@ -1,5 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
 import "../../styles/RecipeDisplay.css";
+import { useNavigate } from "react-router-dom";
 import { RecipeContext } from "../../context/recipeContext";
 import { Link } from "react-router-dom";
 import {
@@ -8,15 +9,17 @@ import {
   getUserId,
   isAuthenticated,
   refreshAccessToken,
+  setAuthToken,
 } from "../../utils/auth";
 import axios from "axios";
 import Swal from "sweetalert2";
+import loadingGif from "../../assets/loading.gif";
 
 const RecipeDisplay = (props) => {
   const { recipe } = props;
   const { saveRecipe, isRecipeSaved } = useContext(RecipeContext);
   const [isSaved, setIsSaved] = useState(isRecipeSaved(recipe.id));
-
+  const history = useNavigate();
   useEffect(() => {
     setIsSaved(isRecipeSaved(recipe.recipeid));
   }, [isRecipeSaved, recipe.recipeid]);
@@ -32,7 +35,7 @@ const RecipeDisplay = (props) => {
       const userId = getUserId();
 
       if (!authToken) {
-        authToken = await refreshAccessToken(); // Refresh token if not available or expired
+        authToken = await refreshAccessToken();
       }
 
       const response = await axios.post(
@@ -55,8 +58,8 @@ const RecipeDisplay = (props) => {
     } catch (error) {
       console.error("Error saving recipe:", error);
       if (error.response && error.response.status === 401) {
-        clearAuthData();
-        window.location.href = "/login";
+        console.error("Unauthorized error:", error);
+        await handleUnauthorizedError();
       } else {
         console.error(
           "An error occurred while saving the recipe:",
@@ -78,9 +81,28 @@ const RecipeDisplay = (props) => {
       }
     }
   };
-
+  const handleUnauthorizedError = async () => {
+    try {
+      const { refresh: refreshToken } = getAuthToken();
+      const response = await axios.post(
+        "http://localhost:8000/authentication/token/refresh/",
+        { refresh: refreshToken }
+      );
+      const { access, refresh } = response.data;
+      setAuthToken({ access, refresh });
+      await handleSaveRecipe(); // Retry submitting after token refresh
+    } catch (error) {
+      console.error("Token refresh failed:", error);
+      clearAuthData(); // Clear auth data on token refresh failure
+      history("/login");
+    }
+  };
   if (!recipe) {
-    return <div>Loading...</div>;
+    return (
+      <div className="loader">
+        <img src={loadingGif} alt="Loading..." className="loading-gif" />
+      </div>
+    );
   }
 
   let ingredientsArray = [];
@@ -147,18 +169,52 @@ const RecipeDisplay = (props) => {
                 <button className="saved_recipe">
                   <Link
                     to={`/user/savedrecipes`}
-                    style={{ textDecoration: "none", color: "black" }}
+                    style={{
+                      textDecoration: "none",
+                      color: "black",
+                      cursor: "pointer",
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.backgroundColor = "#e49963";
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.backgroundColor = "#e8a97d";
+                    }}
                   >
                     SAVED
                   </Link>
                 </button>
               ) : (
-                <button onClick={handleSaveRecipe} className="save_recipe">
+                <button
+                  style={{
+                    cursor: "pointer",
+                  }}
+                  onClick={handleSaveRecipe}
+                  onMouseOver={(e) => {
+                    e.target.style.backgroundColor = "#e49963";
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.backgroundColor = "#e8a97d";
+                  }}
+                  className="save_recipe"
+                >
                   SAVE RECIPE
                 </button>
               )}
 
-              <button onClick={handleShareRecipe} className="share">
+              <button
+                onClick={handleShareRecipe}
+                style={{
+                  cursor: "pointer",
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.backgroundColor = "#e49963";
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.backgroundColor = "#e8a97d";
+                }}
+                className="share"
+              >
                 SHARE
               </button>
             </div>

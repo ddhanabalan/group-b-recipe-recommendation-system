@@ -1,0 +1,14 @@
+.loader {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: small;
+}
+
+.loading-gif {
+  margin-top: 20px;
+  width: 100px;
+  height: 100px;
+}

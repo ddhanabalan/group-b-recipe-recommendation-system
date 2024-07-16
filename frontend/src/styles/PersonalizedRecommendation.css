@@ -100,3 +100,6 @@
 .dietary-item.selected {
   background-color: #d77f41;
 }
+.recommendationbtn {
+  cursor: pointer;
+}
