@@ -271,7 +271,7 @@ const AddNewRecipe = () => {
         }
       );
 
-      console.log("Recipe saved:", response.data);
+      //  console.log("Recipe saved:", response.data);
 
       Swal.fire({
         title: "Saved!",

@@ -58,7 +58,7 @@ const EditRecipe = () => {
         );
 
         const recipeData = response.data;
-        console.log("recipe original data:", recipeData);
+        //console.log("recipe original data:", recipeData);
         setFormData({
           title: recipeData.title || "",
           img: recipeData.img || "",
@@ -98,7 +98,7 @@ const EditRecipe = () => {
           setVideoPreview(recipeData.video);
         }
       } catch (error) {
-        console.error("Error fetching recipe:", error);
+        // console.error("Error fetching recipe:", error);
         if (error.response && error.response.status === 401) {
           await handleTokenRefreshAndRetry(fetchData);
         } else {
@@ -168,7 +168,7 @@ const EditRecipe = () => {
   };
   const handleMediaChange = async (e, type) => {
     const file = e.target.files[0];
-    console.log(`Uploading ${type}:`, file);
+    // console.log(`Uploading ${type}:`, file);
     if (!file) return;
 
     const previewUrl = URL.createObjectURL(file);
@@ -195,7 +195,7 @@ const EditRecipe = () => {
           },
         }
       );
-      console.log(`Response from ${type} upload:`, response.data);
+      //console.log(`Response from ${type} upload:`, response.data);
       const mediaUrl = response.data;
       if (type === "image") {
         setFormData((prevData) => ({
@@ -241,7 +241,7 @@ const EditRecipe = () => {
               }
             );
             const thumbnailUrl = thumbnailResponse.data;
-            console.log(`Thumbnail upload response:`, thumbnailResponse.data);
+            //console.log(`Thumbnail upload response:`, thumbnailResponse.data);
 
             setFormData((prevData) => ({
               ...prevData,
@@ -334,7 +334,7 @@ const EditRecipe = () => {
         changes.season = seasonsString;
       }
 
-      console.log("Data to be sent:", Object.fromEntries(dataToSend));
+      // console.log("Data to be sent:", Object.fromEntries(dataToSend));
 
       const response = await axios.post(
         `http://localhost:8000/recipe/editrecipe/`,
@@ -347,7 +347,7 @@ const EditRecipe = () => {
         }
       );
 
-      console.log("Response from edit recipe:", response.data);
+      // console.log("Response from edit recipe:", response.data);
 
       if (response.status === 200) {
         Swal.fire({

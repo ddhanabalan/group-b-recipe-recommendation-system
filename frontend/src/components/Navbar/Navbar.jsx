@@ -60,8 +60,6 @@ function Navbar() {
   };
 
   const handleSearch = debounce((term) => {
-    // console.log("User searched for:", term);
-
     if (term) {
       setShowDropdown(true);
       const filteredRecipes = allRecipes.filter((recipe) =>
@@ -82,57 +80,43 @@ function Navbar() {
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && searchTerm.trim().length > 0) {
-      //console.log("User searched for:", searchTerm);
       setSearchTerm("");
     }
   };
 
   const handleRecipeClick = async (recipeid, recipeTitle) => {
     try {
-      if (!isAuthenticated()) {
-        window.location.href = "/login";
-        return;
-      }
+      if (isAuthenticated()) {
+        let authToken = getAuthToken();
+        const userId = getUserId();
 
-      let authToken = getAuthToken();
-      const userId = getUserId(); // Assuming getUserId() retrieves the user ID
-
-      // Check if token needs refreshing
-      if (!authToken) {
-        authToken = await refreshAccessToken(); // Assuming refreshAccessToken() refreshes the token
-      }
-
-      // Log selected recipe to console
-      //console.log("Selected recipe:", recipeTitle);
-
-      // Construct the data to send
-      const searchData = {
-        userid: userId,
-        search_text: recipeTitle,
-      };
-
-      // Send data to API endpoint
-      const response = await axios.post(
-        "http://localhost:8000/recipe/addsearchhistory/",
-        searchData,
-        {
-          headers: {
-            Authorization: `Bearer ${authToken.access}`,
-            "Content-Type": "application/json",
-          },
+        if (!authToken) {
+          authToken = await refreshAccessToken();
         }
-      );
 
-      // Handle success scenario
-      //  console.log("Search history added successfully:", response.data);
+        const searchData = {
+          userid: userId,
+          search_text: recipeTitle,
+        };
+        //console.log("reciep titles passing :", searchData);
+        const response = await axios.post(
+          "http://localhost:8000/recipe/addsearchhistory/",
+          searchData,
+          {
+            headers: {
+              Authorization: `Bearer ${authToken.access}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
-      // Update search history in session storage
-      const updatedHistory = [
-        ...searchHistory.filter((item) => item.id !== recipeid),
-        { id: recipeid, title: recipeTitle },
-      ];
-      setSearchHistory(updatedHistory);
-      sessionStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
+        const updatedHistory = [
+          ...searchHistory.filter((item) => item.id !== recipeid),
+          { id: recipeid, title: recipeTitle },
+        ];
+        setSearchHistory(updatedHistory);
+        sessionStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
+      }
 
       setLastSelectedRecipe(recipeTitle);
       setShowDropdown(false);
@@ -140,12 +124,11 @@ function Navbar() {
     } catch (error) {
       console.error("Error adding search history:", error);
 
-      // Handle error scenario, e.g., redirect to login if unauthorized
       if (error.response && error.response.status === 401) {
         clearAuthData();
         window.location.href = "/login";
       } else {
-        // alert("Failed to add search history. Please try again later.");
+        console.error("Failed to add search history. Please try again later.");
       }
     }
   };
