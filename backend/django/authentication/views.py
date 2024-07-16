@@ -295,7 +295,7 @@ class AllUsersLimited(APIView):
 
     def post(self, request, *args, **kwargs):
         limit = int(request.data.get('page'))
-        queryset = User.objects.all().order_by('-created_at')[((limit-1)*50):(limit*50)]
+        queryset = User.objects.exclude(role='admin').order_by('-created_at')[((limit-1)*50):(limit*50)]
         serializer = AllUserSerializer(queryset, many=True)
         data = serializer.data
         
@@ -304,7 +304,7 @@ class AllUsersLimited(APIView):
 class UsersCount(APIView):
 
     def get(self, request, *args, **kwargs):
-        count = User.objects.count()
+        count = User.objects.exclude(role='admin').count()
         return Response(count)
 
 class FeedbackCount(APIView):
