@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import moment from "moment";
+import Swal from "sweetalert2";
 import AdminSideBar from "../../components/admin/AdminSideBar";
 import AdminNavbar from "../../components/adminNavbar/AdminNavbar";
 import Footer from "../../components/Footer/Footer";
@@ -99,23 +100,42 @@ const UsersList = () => {
   };
 
   const handleRemoveUser = async (userid) => {
-    try {
-      const authToken = getAuthToken();
-      await axios.delete("http://localhost:8000/authentication/deleteuser/", {
-        headers: {
-          Authorization: `Bearer ${authToken.access}`,
-        },
-        data: {
-          userid: userid,
-        },
-      });
-      setUsers(users.filter((user) => user.userid !== userid));
-    } catch (error) {
-      console.error("Error removing user:", error);
-      if (error.response && error.response.status === 401) {
-        await handleTokenRefresh(() => handleRemoveUser(userid));
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const authToken = getAuthToken();
+          await axios.delete(
+            "http://localhost:8000/authentication/deleteuser/",
+            {
+              headers: {
+                Authorization: `Bearer ${authToken.access}`,
+              },
+              data: {
+                userid: userid,
+              },
+            }
+          );
+          setUsers(users.filter((user) => user.userid !== userid));
+          setTotalUsers(totalUsers - 1); // Update total users count
+          Swal.fire("Deleted!", "The user has been deleted.");
+        } catch (error) {
+          console.error("Error removing user:", error);
+          if (error.response && error.response.status === 401) {
+            await handleTokenRefresh(() => handleRemoveUser(userid));
+          } else {
+            Swal.fire("Error!", "There was an error deleting the user.");
+          }
+        }
       }
-    }
+    });
   };
 
   return (

@@ -70,19 +70,27 @@ const AddNewRecipe = () => {
         [name]: newValue,
       }));
     } else {
-      setFormData((prevData) => {
-        const newData = {
+      if (name === "calories" && value.length > 1 && value.startsWith("0")) {
+        // If the value starts with '0' and has more than one digit, strip leading zeros
+        setFormData((prevData) => ({
+          ...prevData,
+          [name]: parseInt(value, 10).toString(),
+        }));
+      } else {
+        setFormData((prevData) => ({
           ...prevData,
           [name]: value,
-        };
+        }));
+      }
 
-        if (name === "hours" || name === "minutes") {
-          const hours = name === "hours" ? value : newData.hours;
-          const minutes = name === "minutes" ? value : newData.minutes;
-          newData.total_mins = calculateTotalMins(hours, minutes);
-        }
-        return newData;
-      });
+      if (name === "hours" || name === "minutes") {
+        const hours = name === "hours" ? value : formData.hours;
+        const minutes = name === "minutes" ? value : formData.minutes;
+        setFormData((prevData) => ({
+          ...prevData,
+          total_mins: calculateTotalMins(hours, minutes),
+        }));
+      }
     }
   };
 
