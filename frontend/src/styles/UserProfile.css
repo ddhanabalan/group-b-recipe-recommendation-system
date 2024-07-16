@@ -88,3 +88,40 @@
   height: 30px;
   margin-top: 8px;
 }
+
+.user-preferences {
+  margin-bottom: 10px;
+}
+
+.preference-item {
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.preference-item label {
+  font-weight: bold;
+}
+
+.preference-food-type {
+  font-weight: bold;
+  color: #333333;
+}
+
+.preference-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  list-style-type: none;
+  padding: 0;
+}
+
+.preference-list-item {
+  background-color: #ffffff;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  color: #555555;
+  font-size: 14px;
+  display: inline-block;
+  margin: 5px 0;
+}

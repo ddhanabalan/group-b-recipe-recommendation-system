@@ -30,12 +30,36 @@ const UserProfile = () => {
   });
   const [isEditing, setIsEditing] = useState(false);
 
+  /*const [preferences, setPreferences] = useState({
+    food_type: "",
+    preference: [],
+  });*/
+
   useEffect(() => {
     // Check if user is authenticated and has user role
     if (!isAuthenticated() || getUserRole() !== "user") {
       history("/login");
-    }
+    } /*else {
+      fetchPreferences();
+    }*/
   }, [history]);
+
+  /* const fetchPreferences = async () => {
+    try {
+      const { access: accessToken } = getAuthToken();
+      const response = await axios.get(
+        "http://localhost:8000/authentication/userpreferences/",
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      setPreferences(response.data);
+    } catch (error) {
+      console.error("Error fetching preferences:", error);
+    }
+  };*/
 
   const handleToggleEdit = () => {
     setIsEditing(!isEditing);
@@ -48,6 +72,7 @@ const UserProfile = () => {
       [name]: value,
     }));
   };
+
   const handleSubmit = async () => {
     try {
       const token = getAuthToken();
@@ -188,6 +213,24 @@ const UserProfile = () => {
               <label>Email:</label>
               <span>{editedData.email}</span>
             </div>
+            {/*} <div className="user-preferences">
+              <div className="preference-item" style={{ display: "flex" }}>
+                <label>Food Type:</label>
+                <span className="preference-food-type">
+                  {preferences.food_type}
+                </span>
+              </div>
+              <div className="preference-item">
+                <label>Preferred Cuisines:</label>
+                <ul className="preference-list">
+                  {preferences.preference.map((pref, index) => (
+                    <li key={index} className="preference-list-item">
+                      {pref}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>*/}
             <div className="detail-item">
               <button
                 onClick={handleChangePassword}
@@ -197,6 +240,7 @@ const UserProfile = () => {
               </button>
             </div>
           </div>
+
           <div className="user-history">
             <UserHistory />
           </div>
