@@ -1,11 +1,18 @@
 import React, { useState } from "react";
-import axiosInstance from "../../utils/api";
+import axiosInstance from "../../utils/axiosInstance"; // Adjust the import path based on your project structure
 import logo_dark from "../../assets/logo.svg";
 import login_image from "../../assets/loginpic.jpg";
 import "../../styles/Login.css";
-import Validation from "./Validation";
-import { setAuthToken, setUserId } from "../../utils/auth";
-import { Navigate, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import {
+  setAuthToken,
+  setUserId,
+  setUserEmail,
+  setUserName,
+  setUserRole,
+} from "../../utils/auth";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   const [values, setValues] = useState({
@@ -13,7 +20,7 @@ function Login() {
     password: "",
   });
   const [errors, setErrors] = useState({});
-  const history = useNavigate();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,30 +29,64 @@ function Login() {
       [name]: value,
     });
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await axiosInstance.post(
-        "http://localhost:8000/authentication/login/",
+      const response = await axiosInstance.post("/authentication/login/", {
+        username: values.name,
+        password: values.password,
+      });
+
+      const { userid, username, email, role } = response.data.user;
+      const { access, refresh } = response.data;
+
+      setUserId(userid);
+      setUserName(username);
+      setUserEmail(email);
+      setUserRole(role);
+      setAuthToken({ access, refresh });
+
+      // Fetch user preferences
+      const preferencesResponse = await axiosInstance.get(
+        "/authentication/userpreferences",
         {
-          username: values.name,
-          password: values.password,
+          headers: {
+            Authorization: `Bearer ${access}`,
+          },
         }
       );
 
-      const userId = response.data.user.userid;
-      setUserId(userId);
+      const { preference, food_type } = preferencesResponse.data;
+      // console.log("User Preferences:", { preference, food_type });
+      localStorage.setItem(
+        "userPreferences",
+        JSON.stringify({ preference, food_type })
+      );
 
-      const token = response.data.token;
-      setAuthToken(token);
-      console.log("Login successful:", response.data);
-      console.log("user id :", userId);
-      if (response.data.user.role === "admin") {
-        history("/dashboard");
+      toast.success("Logged in successfully.", {
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        closeButton: false,
+        style: {
+          height: "50px",
+          border: "2px solid #ccc",
+          borderRadius: "5px",
+          padding: "10px",
+        },
+      });
+
+      if (role === "admin") {
+        navigate("/dashboard");
       } else {
-        history("/home");
+        if (!preference || !food_type) {
+          navigate("/recommendation");
+        } else {
+          navigate("/home");
+        }
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -59,7 +100,6 @@ function Login() {
       }
     }
   };
-
   return (
     <div className="login-container">
       <div className="login-form-container">

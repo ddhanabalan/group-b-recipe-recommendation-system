@@ -27,10 +27,10 @@ const ForgotPassword = () => {
           email: formData.email,
         }
       );
-      console.log(response.data);
+      //console.log(response.data);
       alert("Password reset email sent successfully.");
     } catch (error) {
-      console.error("Error sending password reset email:", error.response.data);
+      //console.error("Error sending password reset email:", error.response.data);
       setError(
         "Failed to send password reset email. Please check your inputs."
       );
@@ -39,11 +39,13 @@ const ForgotPassword = () => {
 
   return (
     <div className="forgotpassword">
-      <div className="card" style={{ height: 270 }}>
-        <h1 align="center">Reset Your Password</h1>
+      <div className="card-forgot" style={{ height: 270 }}>
+        <h1 className="forgot-head" align="center">
+          Reset Your Password
+        </h1>
         {error && <div className="error-message">{error}</div>}
         <form className="form1" onSubmit={handleSubmit}>
-          <table width="285" rules="none" cellPadding="10px">
+          <table width="400" rules="none" cellPadding="10px">
             <tr>
               <td>Username</td>
               <td>

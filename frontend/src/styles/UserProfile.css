@@ -14,16 +14,15 @@
 .profile-icon {
   margin-right: 30px;
 }
-.head {
-  padding-top: 15px;
-}
+
 .user-content-section {
   flex: 1;
   padding: 20px;
 }
 .user-content-section h2 {
-  font-size: 35px;
-
+  font-family: serif;
+  font-size: 33px;
+  margin-bottom: 10px;
   margin-bottom: 20px;
 }
 .user-details {
@@ -33,31 +32,96 @@
 .detail-item {
   margin-bottom: 10px;
   display: flex;
+  font-size: 18px;
 }
 
 .detail-item label {
   font-weight: bold;
   margin-right: 10px;
+  font-size: 18px;
 }
 
 .button-group button {
   margin-right: 10px;
 }
 
-.edit-button {
+.okbtn {
   background-color: #e16d19;
   color: #fff;
   border: none;
-  padding: 8px 12px;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 70px;
+  font-size: 12px;
+  height: 30px;
+  margin-top: 8px;
+}
+.username_field {
+  width: 300px;
+  padding: 8px;
+  margin: 5px 0;
+  box-sizing: border-box;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-right: 10px;
+}
+.changepasswordbtn {
+  background: #e1792f;
+  color: #fff;
+
+  padding: 10px 20px;
+  border: none;
   border-radius: 5px;
   cursor: pointer;
 }
-
-.password-button {
+.cancelbtn {
   background-color: #e16d19;
   color: #fff;
   border: none;
-  padding: 8px 12px;
+  padding: 6px 12px;
   border-radius: 5px;
   cursor: pointer;
+  width: 70px;
+  font-size: 12px;
+  margin-left: 10px;
+  height: 30px;
+  margin-top: 8px;
+}
+
+.user-preferences {
+  margin-bottom: 10px;
+}
+
+.preference-item {
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.preference-item label {
+  font-weight: bold;
+}
+
+.preference-food-type {
+  font-weight: bold;
+  color: #333333;
+}
+
+.preference-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  list-style-type: none;
+  padding: 0;
+}
+
+.preference-list-item {
+  background-color: #ffffff;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  color: #555555;
+  font-size: 14px;
+  display: inline-block;
+  margin: 5px 0;
 }

@@ -1,17 +1,78 @@
 import React, { createContext, useState, useEffect } from "react";
-
+import loadingGif from "../assets/loading.gif";
+import "../styles/loading.css";
 const RecipeContext = createContext();
 
 const RecipeContextProvider = ({ children }) => {
-  const [distinctCategories, setDistinctCategories] = useState([]);
+  const initialCategories = [
+    "Side Dish",
+    "World Cuisine",
+    "Meat and Poultry",
+    "Appetizers and Snacks",
+    "Main Dish",
+    "Sauces and Condiments",
+    "Desserts",
+    "Beverages",
+    "European",
+    "Soups, Stews and Chili",
+    "Seafood",
+    "Bread",
+    "Chicken",
+    "Sauces",
+    "Italian",
+    "Pork",
+    "Vegetables",
+    "Soup",
+    "Breakfast and Brunch",
+    "Yeast Bread",
+    "Salad",
+    "Asian",
+    "Dips and Spreads",
+    "Potatoes",
+    "Beef",
+    "Quick Bread",
+    "Fruit Desserts",
+    "Eggs",
+    "Lamb",
+    "Vegetable Soup",
+    "Stews",
+    "Fish",
+    "Steaks",
+    "Latin American",
+    "Everyday Cooking",
+    "Shellfish",
+    "French",
+    "Cheese Dips and Spreads",
+    "Chicken Breasts",
+    "Pies",
+    "Squash",
+    "Salmon",
+    "Mexican",
+    "Pasta",
+    "Cookies",
+    "Whole Chicken",
+    "Rice",
+    "Shrimp",
+    "Ground",
+    "Canapes and Crostini",
+    "Turkey",
+  ];
+
+  const [distinctCategories, setDistinctCategories] =
+    useState(initialCategories);
   const [allRecipes, setAllRecipes] = useState([]);
   const [savedRecipes, setSavedRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [distinctSeasons, setDistinctSeasons] = useState([]);
-  const [distinctDayOfTimeCooking, setDistinctDayOfTimeCooking] = useState([]);
-  const [distinctVegNonVeg, setDistinctVegNonVeg] = useState([]);
+  const [distinctDayOfTimeCooking] = useState([
+    "Breakfast",
+    "Dinner",
+    "Lunch",
+    "Brunch",
+  ]);
+  const [distinctVegNonVeg] = useState(["Non-veg", "Veg"]);
 
   useEffect(() => {
     if (!dataLoaded) {
@@ -39,24 +100,17 @@ const RecipeContextProvider = ({ children }) => {
 
   useEffect(() => {
     if (!loading && allRecipes) {
-      const categoriesSet = new Set();
       const seasonsSet = new Set();
-      const dayOfTimeCookingSet = new Set();
-      const vegNonVegSet = new Set();
 
       allRecipes.forEach((recipe) => {
-        if (recipe.categories) {
-          recipe.categories.forEach((cat) => categoriesSet.add(cat));
+        if (recipe.season) {
+          recipe.season
+            .split("/")
+            .forEach((season) => seasonsSet.add(season.trim()));
         }
-        seasonsSet.add(recipe.season);
-        dayOfTimeCookingSet.add(recipe.daytimeofcooking);
-        vegNonVegSet.add(recipe.veg_nonveg);
       });
 
-      setDistinctCategories(Array.from(categoriesSet));
       setDistinctSeasons(Array.from(seasonsSet));
-      setDistinctDayOfTimeCooking(Array.from(dayOfTimeCookingSet));
-      setDistinctVegNonVeg(Array.from(vegNonVegSet));
     }
   }, [allRecipes, loading]);
 
@@ -75,7 +129,11 @@ const RecipeContextProvider = ({ children }) => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="loader">
+        <img src={loadingGif} alt="Loading..." className="loading-gif" />
+      </div>
+    );
   }
 
   if (error) {

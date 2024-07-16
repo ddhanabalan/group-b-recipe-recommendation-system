@@ -6,12 +6,17 @@ import "../../styles/FilterSection.css";
 
 const FilterSection = ({ setSearchQuery }) => {
   const { filter, dispatch } = useContext(FilterContext);
-  const { allRecipes, distinctCategories } = useContext(RecipeContext);
+  const {
+    allRecipes,
+    distinctCategories,
+    distinctSeasons,
+    distinctDayOfTimeCooking,
+    distinctVegNonVeg,
+  } = useContext(RecipeContext);
   const [showCategories, setShowCategories] = useState(false);
   const [filteredRecipes, setFilteredRecipes] = useState(allRecipes);
 
   useEffect(() => {
-    // Apply existing filters when filter context or search query changes
     const updatedFilteredRecipes = allRecipes.filter((recipe) => {
       const searchQueryLowerCase = filter.searchQuery
         ? filter.searchQuery.toLowerCase()
@@ -22,10 +27,19 @@ const FilterSection = ({ setSearchQuery }) => {
         recipe.categories.some((cat) =>
           cat.toLowerCase().includes(searchQueryLowerCase)
         );
-      const maxTimeFilter = recipe.total_mins <= filter.maxTime;
-      const maxCaloriesFilter = recipe.calories <= filter.maxCalories;
+      const maxTimeFilter =
+        filter.maxTime === null || recipe.total_mins <= filter.maxTime;
+      const maxCaloriesFilter =
+        filter.maxCalories === null || recipe.calories <= filter.maxCalories;
+      const seasonFilter =
+        filter.season === null || recipe.season === filter.season;
+      const timeOfDayFilter =
+        filter.timeOfDay === null ||
+        recipe.daytimeofcooking === filter.timeOfDay;
+      const vegNonVegFilter =
+        filter.vegNonVeg === null || recipe.vegNonVeg === filter.vegNonVeg;
 
-      let searchFilter = true; // Default to true
+      let searchFilter = true;
       if (searchQueryLowerCase) {
         searchFilter =
           recipe.title.toLowerCase().includes(searchQueryLowerCase) ||
@@ -38,12 +52,27 @@ const FilterSection = ({ setSearchQuery }) => {
       }
 
       return (
-        categoryFilter && maxTimeFilter && maxCaloriesFilter && searchFilter
+        categoryFilter &&
+        maxTimeFilter &&
+        maxCaloriesFilter &&
+        seasonFilter &&
+        timeOfDayFilter &&
+        vegNonVegFilter &&
+        searchFilter
       );
     });
 
     setFilteredRecipes(updatedFilteredRecipes);
-  }, [allRecipes, filter, filter.searchQuery]);
+  }, [
+    allRecipes,
+    filter,
+    filter.searchQuery,
+    filter.maxCalories,
+    filter.maxTime,
+    filter.season,
+    filter.timeOfDay,
+    filter.vegNonVeg,
+  ]);
 
   const handleCategoryChange = (e) => {
     const { name, checked } = e.target;
@@ -57,20 +86,47 @@ const FilterSection = ({ setSearchQuery }) => {
 
     dispatch({
       type: "SET_FILTER",
-      payload: { category: updatedCategories }, // Use 'category' instead of 'categories'
+      payload: { category: updatedCategories },
     });
   };
 
   const handleTimeChange = (e) => {
     const { value } = e.target;
-    dispatch({ type: "SET_FILTER", payload: { maxTime: parseInt(value, 10) } });
+    dispatch({
+      type: "SET_FILTER",
+      payload: { maxTime: value === "" ? null : parseInt(value, 10) },
+    });
   };
 
   const handleCaloriesChange = (e) => {
     const { value } = e.target;
     dispatch({
       type: "SET_FILTER",
-      payload: { maxCalories: parseInt(value, 10) },
+      payload: { maxCalories: value === "" ? null : parseInt(value, 10) },
+    });
+  };
+
+  const handleSeasonChange = (e) => {
+    const { value } = e.target;
+    dispatch({
+      type: "SET_FILTER",
+      payload: { season: value === "" ? null : value },
+    });
+  };
+
+  const handleTimeOfDayChange = (e) => {
+    const { value } = e.target;
+    dispatch({
+      type: "SET_FILTER",
+      payload: { timeOfDay: value === "" ? null : value },
+    });
+  };
+
+  const handleVegNonVegChange = (e) => {
+    const { value } = e.target;
+    dispatch({
+      type: "SET_FILTER",
+      payload: { vegNonVeg: value === "" ? null : value },
     });
   };
 
@@ -97,6 +153,7 @@ const FilterSection = ({ setSearchQuery }) => {
       </h1>
       <div className="search-container">
         <input
+          id="recipe_search"
           type="text"
           placeholder="Search recipes by name"
           onChange={handleSearch}
@@ -115,6 +172,7 @@ const FilterSection = ({ setSearchQuery }) => {
           {distinctCategories.map((category) => (
             <label key={category} className="category-label">
               <input
+                id="filter_cat"
                 type="checkbox"
                 name={category}
                 onChange={handleCategoryChange}
@@ -131,12 +189,12 @@ const FilterSection = ({ setSearchQuery }) => {
         <input
           type="range"
           min="0"
-          max="120"
+          max="14500"
           step="5"
-          value={filter.maxTime}
+          value={filter.maxTime || ""}
           onChange={handleTimeChange}
         />
-        {filter.maxTime} mins
+        {filter.maxTime !== null ? `${filter.maxTime} mins` : "All"}
       </label>
       <br />
       <label className="max-calorie">
@@ -144,12 +202,49 @@ const FilterSection = ({ setSearchQuery }) => {
         <input
           type="range"
           min="0"
-          max="1000"
+          max="5000"
           step="50"
-          value={filter.maxCalories}
+          value={filter.maxCalories || ""}
           onChange={handleCaloriesChange}
         />
-        {filter.maxCalories} calories
+        {filter.maxCalories !== null ? `${filter.maxCalories} calories` : "All"}
+      </label>
+      <br />
+
+      <label className="season-label">
+        Season:
+        <select value={filter.season || ""} onChange={handleSeasonChange}>
+          <option value="">All</option>
+          {distinctSeasons.map((season) => (
+            <option key={season} value={season}>
+              {season}
+            </option>
+          ))}
+        </select>
+      </label>
+      <br />
+      <label className="time-of-day-label">
+        Time of Day:
+        <select value={filter.timeOfDay || ""} onChange={handleTimeOfDayChange}>
+          <option value="">All</option>
+          {distinctDayOfTimeCooking.map((time) => (
+            <option key={time} value={time}>
+              {time}
+            </option>
+          ))}
+        </select>
+      </label>
+      <br />
+      <label className="veg-non-veg-label">
+        Veg/Non-Veg:
+        <select value={filter.vegNonVeg || ""} onChange={handleVegNonVegChange}>
+          <option value="">All</option>
+          {distinctVegNonVeg.map((type) => (
+            <option key={type} value={type}>
+              {type}
+            </option>
+          ))}
+        </select>
       </label>
       <br />
       <button className="reset-filter" onClick={handleResetFilter}>

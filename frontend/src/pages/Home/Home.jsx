@@ -9,7 +9,7 @@ import FastfoodIcon from "@mui/icons-material/Fastfood";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import SupervisedUserCircleRoundedIcon from "@mui/icons-material/SupervisedUserCircleRounded";
 import joinpic from "../../assets/joinnowpic.jpg";
-import { isAuthenticated } from "../../utils/auth";
+import { getUserId, isAuthenticated } from "../../utils/auth";
 import "../../styles/Home.css";
 import { RecipeContext } from "../../context/recipeContext";
 
@@ -17,10 +17,10 @@ function Home() {
   const { loading, error } = useContext(RecipeContext);
   const [popularRecipes, setPopularRecipes] = useState([]);
   const [newRecipes, setNewRecipes] = useState([]);
+  const [recommendedRecipes, setRecommendedRecipes] = useState([]);
   const authToken = isAuthenticated();
-
+  const userid = getUserId();
   useEffect(() => {
-    // Fetch popular recipes from the popular recipes API endpoint
     fetch("http://localhost:8000/recipe/popularrecipes/")
       .then((response) => response.json())
       .then((data) => setPopularRecipes(data))
@@ -33,7 +33,21 @@ function Home() {
       .then((response) => response.json())
       .then((data) => setNewRecipes(data))
       .catch((error) => console.error("Error fetching new recipes:", error));
+
+    fetch("http://localhost:8000/recommend/userrecommend/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userid: userid }),
+    })
+      .then((response) => response.json())
+      .then((data) => setRecommendedRecipes(data))
+      .catch((error) =>
+        console.error("Error fetching recommended recipes:", error)
+      );
   }, []);
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -45,6 +59,19 @@ function Home() {
     <div>
       <Navbar />
       <HeroSection />
+      {/*recommend for user  section*/}
+      {authToken && (
+        <div className="recommendedrecipe">
+          <div className="recommended-container">
+            <div className="justforyou-heading">
+              <h2>Today's Top Recommendations for You</h2>
+            </div>
+            <div className="slider-container new-slider">
+              <CarouselComponent data={recommendedRecipes} />
+            </div>
+          </div>
+        </div>
+      )}
       {/*popular recipes section*/}
       <div className="popularrecipe">
         <h1>Popular Recipes</h1>

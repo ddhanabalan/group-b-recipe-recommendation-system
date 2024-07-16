@@ -53,6 +53,11 @@
   margin-bottom: 10px;
   margin-top: 20px;
 }
+.main-recipe-section-header h1 {
+  font-size: 40px;
+  font-family: serif;
+  padding-top: 15px;
+}
 .pagination-container {
   display: flex;
   justify-content: center;
@@ -79,8 +84,8 @@
   cursor: pointer;
 }
 
-.pagination li button.active {
-  background-color: #007bff;
-  color: #fff;
-  border-color: #007bff;
+.pagination button.active {
+  background-color: #e49963; /* Example color for active page */
+  color: white;
+  border-color: #e68845;
 }

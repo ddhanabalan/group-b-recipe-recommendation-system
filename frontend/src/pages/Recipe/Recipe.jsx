@@ -23,20 +23,33 @@ const Recipe = () => {
     const categoryFilter =
       filter.category.length === 0 ||
       recipe.categories.some((cat) => filter.category.includes(cat));
-    const maxTimeFilter = recipe.total_mins <= filter.maxTime;
-    const maxCaloriesFilter = recipe.calories <= filter.maxCalories;
+    const maxTimeFilter =
+      filter.maxTime === null || recipe.total_mins <= filter.maxTime;
+    const maxCaloriesFilter =
+      filter.maxCalories === null || recipe.calories <= filter.maxCalories;
+    const seasonFilter = !filter.season || recipe.season === filter.season;
+    const timeOfDayFilter =
+      !filter.timeOfDay ||
+      recipe.daytimeofcooking
+        .toLowerCase()
+        .includes(filter.timeOfDay.toLowerCase());
+    const vegNonVegFilter =
+      !filter.vegNonVeg ||
+      recipe.veg_nonveg.toLowerCase() === filter.vegNonVeg.toLowerCase();
 
     return (
       (recipe.title.toLowerCase().includes(searchQueryLowerCase) ||
         searchQueryLowerCase === "") &&
       categoryFilter &&
       maxTimeFilter &&
-      maxCaloriesFilter
+      maxCaloriesFilter &&
+      seasonFilter &&
+      timeOfDayFilter &&
+      vegNonVegFilter
     );
   });
 
   const sortedRecipes = filteredRecipes.sort(sortFunction);
-
   const indexOfLastRecipe = currentPage * recipesPerPage;
   const indexOfFirstRecipe = indexOfLastRecipe - recipesPerPage;
   const currentRecipes = sortedRecipes.slice(

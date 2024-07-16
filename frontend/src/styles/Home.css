@@ -11,6 +11,59 @@
   padding-left: 70px;
   padding-top: 40px;
 }
+/*recommended recipes*/
+.recommendedrecipe {
+  height: 70vh;
+  gap: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc; /* Light gray border */
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.recommendedrecipe h1 {
+  color: black;
+  font-size: 36px;
+  font-family: serif;
+  margin-bottom: 20px;
+}
+
+.recommended-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.justforyou-heading {
+  text-align: center;
+  margin: 20px 0;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  background-color: #f8f3ee;
+  border-left: 6px solid #e59962;
+  border-right: 6px solid #e59962;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.justforyou-heading h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #000000;
+  margin: 0;
+  padding: 10px 0;
+  font-family: "sans-serif";
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.slider-container {
+  width: 80%; /* Adjust width as needed */
+  margin-left: 70px;
+  margin-right: 70px;
+}
 /*new recipe*/
 .newrecipe {
   height: 70vh;

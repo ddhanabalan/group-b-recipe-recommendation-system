@@ -1,77 +1,76 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import "../../styles/ForgotPassword.css";
+import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "../../styles/Otp.css";
 
 const Otp = () => {
   const location = useLocation();
-  const [formData, setFormData] = useState({
-    email: "",
-    otp: "",
-  });
-
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({ email: "", otp: "" });
   const [verificationError, setVerificationError] = useState("");
 
   useEffect(() => {
-    const pathnameSegments = location.pathname.split("/"); // Split URL path into segments
-    const emailSegmentIndex = pathnameSegments.indexOf("otp") + 1; // Get index of email segment
+    const pathnameSegments = location.pathname.split("/");
+    const emailSegmentIndex = pathnameSegments.indexOf("otp") + 1;
     if (emailSegmentIndex > 0 && emailSegmentIndex < pathnameSegments.length) {
-      const email = pathnameSegments[emailSegmentIndex]; // Extract email from URL path
-      setFormData((prevData) => ({ ...prevData, email })); // Update form data state with email
+      const email = pathnameSegments[emailSegmentIndex];
+      setFormData((prevData) => ({ ...prevData, email }));
     }
   }, [location.pathname]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value.trim(),
-    });
+    setFormData({ ...formData, [name]: value.trim() });
   };
 
   const handleOTPSubmit = async (e) => {
     e.preventDefault();
     try {
-      console.log("Request body sent to server:", {
-        email: formData.email,
-        vericode: formData.otp,
-      });
+      const requestData = { username: formData.email, vericode: formData.otp };
 
       const response = await fetch(
         "http://localhost:8000/authentication/verify-email/",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: formData.email,
-            vericode: formData.otp,
-          }),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(requestData),
         }
       );
 
       if (response.ok) {
-        const data = await response.json();
-        console.log("Response from server:", data); // Log the response content
-        alert("Email verified successfully.");
-        // Redirect to login page after successful email verification
-        window.location.href = "/login";
+        toast.success("Email verified successfully.", {
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          closeButton: false,
+          style: {
+            height: "50px",
+            border: "2px solid #ccc",
+            borderRadius: "5px",
+            padding: "10px",
+          },
+        });
+        navigate("/login"); // Redirect to login page
       } else {
         const data = await response.json();
-        setVerificationError(data.message || "Failed to verify email.");
+        setVerificationError(data.error || "Failed to verify.");
       }
     } catch (error) {
-      console.error("Error verifying email:", error.message);
-      setVerificationError("Failed to verify email.");
+      setVerificationError("Failed to verify.");
     }
   };
 
   return (
-    <div className="forgotpassword">
-      <div className="card" style={{ height: 270 }}>
-        <h1 align="center">Enter OTP</h1>
+    <div className="otp-section">
+      <div className="card-otp" style={{ height: 200 }}>
+        <h1 className="otp-head" align="center">
+          Enter OTP
+        </h1>
         <form className="form1" onSubmit={handleOTPSubmit}>
-          <table width="285" rules="none" cellPadding="10px">
+          <table width="400" rules="none" cellPadding="10px">
             <tr>
               <td style={{ fontSize: 20, fontFamily: "Playfair Display" }}>
                 <input

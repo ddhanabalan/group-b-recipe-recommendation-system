@@ -33,6 +33,7 @@
   border: none;
   border-radius: 10px;
   margin-right: 10px;
+  cursor: pointer;
 }
 .edit-btn {
   background-color: #e49963;
@@ -43,6 +44,7 @@
   border: none;
   border-radius: 10px;
   margin-right: 10px;
+  cursor: pointer;
 }
 .save-btn {
   background-color: #e49963;
@@ -53,6 +55,7 @@
   border: none;
   border-radius: 10px;
   margin-right: 10px;
+  cursor: pointer;
 }
 .add-recipe-form {
   display: flex;
@@ -76,7 +79,6 @@
   margin-top: 20px;
 }
 #title {
-  margin-bottom: 20px;
   width: 100%;
   padding: 8px;
   border: 1px solid #ccc;
@@ -102,7 +104,6 @@
 }
 
 #minutes {
-  margin-bottom: 20px;
   width: 100%;
   padding: 8px;
   border: 1px solid #ccc;
@@ -156,6 +157,18 @@
 .category-part {
   overflow-y: auto;
   height: 350px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+#catcheck {
+  width: 100px;
+}
+#season-check {
+  width: 100px;
+}
+.season-part {
+  overflow-y: auto;
+  height: 130px;
   margin-top: 10px;
   margin-bottom: 20px;
 }

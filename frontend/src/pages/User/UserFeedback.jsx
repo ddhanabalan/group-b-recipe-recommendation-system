@@ -1,18 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import UserSideBar from "../../components/userSideBar/UserSideBar";
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
 import "../../styles/User.css";
 import "../../styles/UserFeedback.css";
+import {
+  clearAuthData,
+  getAuthToken,
+  getUserId,
+  refreshAccessToken,
+  setAuthToken,
+} from "../../utils/auth";
+import { isAuthenticated, getUserRole } from "../../utils/auth";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const UserFeedback = () => {
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
     category: "",
     message: "",
   });
+
+  const history = useNavigate();
+
+  useEffect(() => {
+    if (!isAuthenticated() || getUserRole() !== "user") {
+      history("/login");
+      return;
+    }
+  }, [history]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,38 +39,91 @@ const UserFeedback = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (
-      formData.name &&
-      formData.email &&
-      formData.category &&
-      formData.message
-    ) {
-      // Process form submission
-      setFormData({
-        name: "",
-        email: "",
-        category: "",
-        message: "",
-      });
-      Swal.fire({
-        title: "Thank you!",
-        text: "Your feedback has been submitted successfully.",
-        icon: "success",
-        confirmButtonText: "OK",
-        icon: null,
-      });
+    const userId = getUserId();
+    const authToken = getAuthToken();
+    if (!authToken) {
+      authToken = await refreshAccessToken();
+    }
+    if (formData.category && formData.message) {
+      const dataToSend = {
+        userid: userId,
+        category: formData.category,
+        feedback: formData.message,
+      };
+
+      try {
+        const response = await fetch(
+          "http://localhost:8000/authentication/addfeedback/",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${authToken.access}`,
+            },
+            body: JSON.stringify(dataToSend),
+          }
+        );
+
+        if (response.status === 401) {
+          const error = await response.json();
+          console.error("Unauthorized error:", error);
+          await handleUnauthorizedError();
+        }
+
+        const responseData = await response.json();
+
+        if (response.status === 201) {
+          setFormData({
+            category: "",
+            message: "",
+          });
+          Swal.fire({
+            title: "Thank you!",
+            text: "Your feedback has been submitted successfully.",
+            confirmButtonText: "OK",
+          });
+        } else {
+          throw new Error(
+            responseData.message ||
+              `Failed to submit feedback (${response.status})`
+          );
+        }
+      } catch (error) {
+        console.error("Error submitting feedback:", error.message);
+        Swal.fire({
+          title: "Error",
+          text:
+            error.message ||
+            "Failed to submit feedback. Please try again later.",
+          confirmButtonText: "OK",
+        });
+      }
     } else {
       Swal.fire({
         title: "Error",
         text: "Please fill in all fields before submitting.",
-        icon: "error",
         confirmButtonText: "OK",
       });
     }
   };
-
+  const handleUnauthorizedError = async () => {
+    try {
+      const { refresh: refreshToken } = getAuthToken();
+      const response = await axios.post(
+        "http://localhost:8000/authentication/token/refresh/",
+        { refresh: refreshToken }
+      );
+      const { access, refresh } = response.data;
+      setAuthToken({ access, refresh });
+      await handleSubmit(); // Retry submitting after token refresh
+    } catch (error) {
+      console.error("Token refresh failed:", error);
+      clearAuthData(); // Clear auth data on token refresh failure
+      history("/login");
+    }
+  };
   return (
     <div>
       <Navbar />
@@ -74,30 +144,8 @@ const UserFeedback = () => {
             <hr />
           </div>
           <div className="user-content-item">
-            <div className="card">
+            <div className="card-feedback">
               <form onSubmit={handleSubmit}>
-                <div>
-                  <label htmlFor="name">Name:</label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div>
-                  <label htmlFor="email">Email:</label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
                 <div>
                   <label htmlFor="category">Category:</label>
                   <select
@@ -109,7 +157,6 @@ const UserFeedback = () => {
                   >
                     <option value="">Select Category</option>
                     <option value="complaint">Complaint</option>
-                    <option value="bug">Bug</option>
                     <option value="general">General</option>
                     <option value="suggestion">Suggestion</option>
                   </select>

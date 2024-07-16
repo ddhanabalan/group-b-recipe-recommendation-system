@@ -5,29 +5,38 @@ import { IoIosSave } from "react-icons/io";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import { CgProfile } from "react-icons/cg";
 import { MdOutlineFeedback } from "react-icons/md";
+
 const UserSideBar = () => {
   return (
     <div className="sidebar">
       <ul>
         <li>
-          <IoIosSave style={{ fontSize: 20, paddingRight: 5 }} />
-          <Link to="/user/savedrecipes">Saved Recipes</Link>
+          <Link to="/user/savedrecipes">
+            <IoIosSave style={{ fontSize: 20, paddingRight: 5 }} />
+            Saved Recipes
+          </Link>
         </li>
         <li>
-          <IoIosAddCircleOutline style={{ fontSize: 20, paddingRight: 5 }} />
-          <Link to="/user/addedrecipes">Added Recipes</Link>
-        </li>
-
-        <li>
-          <MdOutlineFeedback style={{ fontSize: 20, paddingRight: 5 }} />
-          <Link to="/user/feedbacks">Feedbacks</Link>
+          <Link to="/user/addedrecipes">
+            <IoIosAddCircleOutline style={{ fontSize: 20, paddingRight: 5 }} />
+            Added Recipes
+          </Link>
         </li>
         <li>
-          <CgProfile style={{ fontSize: 20, paddingRight: 5 }} />
-          <Link to="/user/profile">Profile</Link>
+          <Link to="/user/feedbacks">
+            <MdOutlineFeedback style={{ fontSize: 20, paddingRight: 5 }} />
+            Feedbacks
+          </Link>
+        </li>
+        <li>
+          <Link to="/user/profile">
+            <CgProfile style={{ fontSize: 20, paddingRight: 5 }} />
+            Profile
+          </Link>
         </li>
       </ul>
     </div>
   );
 };
+
 export default UserSideBar;

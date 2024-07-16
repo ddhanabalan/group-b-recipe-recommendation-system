@@ -1,0 +1,95 @@
+version: '3.2'
+
+services:
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - app_network
+
+  mysql_server:
+    build:
+      context: ./backend/mysqldb
+      dockerfile: Dockerfile
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    networks:
+      - app_network
+
+  recipesystem:
+    build:
+      context: ./backend/django
+      dockerfile: Dockerfile
+    # command: sh -c "python manage.py makemigrations && python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"
+    # --noreload
+    command: sh -c "python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"
+    restart: always
+    volumes:
+      - ./backend/django:/app
+      - ./backend/AIML:/app/AIML
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql_server
+      - redis
+    networks:
+      - app_network
+    environment:
+      - NLTK_DATA=/usr/share/nltk_data
+
+  celery_worker:
+    build: ./backend/django
+    user: celeryuser
+    command: celery -A recipesystem worker -l info -P gevent
+    restart: always
+    volumes:
+      - ./backend/django:/app
+      - ./backend/AIML:/app/AIML
+    depends_on:
+      - recipesystem
+    networks:
+      - app_network
+
+  celery_beat:
+    build: ./backend/django
+    user: celeryuser
+    command: celery -A recipesystem beat -l info
+    restart: always
+    volumes:
+      - ./backend/django:/app
+      - ./backend/AIML:/app/AIML
+    depends_on:
+      - recipesystem
+    networks:
+      - app_network
+  
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - mysql_server
+      - recipesystem
+      - celery_beat
+      - celery_worker
+    ports:
+      - "3000:3000"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+
+networks:
+  app_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
