@@ -38,7 +38,7 @@ const VideoDisplay = ({ recipe }) => {
             },
           }
         );
-        console.log("API response:", response.data);
+        // console.log("API response:", response.data);
       } catch (error) {
         console.error("Error sending feedback to API:", error);
         if (error.response && error.response.status === 401) {

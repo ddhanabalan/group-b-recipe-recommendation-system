@@ -9,15 +9,17 @@ import {
   clearAuthToken,
   getAuthToken,
   refreshAccessToken,
+  isAuthenticated,
+  getUserRole,
 } from "../../utils/auth";
-import { isAuthenticated, getUserRole } from "../../utils/auth";
+import Swal from "sweetalert2";
 import "../../styles/UsersList.css";
 
 const NewUsersList = () => {
   const [users, setUsers] = useState([]);
   const [pageNo, setPageNo] = useState(1);
   const [inputPageNo, setInputPageNo] = useState("");
-  const [totalUsers, setTotalUsers] = useState(0); // State to store total number of users
+  const [totalUsers, setTotalUsers] = useState(0);
   const history = useNavigate();
 
   useEffect(() => {
@@ -26,7 +28,7 @@ const NewUsersList = () => {
       return;
     }
     fetchData(pageNo);
-    fetchTotalUsers(); // Fetch total number of users when component mounts
+    fetchTotalUsers();
   }, [pageNo, history]);
 
   const fetchData = async (pageNumber) => {
@@ -97,21 +99,36 @@ const NewUsersList = () => {
   };
 
   const handleRemoveUser = async (userid) => {
-    try {
-      const authToken = getAuthToken();
-      await axios.delete("http://localhost:8000/authentication/deleteuser/", {
-        headers: {
-          Authorization: `Bearer ${authToken.access}`,
-        },
-        data: {
-          userid: userid,
-        },
-      });
-      setUsers(users.filter((user) => user.userid !== userid));
-    } catch (error) {
-      console.error("Error removing user:", error);
-      if (error.response && error.response.status === 401) {
-        await handleTokenRefresh(() => handleRemoveUser(userid));
+    const confirmed = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    });
+
+    if (confirmed.isConfirmed) {
+      try {
+        const authToken = getAuthToken();
+        await axios.delete("http://localhost:8000/authentication/deleteuser/", {
+          headers: {
+            Authorization: `Bearer ${authToken.access}`,
+          },
+          data: {
+            userid: userid,
+          },
+        });
+        setUsers(users.filter((user) => user.userid !== userid));
+        setTotalUsers(totalUsers - 1);
+
+        Swal.fire("Deleted!", "The user has been deleted.");
+      } catch (error) {
+        console.error("Error removing user:", error);
+        if (error.response && error.response.status === 401) {
+          await handleTokenRefresh(() => handleRemoveUser(userid));
+        }
       }
     }
   };

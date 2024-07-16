@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import AdminSideBar from "../../components/admin/AdminSideBar";
 import AdminNavbar from "../../components/adminNavbar/AdminNavbar";
 import Footer from "../../components/Footer/Footer";
@@ -89,6 +90,11 @@ const ReviewsList = () => {
       });
 
       setReviews(reviews.filter((review) => review.id !== id));
+
+      Swal.fire({
+        title: "Deleted!",
+        text: "The review has been removed.",
+      });
     } catch (error) {
       console.error("Error deleting review:", error);
       if (error.response && error.response.status === 401) {

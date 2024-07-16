@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import Swal from "sweetalert2";
 import AdminSideBar from "../../components/admin/AdminSideBar";
 import AdminNavbar from "../../components/adminNavbar/AdminNavbar";
 import Footer from "../../components/Footer/Footer";
@@ -147,6 +148,8 @@ const FeedbackList = () => {
         "readComplaints",
         JSON.stringify(updatedReadComplaints)
       );
+      Swal.fire("Deleted!", "Feedback has been removed.");
+      fetchTotalFeedbacks();
     } catch (error) {
       console.error("Error removing feedback:", error);
       if (error.response && error.response.status === 401) {
@@ -154,7 +157,6 @@ const FeedbackList = () => {
       }
     }
   };
-
   return (
     <div>
       <AdminNavbar />

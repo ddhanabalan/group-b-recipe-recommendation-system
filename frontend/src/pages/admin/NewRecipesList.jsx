@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import moment from "moment";
+import Swal from "sweetalert2";
 import AdminSideBar from "../../components/admin/AdminSideBar";
 import AdminNavbar from "../../components/adminNavbar/AdminNavbar";
 import Footer from "../../components/Footer/Footer";
@@ -195,7 +196,7 @@ const NewRecipesList = () => {
     if (
       !isNaN(pageNumber) &&
       pageNumber >= 1 &&
-      pageNumber <= Math.ceil(totalRecipes / 50)
+      pageNumber <= Math.ceil(totalRecipes / 20)
     ) {
       setPageNo(pageNumber);
     }
@@ -212,22 +213,40 @@ const NewRecipesList = () => {
   };
 
   const handleRemoveRecipe = async (recipeId) => {
-    try {
-      const authToken = getAuthToken();
-      await axios.delete("http://localhost:8000/recipe/deleterecipe/", {
-        headers: {
-          Authorization: `Bearer ${authToken.access}`,
-        },
-        data: {
-          recipeid: recipeId,
-        },
-      });
-      setRecipes(recipes.filter((recipe) => recipe.recipeid !== recipeId));
-    } catch (error) {
-      if (error.response && error.response.status === 401) {
-        await handleTokenRefreshAndRetry(handleRemoveRecipe, recipeId);
-      } else {
-        console.error("Error removing recipe:", error);
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const authToken = getAuthToken();
+        await axios.delete("http://localhost:8000/recipe/deleterecipe/", {
+          headers: {
+            Authorization: `Bearer ${authToken.access}`,
+          },
+          data: {
+            recipeid: recipeId,
+          },
+        });
+        setRecipes(recipes.filter((recipe) => recipe.recipeid !== recipeId));
+        setTotalRecipes(totalRecipes - 1); // Update total recipes count
+        Swal.fire("Deleted!", "Your recipe has been deleted.");
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          await handleTokenRefreshAndRetry(handleRemoveRecipe, recipeId);
+        } else {
+          console.error("Error removing recipe:", error);
+          Swal.fire(
+            "Error",
+            "There was an error deleting the recipe. Please try again."
+          );
+        }
       }
     }
   };
@@ -242,7 +261,6 @@ const NewRecipesList = () => {
       history("/login");
     }
   };
-
   return (
     <div>
       <AdminNavbar />
@@ -265,7 +283,7 @@ const NewRecipesList = () => {
                   placeholder="No"
                   min="1"
                   className="page-input"
-                  max={Math.ceil(totalRecipes / 50)}
+                  max={Math.ceil(totalRecipes / 20)}
                   style={{ width: "100px", marginRight: "5px" }}
                   onKeyDown={(e) => {
                     if (e.code === "Minus" || e.key === "-" || e.key === ".") {
@@ -340,7 +358,7 @@ const NewRecipesList = () => {
               Prev
             </button>
             <span>
-              {pageNo} of {Math.ceil(totalRecipes / 50)}
+              {pageNo} of {Math.ceil(totalRecipes / 20)}
             </span>
             <button
               onClick={handleNextPage}
