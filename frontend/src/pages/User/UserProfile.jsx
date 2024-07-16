@@ -65,6 +65,14 @@ const UserProfile = () => {
     setIsEditing(!isEditing);
   };
 
+  const handleCancelEdit = () => {
+    setEditedData({
+      name: getUserName(),
+      email: getUserEmail(),
+    });
+    setIsEditing(false);
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setEditedData((prevData) => ({
@@ -198,6 +206,9 @@ const UserProfile = () => {
                   <button onClick={handleSubmit} className="okbtn">
                     Submit
                   </button>
+                  <button onClick={handleCancelEdit} className="cancelbtn">
+                    Cancel
+                  </button>
                 </>
               ) : (
                 <>
@@ -205,6 +216,7 @@ const UserProfile = () => {
                   <FaPencilAlt
                     className="edit-icon"
                     onClick={handleToggleEdit}
+                    style={{ cursor: "pointer" }}
                   />
                 </>
               )}
@@ -213,7 +225,7 @@ const UserProfile = () => {
               <label>Email:</label>
               <span>{editedData.email}</span>
             </div>
-            {/*} <div className="user-preferences">
+            {/* <div className="user-preferences">
               <div className="preference-item" style={{ display: "flex" }}>
                 <label>Food Type:</label>
                 <span className="preference-food-type">
@@ -230,7 +242,7 @@ const UserProfile = () => {
                   ))}
                 </ul>
               </div>
-            </div>*/}
+            </div> */}
             <div className="detail-item">
               <button
                 onClick={handleChangePassword}
