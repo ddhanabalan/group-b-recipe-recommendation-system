@@ -8,6 +8,8 @@ from recipe.models import Recipe, Category
 from recipe.serializers import RecipeSerializer, RecipeCategories
 from django.conf import settings
 import random
+from .models import Recommendation, RecommendedRecipes
+from datetime import date
 
 # Custom Unpickler to ensure recommend_recipe is available
 class CustomUnpickler(pickle.Unpickler):
@@ -54,22 +56,28 @@ class UserPrediction(APIView):
         data = request.data.get('userid')
         if not data:
             return Response({'error': 'No data provided'}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Make prediction
-        prediction = UserPrediction.model(int(data))
-        # print(prediction)
-        if len(prediction)==0:
-            avg_review = Recipe.objects.aggregate(Avg("total_reviews"))
-            # print(avg_review)
-            avg_total_reviews = avg_review['total_reviews__avg']
-            # print(avg_total_reviews)
-            top_recipes = list(Recipe.objects.filter(total_reviews__gte=avg_total_reviews).values_list('recipeid', flat=True).order_by('-rating')[:50])
-            # print(prediction)
-            # Randomly select 10 recipes from the top 50
-            if len(top_recipes) > 10:
-                prediction = random.sample(top_recipes, 10)
-            else:
-                prediction = top_recipes
+        
+        today = date.today()
+        try:
+            recommendation = Recommendation.objects.get(userid=data, date=today)
+            recommended_recipes = recommendation.recipes.all()
+            prediction = [rec.recipeid.recipeid for rec in recommended_recipes]  # Access recipeid as foreign key
+        except Recommendation.DoesNotExist:
+            # Make prediction
+            prediction = UserPrediction.model(int(data))
+            if len(prediction)==0:
+                avg_review = Recipe.objects.aggregate(Avg("total_reviews"))
+                avg_total_reviews = avg_review['total_reviews__avg']
+                top_recipes = list(Recipe.objects.filter(total_reviews__gte=avg_total_reviews).values_list('recipeid', flat=True).order_by('-rating')[:50])
+                # Randomly select 10 recipes from the top 50
+                if len(top_recipes) > 10:
+                    prediction = random.sample(top_recipes, 10)
+                else:
+                    prediction = top_recipes
+            # Save the new recommendation
+            recommendation = Recommendation.objects.create(userid_id=data)
+            for recipe_id in prediction:
+                RecommendedRecipes.objects.create(recmd_id=recommendation, recipeid_id=recipe_id)
         queryset = Recipe.objects.filter(recipeid__in=prediction)
         serializer = RecipeSerializer(queryset, many=True)
         data = serializer.data

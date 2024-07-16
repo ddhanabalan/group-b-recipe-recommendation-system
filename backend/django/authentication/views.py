@@ -30,14 +30,6 @@ def generate_unique_userid():
             return userid
 
 class UserSignup(APIView):
-    
-    # def post(self, request):
-    #     userid = generate_unique_userid()
-    #     serializer = UserSerializer(data={**request.data, 'userid': userid})
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
     def post(self, request):
         username = request.data.get('username')
@@ -73,11 +65,13 @@ class UserSignup(APIView):
                 # Generate a verification code
                 verification_code = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
                 
+                hashed_verification_code = make_password(verification_code)
+                
                 # Send verification email
                 send_verification_email(serializer.validated_data['email'], verification_code)
                 
                 # Save user details along with verification code in the temp table
-                serializer.save(vericode=verification_code)
+                serializer.save(vericode=hashed_verification_code)
                 
                 return Response({'message': 'Please check your email for verification code'}, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -98,10 +92,13 @@ class VerifyEmail(APIView):
         username = request.data.get('username')
         vericode = request.data.get('vericode')
         
-        # Check if the verification code matches the one in the temp table
         try:
-            temp = Temp.objects.get(username=username, vericode=vericode)
+            temp = Temp.objects.get(username=username)
         except Temp.DoesNotExist:
+            return Response({'error': 'Invalid username'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Verify the provided verification code against the hashed code
+        if not check_password(vericode, temp.vericode):
             return Response({'error': 'Invalid verification code'}, status=status.HTTP_400_BAD_REQUEST)
         
         # Check if the verification code is older than 5 minutes

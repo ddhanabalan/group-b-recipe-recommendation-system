@@ -10,9 +10,6 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["userid","username", "email", "password",'role', 'preference', 'food_type']
-    def create(self, validated_data):
-        validated_data['password'] = make_password(validated_data.get('password'))
-        return super().create(validated_data)
 
 class PasswordResetSerializer(serializers.Serializer):
     new_password = serializers.CharField(write_only=True)
@@ -49,6 +46,10 @@ class TempSerializer(serializers.ModelSerializer):
         model = Temp
         fields = ['userid','username', 'email', 'password', 'created_at']
 
+    def create(self, validated_data):
+        validated_data['password'] = make_password(validated_data.get('password'))
+        return super().create(validated_data)
+    
 class ChangeUsernameSerializer(serializers.Serializer):
     new_username = serializers.CharField(max_length=255)
 

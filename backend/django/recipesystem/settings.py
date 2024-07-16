@@ -73,7 +73,7 @@ CELERY_BEAT_SCHEDULE = {
     'update-recommendation-model-every-day': {
         'task': 'recipe.tasks.update_recommendation_model_task',
         # 'schedule': crontab(minute='*/10'),
-        'schedule': crontab(hour=0, minute=0),  # Schedule it to run daily at midnight
+        'schedule': crontab(hour=0, minute=0),  # Schedule it to run daily at midnight (1:30 AM) IST
     },
 }
 
@@ -137,7 +137,7 @@ ROOT_URLCONF = 'recipesystem.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, ''),os.path.join(BASE_DIR, '../../frontend/public')],
+        'DIRS': [os.path.join(BASE_DIR, '')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
