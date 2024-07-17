@@ -16,7 +16,8 @@ function Signup() {
   const [usernameError, setUsernameError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [generalError, setGeneralError] = useState("");
-  const history = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false); // State to handle button disabling
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -37,11 +38,13 @@ function Signup() {
     setUsernameError("");
     setEmailError("");
     setGeneralError("");
+    setIsSubmitting(true); // Disable the button when form is submitted
 
     if (!validatePassword(formData.password)) {
       setPasswordError(
         "Password must be at least 6 characters long, with at least one uppercase letter, one lowercase letter, one special character, and one digit."
       );
+      setIsSubmitting(false); // Re-enable the button if validation fails
       return;
     }
 
@@ -58,7 +61,7 @@ function Signup() {
       if (response.status === 201) {
         const username = formData.username;
         localStorage.setItem("signupUsername", username);
-        history(`/otp/${username}`);
+        navigate(`/otp/${username}`);
       }
     } catch (error) {
       if (error.response && error.response.data) {
@@ -83,6 +86,8 @@ function Signup() {
       } else {
         setGeneralError("Error during signup. Please try again.");
       }
+    } finally {
+      setIsSubmitting(false); // Re-enable the button after processing the form
     }
   };
 
@@ -128,14 +133,18 @@ function Signup() {
           {emailError && <p className="error-message">{emailError}</p>}
           {generalError && <p className="error-message">{generalError}</p>}
           <div className="form-button">
-            <button type="submit" className="signup-button">
-              SIGN UP
+            <button
+              type="submit"
+              className="signup-button"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Signing Up..." : "SIGN UP"}
             </button>
           </div>
         </form>
 
         <p className="login-link">
-          Already have an account ? <a href="/login">Login</a>
+          Already have an account? <a href="/login">Login</a>
         </p>
       </div>
       <div className="image-container">
