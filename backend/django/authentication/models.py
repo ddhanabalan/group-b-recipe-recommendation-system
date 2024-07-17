@@ -4,7 +4,7 @@ from django.utils.timezone import now
 
 class Temp(models.Model):
     userid = models.IntegerField(primary_key=True,unique=True)
-    username = models.CharField(max_length=255)
+    username = models.CharField(max_length=255,unique=True)
     email = models.EmailField(unique=False)
     password = models.CharField(max_length=255)
     vericode = models.CharField(max_length=255)
