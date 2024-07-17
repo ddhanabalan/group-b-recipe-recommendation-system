@@ -66,12 +66,15 @@ class UserSignup(APIView):
                 verification_code = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
                 
                 hashed_verification_code = make_password(verification_code)
-                
-                # Send verification email
-                send_verification_email(serializer.validated_data['email'], verification_code)
-                
-                # Save user details along with verification code in the temp table
-                serializer.save(vericode=hashed_verification_code)
+                try:
+                    # Save user details along with verification code in the temp table
+                    serializer.save(vericode=hashed_verification_code)
+
+                    # Send verification email
+                    send_verification_email(serializer.validated_data['email'], verification_code)
+
+                except:
+                    return Response({"message":"Some error occured please try again"}, status=status.HTTP_400_BAD_REQUEST)
                 
                 return Response({'message': 'Please check your email for verification code'}, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -84,7 +87,7 @@ def send_verification_email(email, verification_code):
     text_content = strip_tags(html_content) 
     email_message = EmailMultiAlternatives(subject, text_content, settings.EMAIL_HOST_USER, [email])
     email_message.attach_alternative(html_content, "text/html")
-    email_message.send(fail_silently=False)
+    email_message.send(fail_silently=True)
 
 class VerifyEmail(APIView):
     
