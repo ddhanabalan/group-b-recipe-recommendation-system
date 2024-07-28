@@ -39,10 +39,10 @@ const PersonalizedRecommendationPage = () => {
   useEffect(() => {
     const userPreferences =
       JSON.parse(localStorage.getItem("userPreferences")) || {};
-    console.log(
+    /*console.log(
       "preference at recommendation page:",
       localStorage.getItem("userPreferences")
-    );
+    );*/
     if (
       !userPreferences.preference ||
       userPreferences.preference.length === 0

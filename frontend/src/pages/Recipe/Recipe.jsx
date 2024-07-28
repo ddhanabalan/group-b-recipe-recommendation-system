@@ -30,6 +30,7 @@ const Recipe = () => {
     const seasonFilter =
       !filter.season ||
       recipe.season.toLowerCase().includes(filter.season.toLowerCase());
+
     const timeOfDayFilter =
       !filter.timeOfDay ||
       recipe.daytimeofcooking
