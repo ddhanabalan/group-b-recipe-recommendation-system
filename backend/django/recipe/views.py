@@ -11,6 +11,7 @@ from django.utils import timezone
 from datetime import timedelta
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.shortcuts import get_object_or_404
+from authentication.models import User
 
 def AddCategories(data):
     for recipe_data in data:
@@ -47,14 +48,25 @@ class AllRecipesLimited(APIView):
         
         return Response(data)
 
-class PopularRecipes(generics.ListAPIView):
+class PopularRecipes(APIView):
 
-    def list(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
+        userid=request.data.get('userid')
         start_date = timezone.now() - timedelta(days=30)
-        queryset = Recipe.objects.filter(created_at__gte=start_date).order_by("-total_reviews")[:10]
-        while len(queryset)<5:
-            start_date = start_date - timedelta(days=30)
+        food_type=""
+        if userid != '':
+            user=User.objects.get(pk=userid)
+            food_type=user.food_type
+        if userid != '' and food_type.lower() == "veg":
+            queryset = Recipe.objects.filter(created_at__gte=start_date,veg_nonveg = "Veg").order_by("-total_reviews")[:10]
+            while len(queryset)<5:
+                start_date = start_date - timedelta(days=30)
+                queryset = Recipe.objects.filter(created_at__gte=start_date,veg_nonveg = "Veg").order_by("-total_reviews")[:10]
+        else:
             queryset = Recipe.objects.filter(created_at__gte=start_date).order_by("-total_reviews")[:10]
+            while len(queryset)<5:
+                start_date = start_date - timedelta(days=30)
+                queryset = Recipe.objects.filter(created_at__gte=start_date).order_by("-total_reviews")[:10]
         serializer = RecipeSerializer(queryset, many=True)
         # serializer = self.get_serializer(queryset, many=True)
         data = serializer.data
@@ -62,12 +74,18 @@ class PopularRecipes(generics.ListAPIView):
         data = AddCategories(data)
         return Response(data)
     
-class NewRecipes(generics.ListAPIView):
-    queryset = Recipe.objects.order_by("-created_at")[:10]
-    serializer_class = RecipeSerializer
+class NewRecipes(APIView):
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
+    def post(self, request, *args, **kwargs):
+        userid=request.data.get('userid')
+        food_type=""
+        if userid != '':
+            user=User.objects.get(pk=userid)
+            food_type=user.food_type
+        if userid != '' and food_type.lower() == "veg":
+            queryset = Recipe.objects.filter(veg_nonveg = "Veg").order_by("-created_at")[:10]
+        else:
+            queryset = Recipe.objects.order_by("-created_at")[:10]
         serializer = RecipeSerializer(queryset, many=True)
         # serializer = self.get_serializer(queryset, many=True)
         data = serializer.data
@@ -130,7 +148,7 @@ class RecipeReviews(APIView):
         recipe_id = request.data.get('recipeid')
         if not recipe_id:
             return Response({'error': 'Recipe ID is required'}, status=status.HTTP_400_BAD_REQUEST)
-        queryset = Reviews.objects.filter(recipeid=recipe_id)
+        queryset = Reviews.objects.filter(recipeid=recipe_id).order_by('-review_date')
         serializer = ReviewsSerializer(queryset, many=True)
         data = serializer.data
 
@@ -144,7 +162,7 @@ class RecipeReviewsLimited(APIView):
         limit = int(request.data.get('page'))
         if not recipe_id:
             return Response({'error': 'Recipe ID is required'}, status=status.HTTP_400_BAD_REQUEST)
-        queryset = Reviews.objects.filter(recipeid=recipe_id)[((limit-1)*10):(limit*10)]
+        queryset = Reviews.objects.filter(recipeid=recipe_id).order_by('-review_date')[((limit-1)*10):(limit*10)]
         serializer = ReviewsSerializer(queryset, many=True)
         data = serializer.data
 

@@ -445,18 +445,25 @@ recipe_factors=nmf.components_
 user_id_to_index = {user_id: idx for idx, user_id in enumerate(user_item_matrix.index)}
 
 # Function to recommend recipes based on user ID
-def recommend_recipes(user_id, top_n=10):
+def recommend_recipes(user_id, preference, top_n=100):
     if user_id not in user_id_to_index:
         return []
 
     user_index = user_id_to_index[user_id]
     user_factor = user_factors[user_index]
     predicted_ratings = user_factor.dot(recipe_factors)
-    top_recipe_indices = predicted_ratings.argsort()[-top_n:][::-1]  # Get top n indices, sorted in descending order
-    
-    # Map indices back to recipe IDs
+    top_recipe_indices = predicted_ratings.argsort()[-top_n:][::-1]
+   
     top_recipe_ids = user_item_matrix.columns[top_recipe_indices]
-    return top_recipe_ids
+   
+    if preference == 0:
+        # Only return vegetarian recipes
+        filtered_recipe_ids = [recipe_id for recipe_id in top_recipe_ids if df.loc[df['recipe_id'] == recipe_id, 'diet_type'].values[0] == "veg"]
+    else:
+        # Return both vegetarian and non-vegetarian recipes
+        filtered_recipe_ids = top_recipe_ids
+   
+    return filtered_recipe_ids[:top_n]
 
 # In[26]:
 
