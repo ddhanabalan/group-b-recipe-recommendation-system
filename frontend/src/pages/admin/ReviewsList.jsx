@@ -170,10 +170,7 @@ const ReviewsList = () => {
             </thead>
             <tbody>
               {filteredReviews.map((review, index) => (
-                <tr
-                  key={index}
-                  className={review.rating <= 2 ? "highlighted-row" : ""}
-                >
+                <tr key={index}>
                   <td>{review.recipeid}</td>
                   <td>{review.userid}</td>
                   <td>{review.username}</td>

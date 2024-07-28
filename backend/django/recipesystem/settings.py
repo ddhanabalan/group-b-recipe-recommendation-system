@@ -72,8 +72,8 @@ from celery.schedules import crontab
 CELERY_BEAT_SCHEDULE = {
     'update-recommendation-model-every-day': {
         'task': 'recipe.tasks.update_recommendation_model_task',
-        'schedule': crontab(minute='*/5'),
-        # 'schedule': crontab(hour=0, minute=0),  # Schedule it to run daily at midnight (1:30 AM) IST
+        # 'schedule': crontab(minute='*/5'),
+        'schedule': crontab(hour=0, minute=0),  # Schedule it to run daily at midnight (1:30 AM) IST
     },
 }
 

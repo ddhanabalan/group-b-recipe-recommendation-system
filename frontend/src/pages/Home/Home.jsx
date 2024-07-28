@@ -19,21 +19,37 @@ function Home() {
   const [newRecipes, setNewRecipes] = useState([]);
   const [recommendedRecipes, setRecommendedRecipes] = useState([]);
   const authToken = isAuthenticated();
-  const userid = getUserId();
+  const userid = authToken ? getUserId() : "";
+
   useEffect(() => {
-    fetch("http://localhost:8000/recipe/popularrecipes/")
+    // Fetch popular recipes
+    fetch("http://localhost:8000/recipe/popularrecipes/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userid: userid }),
+    })
       .then((response) => response.json())
       .then((data) => setPopularRecipes(data))
       .catch((error) =>
-        console.error("Error fetching popular recipes:", error)
+        console.error("Error fetching recommended recipes:", error)
       );
 
-    // Fetch new recipes from the new recipes API endpoint
-    fetch("http://localhost:8000/recipe/newrecipes/")
+    // Fetch new recipes
+    fetch("http://localhost:8000/recipe/newrecipes/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userid: userid }),
+    })
       .then((response) => response.json())
       .then((data) => setNewRecipes(data))
-      .catch((error) => console.error("Error fetching new recipes:", error));
-
+      .catch((error) =>
+        console.error("Error fetching recommended recipes:", error)
+      );
+    // Fetch recommended recipes
     fetch("http://localhost:8000/recommend/userrecommend/", {
       method: "POST",
       headers: {
