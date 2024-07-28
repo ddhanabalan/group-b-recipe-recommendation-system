@@ -16,6 +16,7 @@ class Command(BaseCommand):
 
         # Field mapping from reviews table to CSV
         field_mapping = {
+            'id': 'comment_id',
             'review_date': 'date',
             'rating': 'rating',
             'recipeid': 'recipe_id',
@@ -30,7 +31,6 @@ class Command(BaseCommand):
                 df = pickle.load(file)
         else:
             df = pd.DataFrame(columns=field_mapping.values())
-
         # Fetch new data using Django ORM
         new_data = Reviews.objects.all().values()
         new_data_df = pd.DataFrame(list(new_data))
@@ -43,7 +43,7 @@ class Command(BaseCommand):
 
         # Append new data to the existing DataFrame
         updated_df = pd.concat([df, new_data_df]).drop_duplicates().reset_index(drop=True)
-
+        
         # Also save the updated DataFrame to a pickle file
         with open(pickle_file_path, 'wb') as file:
             pickle.dump(updated_df, file)
