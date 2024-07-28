@@ -1,326 +1,125 @@
-<!-- # group-b-recipe-recommendation-system-backend
-
-## Table of Contents
-
-- [API Endpoints](#api-endpoints)
-  - [Signup](#signup)
-  - [Login](#login)
-  - [Forgot Password](#forgot-password)
-  - [Reset Password](#reset-password)
-- [Dependencies](#dependencies)
-
-## API Endpoints
-
-### Signup
-
-#### Request
-
-- **URL:** `/authentication/signup/`
-- **Method:** POST
-- **Body:**
-  - `username`: string (required)
-  - `password`: string (required)
-  - `email`: string (required)
-  - Additional fields as per your User model
-
-#### Response
-
-- **Success Response:**
-  - **Code:** 201 CREATED
-  - **Content:** 
-    ```json
-    {
-        "id": 1,
-        "username": "example",
-        "email": "example@example.com",
-        ...
-    }
-    ```
-- **Error Response:**
-  - **Code:** 400 BAD REQUEST
-  - **Content:** 
-    ```json
-    {
-        "error": "Error message goes here"
-    }
-    ```
-
-### Login
-
-#### Request
-
-- **URL:** `/authentication/login/`
-- **Method:** POST
-- **Body:**
-  - `username`: string (required)
-  - `password`: string (required)
-
-#### Response
-
-- **Success Response:**
-  - **Code:** 200 OK
-  - **Content:** 
-    ```json
-    {
-        "id": 1,
-        "username": "example",
-        "email": "example@example.com",
-        ...
-    }
-    ```
-- **Error Response:**
-  - **Code:** 401 UNAUTHORIZED
-  - **Content:** 
-    ```json
-    {
-        "error": "Invalid username or password"
-    }
-    ```
-
-### Forgot Password
-
-#### Request
-
-- **URL:** `/authentication/forgot-password/`
-- **Method:** POST
-- **Body:**
-  - `username`: string (required)
-  - `email`: string (required)
-
-#### Response
-
-- **Success Response:**
-  - **Code:** 200 OK
-  - **Content:** 
-    ```json
-    {
-        "message": "Password reset email sent"
-    }
-    ```
-- **Error Response:**
-  - **Code:** 404 NOT FOUND
-  - **Content:** 
-    ```json
-    {
-        "error": "User with provided username or email does not exist"
-    }
-    ```
-
-### Reset Password
-
-#### Request
-
-- **URL:** `/authentication/reset/{uidb64}/{token}/`
-- **Method:** POST
-- **Body:**
-  - `new_password`: string (required)
-
-#### Response
-
-- **Success Response:**
-  - **Code:** 200 OK
-  - **Content:** 
-    ```json
-    {
-        "message": "Password reset successful"
-    }
-    ```
-- **Error Response:**
-  - **Code:** 400 BAD REQUEST
-  - **Content:** 
-    ```json
-    {
-        "error": "Invalid reset link"
-    }
-    ```
-
-## Dependencies
-
-- Django
-- Django REST Framework -->
-
 # Group B Recipe Recommendation System Backend
 
 ## Overview
 
 This is the backend component of the Group B Recipe Recommendation System, providing API endpoints for user authentication, recipe management, and more.
 
-## API Endpoints
+## Authentication APIs
 
-- [User Signup](#user-signup)
-- [Verify Email](#verify-email)
-- [User Login](#user-login)
-- [Logout](#logout)
-- [Forgot Password](#forgot-password)
-- [Reset Password](#reset-password)
-- [All Recipes](#all-recipes)
-- [Popular Recipes](#popular-recipes)
-- [New Recipes](#new-recipes)
-- [Add Favorite](#add-favorite)
-- [All Favorites](#all-favorites)
-- [Recipe Reviews](#recipe-reviews)
-- [All Reviews](#all-reviews)
-- [All Titles](#all-titles)
-- [Add Review](#add-review)
-- [Delete Review](#delete-review)
-- [Add Recipe](#add-recipe)
-- [All Categories](#all-categories)
-- [User Recipes](#user-recipes)
+All authentication endpoints are prefixed with `/authentication/`.
 
-## User Signup
+| Endpoint | Description |
+| --- | --- |
+| `POST /authentication/signup/` | User sign-up |
+| `POST /authentication/login/` | User login |
+| `POST /authentication/token/refresh/` | Refresh authentication token |
+| `POST /authentication/forgot-password/` | Request password reset |
+| `POST /authentication/reset/<str:uidb64>/<str:token>/` | Confirm password reset |
+| `POST /authentication/verify-email/` | Verify email address |
+| `POST /authentication/logout/` | User logout |
+| `POST /authentication/change-username/` | Change username |
+| `POST /authentication/change-password/` | Change password |
+| `GET /authentication/userdetails/` | Fetch username and email |
+| `POST /authentication/addfeedback/` | Add feedback |
+| `DELETE /authentication/deletefeedback/` | Delete feedback |
+| `GET /authentication/allfeedbacklimited/` | Fetch limited feedback |
+| `GET /authentication/alluserslimited/` | Fetch limited users |
+| `GET /authentication/userscount/` | Get users count |
+| `GET /authentication/feedbackcount/` | Get feedback count |
+| `DELETE /authentication/deleteuser/` | Delete user |
+| `GET /authentication/newuserscount/` | Get new users count in the last 30 days |
+| `GET /authentication/newusersdetails/` | Get new users details in the last 30 days |
+| `POST /authentication/addpreference/` | Add user preference |
+| `POST /authentication/addfoodtype/` | Add food type |
+| `GET /authentication/userpreferences/` | Fetch user preferences |
 
-**URL:** `/authentication/signup/`  
-**Method:** `POST`  
-**Description:** Allows users to register for a new account.  
-**Parameters:**
-- `username`: string (required)
-- `password`: string (required)
-- `email`: string (required)
+## Recipe APIs
 
-## Verify Email
+All recipe endpoints are prefixed with `/recipe/`.
 
-**URL:** `/authentication/verify-email/`  
-**Method:** `POST`  
-**Description:** Allows users to verify their email address using the verification code sent to their email after signup.  
-**Parameters:**
-- `email`: string (required)
-- `vericode`: string (required)
+| Endpoint | Description |
+| --- | --- |
+| `GET /recipe/allrecipes/` | Fetch all recipes |
+| `GET /recipe/allrecipeslimited/` | Fetch limited recipes |
+| `POST /recipe/popularrecipes/` | Fetch popular recipes |
+| `POST /recipe/newrecipes/` | Fetch new recipes |
+| `POST /recipe/saverecipe/` | Save recipe to favorites |
+| `DELETE /recipe/deletefavourite/` | Remove recipe from favorites |
+| `GET /recipe/saved/` | Fetch all favorite recipes |
+| `GET /recipe/recipereviews/` | Fetch recipe reviews |
+| `GET /recipe/recipereviewslimited/` | Fetch limited recipe reviews |
+| `GET /recipe/allreviews/` | Fetch all reviews |
+| `GET /recipe/allreviewslimited/` | Fetch limited reviews |
+| `GET /recipe/alltitles/` | Fetch all recipe titles |
+| `POST /recipe/addreview/` | Add review |
+| `DELETE /recipe/deletereview/` | Delete review |
+| `POST /recipe/addrecipe/` | Add recipe |
+| `DELETE /recipe/deleterecipe/` | Delete recipe |
+| `GET /recipe/userrecipes/` | Fetch user recipes |
+| `GET /recipe/allcategories/` | Fetch all recipe categories |
+| `POST /recipe/userhistory/` | Add to user history |
+| `GET /recipe/recipescount/` | Get recipes count |
+| `GET /recipe/reviewscount/` | Get reviews count |
+| `GET /recipe/newrecipescount/` | Get new recipes count in the last 30 days |
+| `GET /recipe/newrecipesdetails/` | Get new recipes details in the last 30 days |
+| `POST /recipe/upload/` | Upload media |
+| `GET /recipe/fetchhistory/` | Fetch user history |
+| `DELETE /recipe/deleteallhistory/` | Delete all user history |
+| `DELETE /recipe/deletehistory/` | Delete specific user history |
+| `POST /recipe/addsearchhistory/` | Add to user search history |
+| `GET /recipe/singlerecipe/` | Fetch single recipe |
+| `POST /recipe/editrecipe/` | Edit recipe |
+| `POST /recipe/maderecipe/` | Mark recipe as made |
 
-## User Login
+## Recommendation APIs
 
-**URL:** `/authentication/login/`  
-**Method:** `POST`  
-**Description:** Allows registered users to log in to their account.  
-**Parameters:**
-- `username`: string (required)
-- `password`: string (required)
+All recommendation endpoints are prefixed with `/recommend/`.
 
-## Logout
-
-**URL:** `/authentication/logout/`  
-**Method:** `POST`  
-**Description:** Logs out the authenticated user and invalidates their token.
-
-## Forgot Password
-
-**URL:** `/authentication/forgot-password/`  
-**Method:** `POST`  
-**Description:** Initiates the process to reset the user's password by sending a password reset email.  
-**Parameters:**
-- `username`: string (required)
-- `email`: string (required)
-
-## Reset Password
-
-**URL:** `/authentication/reset-password-confirm/<uidb64>/<token>/`  
-**Method:** `POST`  
-**Description:** Allows users to reset their password using the password reset link sent to their email after initiating the forgot password process.  
-**Parameters:**
-- `new_password`: string (required)
-
-## All Recipes
-
-**URL:** `/recipe/allrecipes/`  
-**Method:** `GET`  
-**Description:** Retrieves all recipes.  
-
-## Popular Recipes
-
-**URL:** `/recipe/popularrecipes/`  
-**Method:** `GET`  
-**Description:** Retrieves popular recipes.  
-
-## New Recipes
-
-**URL:** `/recipe/newrecipes/`  
-**Method:** `GET`  
-**Description:** Retrieves new recipes.  
-
-## Add Favorite
-
-**URL:** `/recipe/saverecipe/`  
-**Method:** `POST`  
-**Description:** Adds a recipe to favorites.  
-**Parameters:**
-- `userid`: string (required)
-- `recipeid`: string (required)
-
-## All Favorites
-
-**URL:** `/recipe/saved/`  
-**Method:** `POST`  
-**Description:** Retrieves all favorite recipes for a user.  
-**Parameters:**
-- `userid`: string (required)
-
-## Recipe Reviews
-
-**URL:** `/recipe/recipereview/`  
-**Method:** `POST`  
-**Description:** Retrieves reviews for a recipe.  
-**Parameters:**
-- `recipeid`: string (required)
-
-## All Reviews
-
-**URL:** `/recipe/allreviews/`  
-**Method:** `GET`  
-**Description:** Retrieves all reviews.  
-
-## All Titles
-
-**URL:** `/recipe/alltitles/`  
-**Method:** `GET`  
-**Description:** Retrieves titles of all recipes.  
-
-## Add Review
-
-**URL:** `/recipe/addreview/`  
-**Method:** `POST`  
-**Description:** Adds a review for a recipe.  
-**Parameters:**
-- `userid`: string (required)
-- `recipeid`: string (required)
-- `rating`: integer (required)
-- `review_text`: string (optional)
-
-## Delete Review
-
-**URL:** `/recipe/deletereview/`  
-**Method:** `DELETE`  
-**Description:** Deletes a review.  
-**Parameters:**
-- `review_id`: integer (required)
-
-## Add Recipe
-
-**URL:** `/recipe/addrecipe/`  
-**Method:** `POST`  
-**Description:** Adds a new recipe.  
-**Parameters:**
-- `userid`: string (required)
-- `title`: string (required)
-- `description`: string (optional)
-- `ingredients`: array of strings (required)
-- `directions`: array of strings (required)
-- `categories`: array of strings (required)
-
-## All Categories
-
-**URL:** `/recipe/allcategories/`  
-**Method:** `GET`  
-**Description:** Retrieves all recipe categories.  
-
-## User Recipes
-
-**URL:** `/recipe/userrecipes/`  
-**Method:** `POST`  
-**Description:** Retrieves recipes for a user.  
-**Parameters:**
-- `userid`: string (required)
+| Endpoint | Description |
+| --- | --- |
+| `POST /recommend/reciperecommend/` | Get recipe recommendation |
+| `POST /recommend/userrecommend/` | Get user recommendation |
 
 ## Dependencies
 
-- Django
-- Django REST Framework
-- Django Simple JWT
+The project dependencies are listed below :
+
+- `asgiref==3.8.0`
+- `charset-normalizer==3.3.2`
+- `contourpy==1.2.1`
+- `cycler==0.12.1`
+- `Django==5.0.3`
+- `django-cors-headers==4.3.1`
+- `djangorestframework==3.15.1`
+- `djangorestframework-simplejwt==5.3.1`
+- `fonttools==4.51.0`
+- `idna==3.7`
+- `joblib==1.4.2`
+- `kiwisolver==1.4.5`
+- `matplotlib==3.9.0`
+- `mysqlclient==2.2.4`
+- `nltk==3.8.1`
+- `numpy==1.26.4`
+- `packaging==24.0`
+- `pandas==2.2.2`
+- `pillow==10.3.0`
+- `PyJWT==2.8.0`
+- `pyparsing==3.1.2`
+- `python-dateutil==2.9.0.post0`
+- `python-dotenv==1.0.1`
+- `pytz==2024.1`
+- `regex==2024.5.15`
+- `requests==2.31.0`
+- `scikit-learn==1.4.2`
+- `scipy==1.13.0`
+- `seaborn==0.13.2`
+- `six==1.16.0`
+- `sqlparse==0.4.4`
+- `threadpoolctl==3.5.0`
+- `tqdm==4.66.4`
+- `tzdata==2024.1`
+- `urllib3==2.2.1`
+- `celery==5.4.0`
+- `redis==5.0.6`
+- `django-celery-beat`
+- `gevent`
