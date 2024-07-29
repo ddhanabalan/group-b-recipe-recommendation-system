@@ -1,0 +1,54 @@
+.history-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 2em;
+  margin-bottom: 10px;
+  border-bottom: 1px solid black;
+  font-weight: 600;
+}
+
+.remove-all-button {
+  background-color: #e1792f;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.load-more-button {
+  background-color: #e1792f;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.empty-message {
+  margin-top: 20px;
+  text-align: center;
+  color: #999;
+}
+
+.recipe-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+.recipe-card {
+  width: 150px;
+  margin: 5px;
+  background-color: #f0f0f0;
+
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.recipe-list {
+  display: flex;
+  flex-wrap: wrap;
+}

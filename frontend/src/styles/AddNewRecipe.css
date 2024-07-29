@@ -1,0 +1,174 @@
+.back-arrow {
+  cursor: pointer;
+  margin-left: 70px;
+  padding-top: 5px;
+  color: rgb(0, 0, 0);
+  font-size: 26px;
+}
+
+.back-arrow:hover {
+  text-decoration: underline;
+}
+
+.add-recipe-head {
+  display: flex;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.add-recipe-heading {
+  margin-left: 3%;
+  font-size: 25px;
+  padding-top: 5px;
+  font-weight: 500;
+}
+.add-recipe-btns {
+  margin-left: 60%;
+}
+.preview-btn {
+  background-color: #e49963;
+  font-size: 20px;
+  font-weight: 400;
+  width: 100px;
+  height: 40px;
+  border: none;
+  border-radius: 10px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+.edit-btn {
+  background-color: #e49963;
+  font-size: 20px;
+  font-weight: 400;
+  width: 100px;
+  height: 40px;
+  border: none;
+  border-radius: 10px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+.save-btn {
+  background-color: #e49963;
+  font-size: 20px;
+  font-weight: 400;
+  width: 100px;
+  height: 40px;
+  border: none;
+  border-radius: 10px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+.add-recipe-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
+.add-recipe-form-content {
+  border: 2px solid black;
+  width: 60%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.form-group {
+  height: auto;
+  margin-bottom: 20px;
+  width: 600px;
+
+  margin-top: 20px;
+}
+#title {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+#photo {
+  margin-bottom: 20px;
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+#hours {
+  margin-bottom: 20px;
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+#minutes {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+#calorie {
+  margin-bottom: 20px;
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+.category-container {
+  margin-bottom: 20px;
+}
+.ingredient-container {
+  margin-bottom: 20px;
+}
+.image-portion {
+  margin-bottom: 20px;
+}
+.nonveg-section {
+  margin-bottom: 10px;
+}
+#nonveg {
+  width: 20px;
+}
+#veg {
+  width: 20px;
+}
+.time-cooking {
+  margin-bottom: 10px;
+}
+.season-section {
+  margin-bottom: 10px;
+}
+#summer {
+  width: 20px;
+}
+#autumn {
+  width: 20px;
+}
+#winter {
+  width: 20px;
+}
+#spring {
+  width: 20px;
+}
+.category-part {
+  overflow-y: auto;
+  height: 350px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+#catcheck {
+  width: 100px;
+}
+#season-check {
+  width: 100px;
+}
+.season-part {
+  overflow-y: auto;
+  height: 130px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}

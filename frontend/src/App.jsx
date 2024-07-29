@@ -1,0 +1,72 @@
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+//importing pages
+import Home from "./pages/Home/Home";
+import About from "./pages/About/About";
+import Login from "./pages/Login/Login";
+import Signup from "./pages/Signup/Signup";
+import Recipe from "./pages/Recipe/Recipe";
+import SingleRecipe from "./pages/SingleRecipe/SingleRecipe";
+import Admin from "./pages/admin/Admin";
+import UserSavedRecipes from "./pages/User/UserSavedRecipes";
+import UsersList from "./pages/admin/UsersList";
+import UserAddedRecipes from "./pages/User/UserAddedRecipes";
+import UserFeedback from "./pages/User/UserFeedback";
+import UserProfile from "./pages/User/UserProfile";
+import AddNewRecipe from "./pages/User/AddNewRecipe";
+import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
+import PasswordReset from "./pages/PasswordReset/PasswordReset";
+import Otp from "./pages/Otp/Otp";
+import ReviewsList from "./pages/admin/ReviewsList";
+import RecipesList from "./pages/admin/RecipesList";
+import FeedbackList from "./pages/admin/FeedbackList";
+import ChangePassword from "./pages/changePassword/ChangePassword";
+import NewUsersList from "./pages/admin/NewUsersList";
+import NewRecipesList from "./pages/admin/NewRecipesList";
+import PersonalizedRecommendationPage from "./pages/personalizedRecommendation/PersonalizedRecommendations";
+import EditRecipePage from "./pages/User/EditRecipePage";
+function App() {
+  return (
+    <div>
+      <Router>
+        <Routes>
+          <Route index element={<Home />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/recipe" element={<Recipe />} />
+          <Route
+            path="/recommendation"
+            element={<PersonalizedRecommendationPage />}
+          />
+          <Route path="/about" element={<About />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/SingleRecipe/:RecipeId" element={<SingleRecipe />} />
+          <Route path="/dashboard" element={<Admin />} />
+          <Route path="/admin/users" element={<UsersList />} />
+          <Route path="/admin/newusers" element={<NewUsersList />} />
+          <Route path="/admin/reviews" element={<ReviewsList />} />
+          <Route path="/admin/recipes" element={<RecipesList />} />
+          <Route path="/admin/newrecipes" element={<NewRecipesList />} />
+          <Route path="/admin/feedbacks" element={<FeedbackList />} />
+          <Route path="/user/savedrecipes" element={<UserSavedRecipes />} />
+          <Route path="/user/addedrecipes" element={<UserAddedRecipes />} />
+          <Route path="/user/feedbacks" element={<UserFeedback />} />
+          <Route path="/user/profile" element={<UserProfile />} />
+          <Route path="/addnewrecipe" element={<AddNewRecipe />} />
+          <Route path="/edit-recipe/:recipeId" element={<EditRecipePage />} />
+          <Route path="/forgotpassword" element={<ForgotPassword />} />
+          <Route
+            path="/passwordreset/:userid/:token"
+            element={<PasswordReset />}
+          />
+
+          <Route path="/otp/:username" element={<Otp />} />
+          <Route path="/changepassword" element={<ChangePassword />} />
+        </Routes>
+      </Router>
+    </div>
+  );
+}
+
+export default App;
