@@ -22,6 +22,7 @@ from django.utils import timezone
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 from recipe.models import Reviews
+from recommend.models import Recommendation, RecommendedRecipes
 
 def generate_unique_userid():
     while True:
@@ -394,6 +395,22 @@ class AddFoodType(APIView):
             food_type = request.data.get('food_type')
             user.food_type = food_type
             user.save()
+
+            # Get today's date
+            today = timezone.now().date()
+
+            # Delete the user's recommendations for today
+            recommendations = Recommendation.objects.filter(userid=user.userid, date=today)
+
+            # Collect the IDs of the recommendations to delete
+            recmd_ids = recommendations.values_list('id', flat=True)
+
+            # Delete from RecommendedRecipes where recmd_id matches
+            RecommendedRecipes.objects.filter(recmd_id__in=recmd_ids).delete()
+            
+            # Delete the recommendations themselves
+            recommendations.delete()
+
             return Response({'message': 'Food Type changed successfully'}, status=status.HTTP_200_OK)
         except Exception as error:
             return Response({"error": str(error)}, status=status.HTTP_400_BAD_REQUEST)

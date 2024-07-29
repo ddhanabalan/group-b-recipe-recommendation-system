@@ -5,6 +5,7 @@ from django.db.models import Avg
 import pickle
 import os
 from recipe.models import Recipe, Category
+from authentication.models import User
 from recipe.serializers import RecipeSerializer, RecipeCategories
 from django.conf import settings
 import random
@@ -64,11 +65,21 @@ class UserPrediction(APIView):
             prediction = [rec.recipeid.recipeid for rec in recommended_recipes]  # Access recipeid as foreign key
         except Recommendation.DoesNotExist:
             # Make prediction
-            prediction = UserPrediction.model(int(data))
+            user = User.objects.get(pk = data)
+            if user.food_type.lower() == "veg":
+                preference=0
+            else:
+                preference=1
+            prediction = UserPrediction.model(int(data),preference)
+            if len(prediction)>10:
+                prediction = prediction[:10]
             if len(prediction)==0:
                 avg_review = Recipe.objects.aggregate(Avg("total_reviews"))
                 avg_total_reviews = avg_review['total_reviews__avg']
-                top_recipes = list(Recipe.objects.filter(total_reviews__gte=avg_total_reviews).values_list('recipeid', flat=True).order_by('-rating')[:50])
+                if preference==0:
+                    top_recipes = list(Recipe.objects.filter(total_reviews__gte=avg_total_reviews,veg_nonveg = "Veg").values_list('recipeid', flat=True).order_by('-rating')[:50])
+                else:
+                    top_recipes = list(Recipe.objects.filter(total_reviews__gte=avg_total_reviews).values_list('recipeid', flat=True).order_by('-rating')[:50])
                 # Randomly select 10 recipes from the top 50
                 if len(top_recipes) > 10:
                     prediction = random.sample(top_recipes, 10)

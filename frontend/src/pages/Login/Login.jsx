@@ -20,6 +20,7 @@ function Login() {
     password: "",
   });
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false); // New state for loading
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -29,8 +30,10 @@ function Login() {
       [name]: value,
     });
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); // Set loading to true when form is submitted
 
     try {
       const response = await axiosInstance.post("/authentication/login/", {
@@ -58,7 +61,6 @@ function Login() {
       );
 
       const { preference, food_type } = preferencesResponse.data;
-      // console.log("User Preferences:", { preference, food_type });
       localStorage.setItem(
         "userPreferences",
         JSON.stringify({ preference, food_type })
@@ -90,6 +92,7 @@ function Login() {
       }
     } catch (error) {
       console.error("Login error:", error);
+      setLoading(false); // Reset loading state in case of error
 
       if (error.response && error.response.status === 401) {
         setErrors({ invalidCredentials: "Invalid username or password" });
@@ -100,6 +103,7 @@ function Login() {
       }
     }
   };
+
   return (
     <div className="login-container">
       <div className="login-form-container">
@@ -153,8 +157,12 @@ function Login() {
               </p>
             </div>
 
-            <button type="submit" className="login-button">
-              Login
+            <button
+              type="submit"
+              className="login-button"
+              disabled={loading} // Disable the button when loading
+            >
+              {loading ? "Logging in..." : "Login"} {/* Show loading text */}
             </button>
           </form>
           <p className="signup-link" style={{ marginTop: "5px" }}>

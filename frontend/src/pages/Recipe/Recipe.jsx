@@ -27,7 +27,10 @@ const Recipe = () => {
       filter.maxTime === null || recipe.total_mins <= filter.maxTime;
     const maxCaloriesFilter =
       filter.maxCalories === null || recipe.calories <= filter.maxCalories;
-    const seasonFilter = !filter.season || recipe.season === filter.season;
+    const seasonFilter =
+      !filter.season ||
+      recipe.season.toLowerCase().includes(filter.season.toLowerCase());
+
     const timeOfDayFilter =
       !filter.timeOfDay ||
       recipe.daytimeofcooking
@@ -56,6 +59,32 @@ const Recipe = () => {
     indexOfFirstRecipe,
     indexOfLastRecipe
   );
+
+  // Get alternative recipes based on partial matches with other filters
+  const alternativeRecipes = allRecipes
+    .filter((recipe) => {
+      const searchQueryLowerCase = searchQuery.toLowerCase();
+      const categoryFilter =
+        filter.category.length === 0 ||
+        recipe.categories.some((cat) => filter.category.includes(cat));
+      const maxTimeFilter =
+        filter.maxTime === null || recipe.total_mins <= filter.maxTime;
+      const maxCaloriesFilter =
+        filter.maxCalories === null || recipe.calories <= filter.maxCalories;
+      const vegNonVegFilter =
+        !filter.vegNonVeg ||
+        recipe.veg_nonveg.toLowerCase() === filter.vegNonVeg.toLowerCase();
+
+      return (
+        (recipe.title.toLowerCase().includes(searchQueryLowerCase) ||
+          searchQueryLowerCase === "") &&
+        categoryFilter &&
+        maxTimeFilter &&
+        maxCaloriesFilter &&
+        vegNonVegFilter
+      );
+    })
+    .slice(0, 15);
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
@@ -158,7 +187,31 @@ const Recipe = () => {
                     />
                   ))
                 ) : (
-                  <p>No recipes found.</p>
+                  <>
+                    <div className="secondsection">
+                      <div className="filtering-msg">
+                        <h2>Sorry, we couldn't find any results</h2>
+                        <p>
+                          There are no recipes that fit your specific filters,
+                          but here are some delicious alternatives you might
+                          enjoy!
+                        </p>
+                      </div>
+                      <div className="alternative-recipes">
+                        {alternativeRecipes.map((item, i) => (
+                          <Items
+                            key={i}
+                            recipeid={item.recipeid}
+                            title={item.title}
+                            img={item.img}
+                            total_mins={item.total_mins}
+                            calories={item.calories}
+                            rating={item.rating}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </>
                 )}
               </div>
               <div className="pagination">{getPaginationItems()}</div>

@@ -16,108 +16,135 @@ import {
 import "../../styles/RecipesList.css";
 
 const RecipeModal = ({ recipe, onClose }) => {
-  const [showVideo, setShowVideo] = useState(false);
-  const [showThumbnail, setShowThumbnail] = useState(false);
+  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
 
-  const handleVideoClick = () => {
-    setShowVideo(true);
-    setShowThumbnail(false); // Ensure only one media type is displayed
+  const mediaItems = [
+    { type: "image", src: recipe.img },
+    ...(recipe.thumbnails || []).map((thumbnail) => ({
+      type: "thumbnail",
+      src: thumbnail,
+    })),
+    ...(recipe.video
+      ? [{ type: "video-thumbnail", src: recipe.thumbnail }]
+      : []),
+    ...(recipe.video ? [{ type: "video", src: recipe.video }] : []),
+  ].filter((item) => item.src);
+
+  const handlePrevious = () => {
+    setCurrentMediaIndex(
+      (currentMediaIndex - 1 + mediaItems.length) % mediaItems.length
+    );
   };
 
-  const handleThumbnailClick = () => {
-    setShowThumbnail(true);
-    setShowVideo(false); // Ensure only one media type is displayed
+  const handleNext = () => {
+    setCurrentMediaIndex((currentMediaIndex + 1) % mediaItems.length);
   };
 
   const handleCloseModal = () => {
-    setShowVideo(false); // Reset video state on modal close
-    setShowThumbnail(false);
+    setCurrentMediaIndex(0);
     onClose();
+  };
+
+  const handleThumbnailClick = (index) => {
+    setCurrentMediaIndex(index);
   };
 
   return (
     <div className="modal-overlay">
       <div className="modal">
-        <div className="modal-content">
+        <div className="modal-header">
+          <h2>{recipe.title}</h2>
           <span className="close" onClick={handleCloseModal}>
             &times;
           </span>
-          <h2 style={{ paddingBottom: "20px", textDecoration: "underline" }}>
-            {recipe.title}
-          </h2>
-          <img
-            src={recipe.img}
-            alt={recipe.title}
-            style={{ maxWidth: "30%" }}
-          />
-          <p>
-            <b>Recipe ID:</b> {recipe.recipeid}
-          </p>
-          <p>
-            <b>User ID:</b> {recipe.userid}
-          </p>
-          <p>
-            <b>Created At:</b>{" "}
-            {moment(recipe.created_at).format("MM/DD/YYYY, hh:mm:ss A")}
-          </p>
-          <p>
-            <b>Ingredients:</b> {recipe.ingredients}
-          </p>
-          <p>
-            <b>Day time of cooking:</b> {recipe.daytimeofcooking}
-          </p>
-          <p>
-            <b>Season:</b> {recipe.season}
-          </p>
-          <p>
-            <b>Total mins:</b> {recipe.total_mins}
-          </p>
-          <p>
-            <b>Calories: </b>
-            {recipe.calories}
-          </p>
-          <p>
-            <b>Veg/Nonveg:</b> {recipe.veg_nonveg}
-          </p>
-          <p>
-            <b>Categories: </b>
-            {recipe.categories}
-          </p>
-          <p>
-            <b>Total reviews:</b> {recipe.total_reviews}
-          </p>
-          <p>
-            <b>Rating:</b> {recipe.rating}
-          </p>
-          {recipe.video && (
-            <div className="media-container">
-              <div className="media-button">
-                <button onClick={handleVideoClick}>Play Video</button>
-                {showVideo && (
-                  <div className="video-wrapper">
-                    <video controls>
-                      <source src={recipe.video} type="video/mp4" />
-                      Your browser does not support the video tag.
-                    </video>
-                  </div>
-                )}
-              </div>
+        </div>
+        <div className="modal-body">
+          <div className="media-section">
+            <div className="main-media-container">
+              {mediaItems[currentMediaIndex].type === "video" ? (
+                <div className="video-wrapper">
+                  <video controls>
+                    <source
+                      src={mediaItems[currentMediaIndex].src}
+                      type="video/mp4"
+                    />
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+              ) : (
+                <img
+                  className="main-image"
+                  src={mediaItems[currentMediaIndex].src}
+                  alt={`Media ${currentMediaIndex + 1}`}
+                />
+              )}
             </div>
-          )}
-          {recipe.thumbnail && (
-            <div className="media-container">
-              <div className="media-button">
-                <button onClick={handleThumbnailClick}>View Thumbnail</button>
-                {showThumbnail && (
-                  <img
-                    src={recipe.thumbnail}
-                    alt="Recipe Thumbnail"
-                    style={{ width: "30%" }}
-                  />
-                )}
+            {recipe.video && mediaItems[currentMediaIndex].type !== "video" && (
+              <div className="video-preview-container">
+                <img
+                  className="video-thumbnail-preview"
+                  src={recipe.thumbnail}
+                  alt="Video Thumbnail Preview"
+                  onClick={() =>
+                    setCurrentMediaIndex(
+                      mediaItems.findIndex((item) => item.type === "video")
+                    )
+                  }
+                />
               </div>
+            )}
+            {mediaItems.length > 1 && (
+              <div className="gallery-navigation">
+                <button onClick={handlePrevious} className="nav-button">
+                  &lt;
+                </button>
+                <button onClick={handleNext} className="nav-button">
+                  &gt;
+                </button>
+              </div>
+            )}
+          </div>
+          <div className="content-section">
+            <div className="modal-details">
+              <p>
+                <strong>Recipe ID:</strong> {recipe.recipeid}
+              </p>
+              <p>
+                <strong>User ID:</strong> {recipe.userid || "Unknown User"}
+              </p>
+              <p>
+                <strong>Created At:</strong>{" "}
+                {moment(recipe.created_at).format("MM/DD/YYYY, hh:mm:ss A")}
+              </p>
+              <p>
+                <strong>Ingredients:</strong> {recipe.ingredients}
+              </p>
+              <p>
+                <strong>Day Time of Cooking:</strong> {recipe.daytimeofcooking}
+              </p>
+              <p>
+                <strong>Season:</strong> {recipe.season}
+              </p>
+              <p>
+                <strong>Total Mins:</strong> {recipe.total_mins}
+              </p>
+              <p>
+                <strong>Calories:</strong> {recipe.calories}
+              </p>
+              <p>
+                <strong>Veg/Nonveg:</strong> {recipe.veg_nonveg}
+              </p>
+              <p>
+                <strong>Categories:</strong> {recipe.categories.join(", ")}
+              </p>
+              <p>
+                <strong>Total Reviews:</strong> {recipe.total_reviews}
+              </p>
+              <p>
+                <strong>Rating:</strong> {recipe.rating}
+              </p>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>
